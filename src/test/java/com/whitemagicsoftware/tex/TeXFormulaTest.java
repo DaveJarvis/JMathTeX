@@ -22,19 +22,22 @@ package com.whitemagicsoftware.tex;
 import be.ugent.caagt.jmathtex.DefaultTeXFont;
 import be.ugent.caagt.jmathtex.TeXEnvironment;
 import be.ugent.caagt.jmathtex.TeXFormula;
-import be.ugent.caagt.jmathtex.TeXIcon;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.STYLE_DISPLAY;
+import static java.awt.Color.BLACK;
+import static java.awt.Color.WHITE;
 import static java.awt.RenderingHints.*;
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -82,6 +85,10 @@ public class TeXFormulaTest {
 
   @Test
   public void test_MathML_SimpleFormula_Success() throws IOException {
+    //    DefaultTeXFont.registerAlphabet(new CyrillicRegistration());
+    //    DefaultTeXFont.registerAlphabet(new GreekRegistration());
+
+
     final var size = 100f;
 
     final var formula = new TeXFormula( TEX );
@@ -93,9 +100,9 @@ public class TeXFormulaTest {
     final var image = new BufferedImage( width, height, TYPE_INT_ARGB );
     final var g = image.createGraphics();
     g.setRenderingHints( DEFAULT_HINTS );
-    g.setColor( Color.WHITE );
+    g.setColor( WHITE );
     g.fillRect( 0, 0, width, height );
-    g.setColor( Color.BLACK );
+    g.setColor( BLACK );
     g.scale( size, size );
     box.draw( g, 0, box.getHeight() );
 
@@ -106,31 +113,18 @@ public class TeXFormulaTest {
     final var ns = "http://www.w3.org/2000/svg";
     final var doc = dom.createDocument( ns, "svg", null );
     final var context = SVGGeneratorContext.createDefault( doc );
-
     final var svgg = new SVGGraphics2D( context, true );
 
-//    DefaultTeXFont.registerAlphabet(new CyrillicRegistration());
-//    DefaultTeXFont.registerAlphabet(new GreekRegistration());
+    final var dim = new Dimension( w, h );
+    svgg.setSVGCanvasSize( dim );
+    svgg.setColor( BLACK );
 
-    TeXIcon icon = formula.createTeXIcon( STYLE_DISPLAY, 20 );
-    icon.setInsets( new Insets( 5, 5, 5, 5 ) );
-    svgg.setSVGCanvasSize( new Dimension( icon.getIconWidth(),
-                                          icon.getIconHeight() ) );
-    svgg.setColor( Color.white );
-    svgg.fillRect( 0, 0, icon.getIconWidth(), icon.getIconHeight() );
+    box.draw( svgg, 0, box.getHeight() );
 
-    final var jl = new JLabel();
-    jl.setForeground( new Color( 0, 0, 0 ) );
-    icon.paintIcon( jl, svgg, 0, 0 );
-
-    boolean useCSS = true;
-    FileOutputStream svgs = new FileOutputStream( "/tmp/saved.svg" );
-    Writer out = new OutputStreamWriter( svgs, UTF_8 );
-    svgg.stream( out, useCSS );
-    svgs.flush();
-    svgs.close();
-
-    //box.draw( svgg, 0, box.getHeight() );
+    final var fos = new FileOutputStream( "/tmp/saved.svg" );
+    final var out = new OutputStreamWriter( fos, UTF_8 );
+    svgg.stream( out, false );
+    fos.close();
 
     final var png = new File( "/tmp/saved.png" );
     ImageIO.write( image, "png", png );
