@@ -23,7 +23,10 @@ import be.ugent.caagt.jmathtex.exceptions.XMLResourceParseException;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -45,6 +48,19 @@ public class ResourceReader<T> {
     } catch( final Exception e ) {
       throw new XMLResourceParseException( mPath.toString(), e );
     }
+  }
+
+  /**
+   * Returns the path to the resource.
+   *
+   * @return The path to a resource, starting at the root level of the
+   * container.
+   */
+  public String getAbsolutePath() throws URISyntaxException {
+    final var url = getClass().getClassLoader().getResource( mPath.toString() );
+    final var uri = Objects.requireNonNull( url ).toURI();
+    final var file = Paths.get( uri ).getParent().toFile();
+    return file.getAbsolutePath();
   }
 
   /**

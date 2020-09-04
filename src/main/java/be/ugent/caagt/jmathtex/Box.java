@@ -49,7 +49,7 @@ import java.util.List;
  * {@link #getLastFontId()} method (the last font
  * that will be used when this box will be painted).
  */
-abstract class Box {
+public abstract class Box {
 
    /**
     * The foreground color of the whole box. Child boxes can override this color.
@@ -71,25 +71,25 @@ abstract class Box {
     * The width of this box, i.e. the value that will be used for further 
     * calculations. 
     */
-   protected float width = 0;
+   protected float width;
 
    /**
     * The height of this box, i.e. the value that will be used for further 
     * calculations.
     */
-   protected float height = 0;
+   protected float height;
 
    /**
     * The depth of this box, i.e. the value that will be used for further 
     * calculations.
     */
-   protected float depth = 0;
+   protected float depth;
 
    /**
     * The shift amount: the meaning depends on the particular kind of box
     * (up, down, left, right)
     */
-   protected float shift = 0;
+   protected float shift;
 
    /**
     * List of child boxes
