@@ -40,7 +40,7 @@
 		<TextStyle name="mathcal"/>
 	</TextStyles>
 
-<!-- non-alphanumeric character-to-symbol-mappings -->
+	<!-- non-alphanumeric character-to-symbol-mappings -->
 
 	<CharacterToSymbolMappings>
 		<Map char="+" symbol="plus"/>

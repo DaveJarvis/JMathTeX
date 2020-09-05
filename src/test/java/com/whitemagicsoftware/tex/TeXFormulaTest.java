@@ -22,17 +22,19 @@ package com.whitemagicsoftware.tex;
 import be.ugent.caagt.jmathtex.DefaultTeXFont;
 import be.ugent.caagt.jmathtex.TeXEnvironment;
 import be.ugent.caagt.jmathtex.TeXFormula;
+import be.ugent.caagt.jmathtex.TeXIcon;
+import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.junit.Test;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.Map;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.STYLE_DISPLAY;
@@ -88,7 +90,6 @@ public class TeXFormulaTest {
     //    DefaultTeXFont.registerAlphabet(new CyrillicRegistration());
     //    DefaultTeXFont.registerAlphabet(new GreekRegistration());
 
-
     final var size = 100f;
 
     final var formula = new TeXFormula( TEX );
@@ -128,5 +129,33 @@ public class TeXFormulaTest {
 
     final var png = new File( "/tmp/saved.png" );
     ImageIO.write( image, "png", png );
+  }
+
+  @Test
+  public void test2() throws IOException {
+    final String file = "/tmp/latex.svg";
+    final boolean fontAsShapes = true;
+    DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+    String ns = "http://www.w3.org/2000/svg";
+    Document document = domImpl.createDocument( ns, "svg", null );
+    SVGGeneratorContext ctx = SVGGeneratorContext.createDefault( document );
+
+    SVGGraphics2D g2 = new SVGGraphics2D( ctx, fontAsShapes );
+    TeXFormula formula = new TeXFormula( TEX );
+    TeXIcon icon = formula.createTeXIcon( STYLE_DISPLAY, 20 );
+    icon.setInsets( new Insets( 5, 5, 5, 5 ) );
+    g2.setSVGCanvasSize( new Dimension( icon.getIconWidth(),
+                                        icon.getIconHeight() ) );
+    g2.setColor( WHITE );
+    g2.fillRect( 0, 0, icon.getIconWidth(), icon.getIconHeight() );
+
+    final JLabel jl = new JLabel();
+    jl.setForeground( BLACK );
+    icon.paintIcon( jl, g2, 0, 0 );
+
+    try( final FileOutputStream svgs = new FileOutputStream( file );
+         final Writer out = new OutputStreamWriter( svgs, UTF_8 ) ) {
+      g2.stream( out, true );
+    }
   }
 }

@@ -123,7 +123,7 @@ public class AccentedAtom extends Atom {
         
         // calculate delta
         float delta = Math.min(b.getHeight(), tf.getXHeight(style, ch
-                .getFontCode()));
+                .getFontId()));
         
         // create vertical box
         VerticalBox vBox = new VerticalBox();

@@ -41,17 +41,17 @@ public class Char {
 
    private final Metrics m;
 
-   private final int fontCode;
+   private final int fontId;
 
-   public Char(char c, Font f, int fc, Metrics m) {
+   public Char(char c, Font f, int fontId, Metrics m) {
       font = f;
-      fontCode = fc;
+      this.fontId = fontId;
       this.c = c;
       this.m = m;
    }
 
    public CharFont getCharFont() {
-      return new CharFont(c, fontCode);
+      return new CharFont( c, fontId );
    }
 
    public char getChar() {
@@ -62,8 +62,8 @@ public class Char {
       return font;
    }
 
-   public int getFontCode() {
-      return fontCode;
+   public int getFontId() {
+      return fontId;
    }
 
    public float getWidth() {

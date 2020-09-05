@@ -29,7 +29,6 @@
 package be.ugent.caagt.jmathtex.parsers;
 
 import be.ugent.caagt.jmathtex.CharFont;
-import be.ugent.caagt.jmathtex.DefaultTeXFont;
 import be.ugent.caagt.jmathtex.FontInfo;
 import be.ugent.caagt.jmathtex.exceptions.ResourceParseException;
 import be.ugent.caagt.jmathtex.exceptions.XMLResourceParseException;
@@ -43,113 +42,123 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static be.ugent.caagt.jmathtex.DefaultTeXFont.*;
+import static java.lang.String.format;
+
 /**
  * Parses the font information from an XML-file.
  */
 public class DefaultTeXFontParser {
-    
-    /**
-     * Number of font ids in a single font description file.
-     */
-    private static final int NUMBER_OF_FONT_IDS = 4;
-    
+
     private static interface CharChildParser { // NOPMD
         public void parse(Element el, char ch, FontInfo info) throws
             XMLResourceParseException;
     }
-    
+
     private static class ExtensionParser implements CharChildParser {
-        
-        
         ExtensionParser() {
             // avoid generation of access class
         }
-        
+
         public void parse(Element el, char ch, FontInfo info)
         throws ResourceParseException {
             int[] extensionChars = new int[4];
-            // get required integer attributes
-            extensionChars[ DefaultTeXFont.REP] = DefaultTeXFontParser
-                    .getIntAndCheck("rep", el);
-            // get optional integer attributes
-            extensionChars[DefaultTeXFont.TOP] = DefaultTeXFontParser
-                    .getOptionalInt("top", el, DefaultTeXFont.NONE);
-            extensionChars[DefaultTeXFont.MID] = DefaultTeXFontParser
-                    .getOptionalInt("mid", el, DefaultTeXFont.NONE);
-            extensionChars[DefaultTeXFont.BOT] = DefaultTeXFontParser
-                    .getOptionalInt("bot", el, DefaultTeXFont.NONE);
-            
+            extensionChars[ REP] = parseIntElement( "rep", el);
+            extensionChars[ TOP] = parseOptionalInt( "top", el, NONE);
+            extensionChars[ MID] = parseOptionalInt( "mid", el, NONE);
+            extensionChars[ BOT] = parseOptionalInt( "bot", el, NONE);
+
             // parsing OK, add extension info
             info.setExtension(ch, extensionChars);
         }
     }
-    
+
     private static class KernParser implements CharChildParser {
-        
+
         KernParser() {
             // avoid generation of access class
         }
-        
+
         public void parse(Element el, char ch, FontInfo info)
         throws ResourceParseException {
-            // get required integer attribute
-            int code = DefaultTeXFontParser.getIntAndCheck("code", el);
-            // get required float attribute
-            float kernAmount = DefaultTeXFontParser.getFloatAndCheck("val", el);
-            
+            int code = parseIntElement( "code", el);
+            float kernAmount = parseFloatElement( "val", el);
+
             // parsing OK, add kern info
             info.addKern(ch, (char) code, kernAmount);
         }
     }
-    
+
     private static class LigParser implements CharChildParser {
-        
+
         LigParser() {
             // avoid generation of access class
         }
-        
+
         public void parse(Element el, char ch, FontInfo info)
         throws ResourceParseException {
-            // get required integer attributes
-            int code = DefaultTeXFontParser.getIntAndCheck("code", el);
-            int ligCode = DefaultTeXFontParser.getIntAndCheck("ligCode", el);
-            
+            int code = parseIntElement( "code", el);
+            int ligCode = parseIntElement( "ligCode", el);
+
             // parsing OK, add ligature info
             info.addLigature(ch, (char) code, (char) ligCode);
         }
     }
-    
+
     private static class NextLargerParser implements CharChildParser {
-        
+
         NextLargerParser() {
             // avoid generation of access class
         }
-        
+
         public void parse(Element el, char ch, FontInfo info)
         throws ResourceParseException {
-            // get required integer attributes
-            int fontId = DefaultTeXFontParser.getIntAndCheck("fontId", el);
-            int code = DefaultTeXFontParser.getIntAndCheck("code", el);
-            
+            int fontId = parseFontIdElement( el );
+            int code = parseIntElement( "code", el);
+
             // parsing OK, add "next larger" info
             info.setNextLarger(ch, (char) code, fontId);
         }
     }
 
+    private static int parseFontIdElement( final Element element ) {
+        return parseFontIdElement( "fontId", element );
+    }
+
+    private static int resolveFontId( final String fontId ) {
+        return mResolvedFontInfo.addIndex( fontId );
+    }
+
+    /**
+     *
+     * @param attribute Name of the font ID attribute (usually "fontId").
+     * @param element Element containing the font ID attribute to parse.
+     * @return
+     */
+    private static int parseFontIdElement(
+        final String attribute, final Element element ) {
+        final String fontId = parseStringElement( attribute, element );
+        return resolveFontId( fontId );
+    }
+
     public static final String RESOURCE_NAME = "DefaultTeXFont.xml";
-    
+
     public static final String STYLE_MAPPING_EL = "TextStyleMapping";
     public static final String SYMBOL_MAPPING_EL = "SymbolMapping";
     public static final String GEN_SET_EL = "GeneralSettings";
     public static final String MUFONTID_ATTR = "mufontid";
     public static final String SPACEFONTID_ATTR = "spacefontid";
 
+    private static final IndexedLinkedHashSet<String> mResolvedFontInfo =
+        new IndexedLinkedHashSet<>();
+
     // string-to-constant mappings
     private static Map<String,Integer> rangeTypeMappings = new HashMap<>();
     static {
-        rangeTypeMappings.put("numbers", DefaultTeXFont.NUMBERS);
-        rangeTypeMappings.put("capitals", DefaultTeXFont.CAPITALS);
-        rangeTypeMappings.put("small", DefaultTeXFont.SMALL);
+        rangeTypeMappings.put("numbers", NUMBERS);
+        rangeTypeMappings.put("capitals", CAPITALS);
+        rangeTypeMappings.put("small", SMALL);
+        rangeTypeMappings.put("unicode", UNICODE);
     }
 
     // parsers for the child elements of a "Char"-element
@@ -163,251 +172,234 @@ public class DefaultTeXFontParser {
     }
 
     private Map<String, CharFont[]> parsedTextStyles;
-    
+
     private Element root;
-    
+
     public DefaultTeXFontParser() throws ResourceParseException {
         root = new XMLResourceReader( RESOURCE_NAME ).read();
         // parse textstyles ahead of the rest, because it's used while
         // parsing the default text style
         parsedTextStyles = parseStyleMappings();
     }
-    
-    public FontInfo[] parseFontDescriptions() throws ResourceParseException {
-        FontInfo[] res = new FontInfo[NUMBER_OF_FONT_IDS];
-        Element fontDescriptions = root.getChild("FontDescriptions");
-        if (fontDescriptions != null) { // element present
-            // iterate all "Font"-elements
-            for (Object obj : fontDescriptions.getChildren("Font")) {
-                Element font = (Element) obj;
-                // get required string attribute
-                String fontName = getAttrValueAndCheckIfNotNull("name", font);
-                // get required integer attribute
-                int fontId = getIntAndCheck("id", font);
-                if (fontId < 0) // id must be greater than 0!!
-                    throw new XMLResourceParseException(RESOURCE_NAME, "Font", "id",
-                            "must have a positive integer value!");
-                // get required real attributes
-                float space = getFloatAndCheck("space", font);
-                float xHeight = getFloatAndCheck("xHeight", font);
-                float quad = getFloatAndCheck("quad", font);
-                
-                // get optional integer attribute
-                int skewChar = getOptionalInt("skewChar", font, -1);
-                
-                // try reading the font
-                Font f = new FontResourceReader(fontName).read();
-                
-                // create FontInfo-object
-                FontInfo info = new FontInfo(fontId, f, xHeight, space, quad);
-                if (skewChar != -1) // attribute set
-                    info.setSkewChar((char) skewChar);
-                
-                // process all "Char"-elements
-                for (Object object : font.getChildren("Char"))
-                    processCharElement((Element) object, info);
-                
+
+    public Map<Integer, FontInfo> parseFontDescriptions()
+        throws ResourceParseException {
+        final Map<Integer, FontInfo> res = new HashMap<>();
+        final Element fontDescriptions = root.getChild( "FontDescriptions" );
+
+        if (fontDescriptions != null) {
+            for( final var font : fontDescriptions.getChildren( "Font" ) ) {
+                final String name = parseStringElement( "name", font);
+                final int id = parseFontIdElement( "id", font);
+                float space = parseFloatElement( "space", font);
+                float xHeight = parseFloatElement( "xHeight", font);
+                float quad = parseFloatElement( "quad", font);
+
+                int skewChar = parseOptionalInt( "skewChar", font, -1);
+
+                final Font f = new FontResourceReader( name ).read();
+                final FontInfo info = new FontInfo(id, f, xHeight, space, quad);
+
+                if( skewChar != -1 ) {
+                    info.setSkewChar( (char) skewChar );
+                }
+
+                // jlm_cmmi10; fontId == 4
+                // jlm_cmmr; fontId == 0
+                // jlm_cmsy10; fontId == 2
+
+                for( final var element : font.getChildren( "Char" ) ) {
+                    processCharElement( element, info );
+                }
+
                 // parsing OK, add to table
-                if (res[fontId] == null)
-                    res[fontId] = info;
-                else
-                    throw new XMLResourceParseException(RESOURCE_NAME, "Font", "id",
-                            "occurs more than once");
+                res.put(id, info);
             }
         }
+
         return res;
     }
-    
+
     private static void processCharElement(Element charElement, FontInfo info)
     throws ResourceParseException {
         // retrieve required integer attribute
-        char ch = (char) getIntAndCheck("code", charElement);
+        char ch = (char) parseIntElement( "code", charElement);
         // retrieve optional float attributes
         float[] metrics = new float[4];
-        metrics[DefaultTeXFont.WIDTH] = getOptionalFloat("width", charElement, 0);
-        metrics[DefaultTeXFont.HEIGHT] = getOptionalFloat("height", charElement,
-                0);
-        metrics[DefaultTeXFont.DEPTH] = getOptionalFloat("depth", charElement, 0);
-        metrics[DefaultTeXFont.IT] = getOptionalFloat("italic", charElement, 0);
+        metrics[ WIDTH ] = parseOptionalFloat( "width", charElement, 0 );
+        metrics[ HEIGHT ] = parseOptionalFloat( "height", charElement, 0 );
+        metrics[ DEPTH ] = parseOptionalFloat( "depth", charElement, 0 );
+        metrics[ ITALIC ] = parseOptionalFloat( "italic", charElement, 0 );
         // set metrics
         info.setMetrics(ch, metrics);
-        
+
         // process children
-        for (Object obj : charElement.getChildren()) {
-            Element el = (Element)obj;
-            Object parser = charChildParsers.get(el.getName());
-            if (parser == null) // unknown element
-                throw new XMLResourceParseException(RESOURCE_NAME
-                        + ": a <Char>-element has an unknown childelement '"
-                        + el.getName() + "'!");
-            else
-                // process the child element
-                ((CharChildParser) parser).parse(el, ch, info);
+        for( final var el : charElement.getChildren() ) {
+            final var elName = el.getName();
+            final var parser = charChildParsers.get( elName );
+            if( parser == null ) {
+                final String msg = format(
+                    "%s: a <Char>-element has unknown child element '%s'",
+                    RESOURCE_NAME, elName );
+                throw new XMLResourceParseException( msg );
+            }
+
+            // process the child element
+            parser.parse( el, ch, info );
         }
     }
 
     public Map<String,CharFont> parseSymbolMappings() throws ResourceParseException {
-        Map<String,CharFont> res = new HashMap<String,CharFont>();
-        Element symbolMappings = root.getChild("SymbolMappings");
-        if (symbolMappings == null)
-            // "SymbolMappings" is required!
-            throw new XMLResourceParseException(RESOURCE_NAME, "SymbolMappings");
-        else { // element present
-            // iterate all mappings
-            for (Object obj : symbolMappings.getChildren(SYMBOL_MAPPING_EL)) {
-                Element mapping = (Element) obj;
-                // get string attribute
-                String symbolName = getAttrValueAndCheckIfNotNull("name", mapping);
-                // get integer attributes
-                int ch = getIntAndCheck("ch", mapping), fontId = getIntAndCheck(
-                        "fontId", mapping);
-                // put mapping in table
-                res.put(symbolName, new CharFont((char) ch, fontId));
-            }
+        final Element symbolMappings = root.getChild("SymbolMappings");
+        if (symbolMappings == null) {
+            throw new XMLResourceParseException( RESOURCE_NAME,"SymbolMappings" );
         }
-        
+
+        final Map<String,CharFont> res = new HashMap<>();
+
+        // iterate all mappings
+        for (Element mapping : symbolMappings.getChildren(SYMBOL_MAPPING_EL)) {
+            String symbolName = parseStringElement( "name", mapping);
+            int ch = parseIntElement( "ch", mapping);
+            int fontId = parseFontIdElement( mapping );
+            res.put(symbolName, new CharFont((char) ch, fontId));
+        }
+
         // "sqrt" must allways be present (used internally only!)
         if (res.get("sqrt") == null)
             throw new XMLResourceParseException(
                     RESOURCE_NAME
                     + ": the required mapping <SymbolMap name=\"sqrt\" ... /> is not found!");
-        else
-            // parsing OK
-            return res;
+        // parsing OK
+        return res;
     }
-    
+
     public String[] parseDefaultTextStyleMappings()
     throws ResourceParseException {
+        Element defaultTextStyleMappings = root.getChild("DefaultTextStyleMapping");
+        if (defaultTextStyleMappings == null) {
+            throw new XMLResourceParseException( RESOURCE_NAME,
+                                                 "DefaultTextStyleMapping" );
+        }
         String[] res = new String[3];
-        Element defaultTextStyleMappings = root
-                .getChild("DefaultTextStyleMapping");
-        if (defaultTextStyleMappings == null)
-            // "DefaultTextStyleMappings" is required!
-            throw new XMLResourceParseException(RESOURCE_NAME,
-                    "DefaultTextStyleMapping");
-        else { // element present
-            // iterate all mappings
-            for (Object obj : defaultTextStyleMappings.getChildren("MapStyle")) {
-                Element mapping = (Element) obj;
-                // get range name and check if it's valid
-                String code = getAttrValueAndCheckIfNotNull("code", mapping);
-                Object codeMapping = rangeTypeMappings.get(code);
-                if (codeMapping == null) // unknown range name
-                    throw new XMLResourceParseException(RESOURCE_NAME, "MapStyle",
-                            "code", "contains an unknown \"range name\" '" + code
-                            + "'!");
-                // get mapped style and check if it exists
-                String textStyleName = getAttrValueAndCheckIfNotNull("textStyle",
-                        mapping);
-                Object styleMapping = parsedTextStyles.get(textStyleName);
-                if (styleMapping == null) // unknown text style
-                    throw new XMLResourceParseException(RESOURCE_NAME, "MapStyle",
-                            "textStyle", "contains an unknown text style '"
-                            + textStyleName + "'!");
-                // now check if the range is defined within the mapped text style
-                CharFont[] charFonts = (CharFont[]) parsedTextStyles
-                        .get(textStyleName);
-                int index = ((Integer) codeMapping).intValue();
-                if (charFonts[index] == null) // range not defined
-                    throw new XMLResourceParseException(RESOURCE_NAME
-                            + ": the default text style mapping '" + textStyleName
-                            + "' for the range '" + code
-                            + "' contains no mapping for that range!");
-                else
-                    // everything OK, put mapping in table
-                    res[index] = textStyleName;
-            }
+        for (final var mapping : defaultTextStyleMappings.getChildren("MapStyle")) {
+            // get range name and check if it's valid
+            String code = parseStringElement( "code", mapping);
+            Integer codeMapping = rangeTypeMappings.get(code);
+            if (codeMapping == null) // unknown range name
+                throw new XMLResourceParseException(RESOURCE_NAME, "MapStyle",
+                        "code", "contains an unknown \"range name\" '" + code
+                        + "'!");
+            // get mapped style and check if it exists
+            String textStyleName = parseStringElement( "textStyle",
+                                                       mapping);
+            CharFont[] styleMapping = parsedTextStyles.get(textStyleName);
+            if (styleMapping == null) // unknown text style
+                throw new XMLResourceParseException(RESOURCE_NAME, "MapStyle",
+                        "textStyle", "contains an unknown text style '"
+                        + textStyleName + "'!");
+            // now check if the range is defined within the mapped text style
+            CharFont[] charFonts = parsedTextStyles.get(textStyleName);
+
+            if (charFonts[codeMapping] == null) // range not defined
+                throw new XMLResourceParseException(RESOURCE_NAME
+                        + ": the default text style mapping '" + textStyleName
+                        + "' for the range '" + code
+                        + "' contains no mapping for that range!");
+
+            // everything OK, put mapping in table
+            res[codeMapping] = textStyleName;
         }
         return res;
     }
-    
+
     public Map<String,Float> parseParameters() throws ResourceParseException {
-        Map<String,Float> res = new HashMap<String,Float>();
-        Element parameters = root.getChild("Parameters");
-        if (parameters == null)
-            // "Parameters" is required!
-            throw new XMLResourceParseException(RESOURCE_NAME, "Parameters");
-        else { // element present
-            // iterate all attributes
-            for (Object obj : parameters.getAttributes()) {
-                String name = ((Attribute) obj).getName();
-                // set float value (if valid)
-                res.put(name, new Float(getFloatAndCheck(name, parameters)));
-            }
-            return res;
+        final Element parameters = root.getChild( "Parameters" );
+        if( parameters == null ) {
+            throw new XMLResourceParseException( RESOURCE_NAME, "Parameters" );
         }
-    }
-    
-    public Map<String,Number> parseGeneralSettings() throws ResourceParseException {
-        Map <String,Number>res = new HashMap<String,Number>();
-        // TODO: must this be 'Number' ?
-        Element generalSettings = root.getChild("GeneralSettings");
-        if (generalSettings == null)
-            // "GeneralSettings" is required!
-            throw new XMLResourceParseException(RESOURCE_NAME, "GeneralSettings");
-        else { // element present
-            // set required int values (if valid)
-            res.put(MUFONTID_ATTR, getIntAndCheck(MUFONTID_ATTR,
-                    generalSettings)); // autoboxing
-            res.put(SPACEFONTID_ATTR, getIntAndCheck(SPACEFONTID_ATTR,
-                    generalSettings)); // autoboxing
-            // set required float values (if valid)
-            res.put("scriptfactor", getFloatAndCheck("scriptfactor",
-                    generalSettings)); // autoboxing
-            res.put("scriptscriptfactor", getFloatAndCheck(
-                    "scriptscriptfactor", generalSettings)); // autoboxing
-            
+        final Map<String, Float> res = new HashMap<>();
+        for( Attribute attr : parameters.getAttributes() ) {
+            String name = attr.getName();
+            res.put( name, parseFloatElement( name, parameters ) );
         }
         return res;
+
     }
-    
+
+    public Map<String, Number> parseGeneralSettings()
+        throws ResourceParseException {
+
+        // TODO: must this be 'Number' ?
+        Element generalSettings = root.getChild( "GeneralSettings" );
+
+        if( generalSettings == null ) {
+            throw new XMLResourceParseException(
+                RESOURCE_NAME, "GeneralSettings" );
+        }
+
+        final Map<String, Number> result = new HashMap<>();
+        // set required int values (if valid)
+        result.put( MUFONTID_ATTR, parseFontIdElement(
+            MUFONTID_ATTR, generalSettings ) );
+        result.put( SPACEFONTID_ATTR, parseFontIdElement(
+            SPACEFONTID_ATTR, generalSettings ) );
+
+        // set required float values (if valid)
+        result.put( "scriptfactor", parseFloatElement(
+            "scriptfactor", generalSettings ) );
+        result.put( "scriptscriptfactor", parseFloatElement(
+            "scriptscriptfactor", generalSettings ) );
+
+        return result;
+    }
+
     public Map<String,CharFont[]> parseTextStyleMappings() {
         return parsedTextStyles;
     }
-    
+
     private Map<String,CharFont[]> parseStyleMappings() throws ResourceParseException {
-        Map<String,CharFont[]> res = new HashMap<>();
-        Element textStyleMappings = root.getChild("TextStyleMappings");
-        if (textStyleMappings == null)
-            // "TextStyleMappings" is required!
-            throw new XMLResourceParseException(RESOURCE_NAME, "TextStyleMappings");
-        else { // element present
-            // iterate all mappings
-            for (Object obj : textStyleMappings.getChildren(STYLE_MAPPING_EL)) {
-                Element mapping = (Element) obj;
-                // get required string attribute
-                String textStyleName = getAttrValueAndCheckIfNotNull("name",
-                        mapping);
-                List<Element> mapRangeList = mapping.getChildren("MapRange");
-                // iterate all mapping ranges
-                CharFont[] charFonts = new CharFont[3];
-                for (Object object : mapRangeList) {
-                    Element mapRange = (Element) object;
-                    // get required integer attributes
-                    int fontId = getIntAndCheck("fontId", mapRange);
-                    int ch = getIntAndCheck("start", mapRange);
-                    // get required string attribute and check if it's a known range
-                    String code = getAttrValueAndCheckIfNotNull("code", mapRange);
-                    Object codeMapping = rangeTypeMappings.get(code);
-                    if (codeMapping == null)
-                        throw new XMLResourceParseException(RESOURCE_NAME,
-                                "MapRange", "code",
-                                "contains an unknown \"range name\" '" + code + "'!");
-                    else
-                        charFonts[((Integer) codeMapping).intValue()] = new CharFont(
-                                (char) ch, fontId);
+        final Element textStyleMappings = root.getChild("TextStyleMappings");
+
+        if( textStyleMappings == null ) {
+            throw new XMLResourceParseException(
+                RESOURCE_NAME, "TextStyleMappings" );
+        }
+
+        final Map<String,CharFont[]> res = new HashMap<>();
+
+        for (final var mapping : textStyleMappings.getChildren(STYLE_MAPPING_EL)) {
+            // get required string attribute
+            String textStyleName = parseStringElement( "name",mapping);
+            List<Element> mapRangeList = mapping.getChildren("MapRange");
+            CharFont[] charFonts = new CharFont[3];
+
+            for (final var mapRange : mapRangeList) {
+                int fontId = parseFontIdElement( mapRange );
+                int ch = parseIntElement( "start", mapRange);
+                String code = parseStringElement( "code", mapRange);
+                Integer codeMapping = rangeTypeMappings.get(code);
+
+                if (codeMapping == null) {
+                    throw new XMLResourceParseException(
+                        RESOURCE_NAME,
+                        "MapRange",
+                        "code",
+                        "contains an unknown \"range name\" '" + code + "'!" );
                 }
-                res.put(textStyleName, charFonts);
+
+                charFonts[ codeMapping ] = new CharFont( (char) ch, fontId );
             }
+            res.put(textStyleName, charFonts);
         }
         return res;
     }
-    
 
-    public static float getFloatAndCheck(String attrName, Element element)
-    throws ResourceParseException {
-        String attrValue = getAttrValueAndCheckIfNotNull(attrName, element);
-        
+
+    public static float parseFloatElement( String attrName, Element element )
+        throws ResourceParseException {
+        String attrValue = parseStringElement( attrName, element);
+
         // try parsing string to float value
         float res = 0;
         try {
@@ -419,25 +411,26 @@ public class DefaultTeXFontParser {
         // parsing OK
         return res;
     }
-    
-    public static int getIntAndCheck(String attrName, Element element)
-    throws ResourceParseException {
-        String attrValue = getAttrValueAndCheckIfNotNull(attrName, element);
-        
+
+    public static int parseIntElement( String attrName, Element element )
+        throws ResourceParseException {
+        String attrValue = parseStringElement( attrName, element );
+
         // try parsing string to integer value
         int res = 0;
         try {
             res = Integer.parseInt(attrValue);
         } catch (NumberFormatException e) {
             throw new XMLResourceParseException(RESOURCE_NAME, element.getName(),
-                    attrName, "has an invalid integer value!");
+                    attrName, "must be an integer value, not: '" + attrValue + "'");
         }
         // parsing OK
         return res;
     }
-    
-    public static int getOptionalInt(String attrName, Element element,
-            int defaultValue) throws ResourceParseException {
+
+    public static int parseOptionalInt(
+        String attrName, Element element, int defaultValue )
+        throws ResourceParseException {
         String attrValue = element.getAttributeValue(attrName);
         if (attrValue == null) // attribute not present
             return defaultValue;
@@ -454,9 +447,10 @@ public class DefaultTeXFontParser {
             return res;
         }
     }
-    
-    public static float getOptionalFloat(String attrName, Element element,
-            float defaultValue) throws ResourceParseException {
+
+    public static float parseOptionalFloat(
+        String attrName, Element element, float defaultValue )
+        throws ResourceParseException {
         String attrValue = element.getAttributeValue(attrName);
         if (attrValue == null) // attribute not present
             return defaultValue;
@@ -474,8 +468,8 @@ public class DefaultTeXFontParser {
         }
     }
 
-    private static String getAttrValueAndCheckIfNotNull(
-        String attrName, Element element ) throws ResourceParseException {
+    private static String parseStringElement( String attrName, Element element )
+        throws ResourceParseException {
         String attrValue = element.getAttributeValue( attrName );
         if( attrValue == null ) {
             throw new XMLResourceParseException(

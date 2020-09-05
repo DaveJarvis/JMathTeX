@@ -28,7 +28,7 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.Font;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,20 +42,22 @@ public class FontInfo {
      */
     public static final int NUMBER_OF_CHAR_CODES = 256;
     
-    private static class CharCouple {
-        
+    private static class CharTuple {
         private final char left, right;
         
-        CharCouple(char l, char r) {
+        CharTuple( char l, char r) {
             left = l;
             right = r;
         }
-        
-        public boolean equals(Object o) {
-            CharCouple lig = (CharCouple) o;
+
+        public boolean equals( final Object o ) {
+            if( !(o instanceof CharTuple) ) {
+                return false;
+            }
+            final CharTuple lig = (CharTuple) o;
             return left == lig.left && right == lig.right;
         }
-        
+
         public int hashCode() {
             return (left + right) % 128;
         }
@@ -68,8 +70,8 @@ public class FontInfo {
     private final Font font;
     
     private final float[][] metrics = new float[NUMBER_OF_CHAR_CODES][];
-    private final Map<CharCouple,Character> lig = new HashMap<>();
-    private final Map<CharCouple,Float> kern = new HashMap<>();
+    private final Map<CharTuple, Character> lig = new HashMap<>();
+    private final Map<CharTuple, Float> kern = new HashMap<>();
     private final CharFont[] nextLarger = new CharFont[NUMBER_OF_CHAR_CODES];
     private final int[][] extensions = new int[NUMBER_OF_CHAR_CODES][];
     
@@ -88,30 +90,23 @@ public class FontInfo {
         this.space = space;
         this.quad = quad;
     }
-    
+
     /**
-     *
-     * @param left
-     *           left character
-     * @param right
-     *           right character
-     * @param k
-     *           kern value
+     * @param left  left character
+     * @param right right character
+     * @param k     kern value
      */
     public void addKern(char left, char right, float k) {
-        kern.put( new CharCouple( left, right ), k );
+        kern.put( new CharTuple( left, right ), k );
     }
-    
+
     /**
-     * @param left
-     *           left character
-     * @param right
-     *           right character
-     * @param ligChar
-     *           ligature to replace left and right character
+     * @param left    left character
+     * @param right   right character
+     * @param ligChar ligature to replace left and right character
      */
     public void addLigature(char left, char right, char ligChar) {
-        lig.put( new CharCouple( left, right ), ligChar );
+        lig.put( new CharTuple( left, right ), ligChar );
     }
     
     public int[] getExtension(char ch) {
@@ -119,7 +114,7 @@ public class FontInfo {
     }
     
     public float getKern(char left, char right, float factor) {
-        Float obj = kern.get( new CharCouple( left, right ) );
+        Float obj = kern.get( new CharTuple( left, right ) );
         if (obj == null)
             return 0;
 
@@ -127,7 +122,7 @@ public class FontInfo {
     }
     
     public CharFont getLigature(char left, char right) {
-        Character obj = lig.get( new CharCouple( left, right ) );
+        Character obj = lig.get( new CharTuple( left, right ) );
         if (obj == null)
             return null;
 
@@ -174,19 +169,29 @@ public class FontInfo {
         metrics[c] = arr;
     }
     
-    public void setNextLarger(char ch, char larger, int fontLarger) {
-        nextLarger[ch] = new CharFont(larger, fontLarger);
+    public void setNextLarger(char ch, char larger, int fontId) {
+        nextLarger[ch] = new CharFont(larger, fontId);
     }
     
     public void setSkewChar(char c) {
         skewChar = c;
     }
     
-    public int getId() {
-        return fontId;
-    }
-    
     public Font getFont() {
         return font;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "fontId=" + fontId +
+            ", font=" + font +
+            ", lig=" + lig +
+            ", kern=" + kern +
+            ", skewChar=" + skewChar +
+            ", xHeight=" + xHeight +
+            ", space=" + space +
+            ", quad=" + quad +
+            '}';
     }
 }

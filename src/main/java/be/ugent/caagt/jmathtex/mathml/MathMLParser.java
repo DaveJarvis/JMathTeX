@@ -38,7 +38,10 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
@@ -225,11 +228,11 @@ public class MathMLParser {
                 String value;
 
                 // check for predefined math space
-                Object preDefined = mathSpaces.get(attr[i]);
+                String preDefined = mathSpaces.get( attr[i]);
                 if (preDefined == null)
                     value = attr[i];
                 else // predefined math space found
-                    value = (String) preDefined;
+                    value = preDefined;
 
                 // parse attribute
                 NumberUnit nu = new NumberUnit(value, true);
@@ -254,9 +257,9 @@ public class MathMLParser {
             return null; // null = transparent
         else {
             // check if html-color
-            Object color = htmlColors.get(str.toLowerCase());
+            String color = htmlColors.get( str.toLowerCase());
             if (color != null) // color found, set str to hexadecimal value
-                str = (String) color;
+                str = color;
         }
 
         try {
@@ -299,12 +302,13 @@ public class MathMLParser {
     * Creates and returns a list of Formula objects from the given
     * list of MathML elements.
     */
-    protected static List<TeXFormula> getFormulaList(List l, Environment env)
+    protected static List<TeXFormula> getFormulaList(List<Element> l, Environment env)
     throws MathMLException {
-        List<TeXFormula> formulas = new LinkedList<>();
-        for (Object obj : l)
-            formulas.add(buildFormula((Element) obj, env));
-        return formulas;
+      final List<TeXFormula> formulas = new LinkedList<>();
+      for( final Element element : l ) {
+        formulas.add( buildFormula( element, env ) );
+      }
+      return formulas;
     }
 
    /*

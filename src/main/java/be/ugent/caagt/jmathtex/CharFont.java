@@ -36,8 +36,8 @@ public class CharFont {
 
    public int fontId;
 
-   public CharFont(char ch, int f) {
-      c = ch;
-      fontId = f;
+   public CharFont(char ch, int fontId) {
+      this.c = ch;
+      this.fontId = fontId;
    }
 }
