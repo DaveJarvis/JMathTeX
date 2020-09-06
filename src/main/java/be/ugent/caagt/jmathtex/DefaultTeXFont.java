@@ -280,8 +280,10 @@ public class DefaultTeXFont implements TeXFont {
         final float[] m = info.getMetrics(cf.c);
 
         return new Metrics(
-            m[WIDTH], m[HEIGHT], m[DEPTH], m[ ITALIC ], size
-                * PIXELS_PER_POINT);
+            m[WIDTH],
+            m[HEIGHT],
+            m[DEPTH],
+            m[ ITALIC ], size, size * PIXELS_PER_POINT);
     }
     
     public int getMuFontId() {

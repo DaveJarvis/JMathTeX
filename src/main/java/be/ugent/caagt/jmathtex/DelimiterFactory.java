@@ -35,7 +35,6 @@ package be.ugent.caagt.jmathtex; // NOPMD
 public class DelimiterFactory {
     
     /**
-     *
      * @param symbol the name of the delimiter symbol
      * @param env the TeXEnvironment in which to create the delimiter box
      * @param minHeight the minimum required total height of the box (height + depth).
@@ -96,8 +95,9 @@ public class DelimiterFactory {
             } while (vBox.getHeight() + vBox.getDepth() < minHeight);
             
             return vBox;
-        } else
-            // no extensions, so return tallest possible character
-            return new CharBox(c);
+        }
+
+        // no extensions, so return tallest possible character
+        return new CharBox(c);
     }
 }

@@ -82,6 +82,8 @@ public class Char {
       return m.getDepth();
    }
 
+   public float getSize() { return m.getSize(); }
+
    public Metrics getMetrics() {
       return m;
    }

@@ -40,14 +40,10 @@ import static be.ugent.caagt.jmathtex.TeXFormula.PREC;
 public class CharBox extends Box {
 
   /**
-   * The font use when drawing the character.
+   * The font to use when drawing the character, the character to draw,
+   * and the size to draw it in.
    */
-  private final int fontId;
-
-  /**
-   * The character to draw.
-   */
-  private final char textChar;
+  private final Char c;
 
   /**
    * Create a new {@link CharBox} that will represent the character defined
@@ -56,32 +52,34 @@ public class CharBox extends Box {
    * @param c a Char-object containing the character's font information.
    */
   public CharBox( Char c ) {
-    width = c.getWidth();
-    height = c.getHeight();
-    depth = c.getDepth();
-    fontId = c.getFontId();
-    textChar = c.getChar();
+    this.width = c.getWidth();
+    this.height = c.getHeight();
+    this.depth = c.getDepth();
+    this.c = c;
   }
 
   public void draw( Graphics2D g2, float x, float y ) {
-    AffineTransform at = g2.getTransform();
+    final var at = g2.getTransform();
     g2.translate( x, y );
 
-    if( Math.abs( 1 - FONT_SCALE_FACTOR ) > PREC ) {
-      g2.scale( 1 / FONT_SCALE_FACTOR, 1 / FONT_SCALE_FACTOR );
+    final var size = c.getSize();
+
+    if (Math.abs(size - FONT_SCALE_FACTOR) > PREC) {
+      g2.scale(size / FONT_SCALE_FACTOR,
+               size / FONT_SCALE_FACTOR);
     }
 
-    final Font font = FontInfo.getFont( fontId );
+    final Font font = FontInfo.getFont( c.getFontId() );
 
     if( g2.getFont() != font ) {
       g2.setFont( font );
     }
 
-    g2.drawChars( new char[]{textChar}, 0, 1, 0, 0 );
+    g2.drawChars( new char[]{c.getChar()}, 0, 1, 0, 0 );
     g2.setTransform( at );
   }
 
   public int getLastFontId() {
-    return fontId;
+    return c.getFontId();
   }
 }
