@@ -1,4 +1,4 @@
-/* TeXFormula.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  *
@@ -95,7 +95,13 @@ public class TeXFormula {
     // used as second index in "delimiterNames" table (over or under)
     private static final int OVER_DEL = 0;
     private static final int UNDER_DEL = 1;
-    
+
+    // font scale for deriving
+    public static float FONT_SCALE_FACTOR = 100f;
+
+    // point-to-pixel conversion
+    public static float PIXELS_PER_POINT = 1f;
+
     // for comparing floats with 0
     protected static final float PREC = 0.0000001f;
     
@@ -132,13 +138,13 @@ public class TeXFormula {
     private String parseString;
     
     // current position in the parse string
-    private int pos = 0;
+    private int pos;
     
     // the root atom of the "atom tree" that represents the formula
-    protected Atom root = null;
+    protected Atom root;
     
     // the current text style
-    private String textStyle = null;
+    private String textStyle;
     
     /**
      * Creates an empty TeXFormula.

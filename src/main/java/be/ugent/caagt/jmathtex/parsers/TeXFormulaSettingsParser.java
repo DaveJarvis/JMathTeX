@@ -1,4 +1,4 @@
-/* TeXFormulaSettingsParser.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  *
@@ -29,6 +29,7 @@
 package be.ugent.caagt.jmathtex.parsers;
 
 import be.ugent.caagt.jmathtex.FontInfo;
+import be.ugent.caagt.jmathtex.TeXFormula;
 import be.ugent.caagt.jmathtex.exceptions.ResourceParseException;
 import be.ugent.caagt.jmathtex.exceptions.XMLResourceParseException;
 import be.ugent.caagt.jmathtex.resources.XMLResourceReader;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Parses predefined TeXFormula's from an XML-file.
+ * Parse predefined {@link TeXFormula}s from an XML file.
  */
 public class TeXFormulaSettingsParser {
     
@@ -55,7 +56,7 @@ public class TeXFormulaSettingsParser {
     public String[] parseSymbolMappings() throws ResourceParseException {
         String[] mappings = new String[ FontInfo.NUMBER_OF_CHAR_CODES];
         Element charToSymbol = root.getChild("CharacterToSymbolMappings");
-        if (charToSymbol != null) // element present
+        if (charToSymbol != null)
             addToMap(charToSymbol.getChildren("Map"), mappings);
         return mappings;
     }
@@ -63,7 +64,7 @@ public class TeXFormulaSettingsParser {
     public String[] parseDelimiterMappings() throws ResourceParseException {
         String[] mappings = new String[FontInfo.NUMBER_OF_CHAR_CODES];
         Element charToDelimiter = root.getChild("CharacterToDelimiterMappings");
-        if (charToDelimiter != null) // element present
+        if (charToDelimiter != null)
             addToMap(charToDelimiter.getChildren(CHARTODEL_MAPPING_EL),
                     mappings);
         return mappings;
@@ -75,14 +76,17 @@ public class TeXFormulaSettingsParser {
             Element map = (Element) obj;
             String ch = map.getAttributeValue("char");
             String symbol = map.getAttributeValue("symbol");
-            // both attributes are required!
+
             if (ch == null)
                 throw new XMLResourceParseException(RESOURCE_NAME, map.getName(),
                         "char", null);
-            else if (symbol == null)
+
+            if (symbol == null)
                 throw new XMLResourceParseException(RESOURCE_NAME, map.getName(),
                         "symbol", null);
-            if (ch.length() == 1) // valid element found
+
+            // valid element found
+            if (ch.length() == 1)
                 table[ch.charAt(0)] =  symbol;
             else
                 // only single-character mappings allowed, ignore others
@@ -93,17 +97,17 @@ public class TeXFormulaSettingsParser {
     }
     
     public Set<String> parseTextStyles() throws ResourceParseException {
-        Set<String> res = new HashSet<>();
-        Element textStyles = root.getChild("TextStyles");
-        if (textStyles != null) { // element present
-            for (Object obj : textStyles.getChildren("TextStyle")) {
-                Element style = (Element) obj;
-                String name = style.getAttributeValue("name");
-                if (name == null)
-                    throw new XMLResourceParseException(RESOURCE_NAME, style
-                            .getName(), "name", null);
-                else
-                    res.add(name);
+        final Set<String> res = new HashSet<>();
+        final Element textStyles = root.getChild("TextStyles");
+        if (textStyles != null) {
+            for (final var style : textStyles.getChildren("TextStyle")) {
+                final String name = style.getAttributeValue("name");
+                if( name == null ) {
+                    throw new XMLResourceParseException( RESOURCE_NAME, style
+                        .getName(), "name", null );
+                }
+
+                res.add(name);
             }
         }
         return res;

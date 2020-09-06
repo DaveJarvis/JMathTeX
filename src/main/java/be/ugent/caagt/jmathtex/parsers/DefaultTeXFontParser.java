@@ -1,4 +1,4 @@
-/* DefaultTeXFontParser.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  *
@@ -63,10 +63,10 @@ public class DefaultTeXFontParser {
         public void parse(Element el, char ch, FontInfo info)
         throws ResourceParseException {
             int[] extensionChars = new int[4];
-            extensionChars[ REP] = parseIntElement( "rep", el);
-            extensionChars[ TOP] = parseOptionalInt( "top", el, NONE);
-            extensionChars[ MID] = parseOptionalInt( "mid", el, NONE);
-            extensionChars[ BOT] = parseOptionalInt( "bot", el, NONE);
+            extensionChars[ REP ] = parseIntElement( "rep", el );
+            extensionChars[ TOP ] = parseOptionalInt( "top", el, NONE );
+            extensionChars[ MID ] = parseOptionalInt( "mid", el, NONE );
+            extensionChars[ BOT ] = parseOptionalInt( "bot", el, NONE );
 
             // parsing OK, add extension info
             info.setExtension(ch, extensionChars);
@@ -74,7 +74,6 @@ public class DefaultTeXFontParser {
     }
 
     private static class KernParser implements CharChildParser {
-
         KernParser() {
             // avoid generation of access class
         }
@@ -90,7 +89,6 @@ public class DefaultTeXFontParser {
     }
 
     private static class LigParser implements CharChildParser {
-
         LigParser() {
             // avoid generation of access class
         }
@@ -106,7 +104,6 @@ public class DefaultTeXFontParser {
     }
 
     private static class NextLargerParser implements CharChildParser {
-
         NextLargerParser() {
             // avoid generation of access class
         }
@@ -204,16 +201,12 @@ public class DefaultTeXFontParser {
                     info.setSkewChar( (char) skewChar );
                 }
 
-                // jlm_cmmi10; fontId == 4
-                // jlm_cmmr; fontId == 0
-                // jlm_cmsy10; fontId == 2
-
                 for( final var element : font.getChildren( "Char" ) ) {
                     processCharElement( element, info );
                 }
 
                 // parsing OK, add to table
-                res.put(id, info);
+                res.put( id, info );
             }
         }
 
@@ -354,11 +347,12 @@ public class DefaultTeXFontParser {
         return result;
     }
 
-    public Map<String,CharFont[]> parseTextStyleMappings() {
+    public Map<String, CharFont[]> parseTextStyleMappings() {
         return parsedTextStyles;
     }
 
-    private Map<String,CharFont[]> parseStyleMappings() throws ResourceParseException {
+    private Map<String, CharFont[]> parseStyleMappings()
+        throws ResourceParseException {
         final Element textStyleMappings = root.getChild("TextStyleMappings");
 
         if( textStyleMappings == null ) {

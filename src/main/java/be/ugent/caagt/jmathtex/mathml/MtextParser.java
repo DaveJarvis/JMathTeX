@@ -1,4 +1,4 @@
-/* MtextParser.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  * 

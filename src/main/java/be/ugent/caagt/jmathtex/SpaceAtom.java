@@ -1,4 +1,4 @@
-/* SpaceAtom.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  *
@@ -30,6 +30,8 @@ package be.ugent.caagt.jmathtex;
 
 import be.ugent.caagt.jmathtex.exceptions.InvalidUnitException;
 
+import static be.ugent.caagt.jmathtex.TeXFormula.PIXELS_PER_POINT;
+
 /**
  * An atom representing whitespace. The dimension values can be set using different
  * unit types.
@@ -46,8 +48,8 @@ public class SpaceAtom extends Atom {
         env -> env.getTeXFont().getXHeight(env.getStyle(), env.getLastFontId()),
         env -> env.getTeXFont().getXHeight(env.getStyle(), env.getLastFontId()),
         env -> 1 / env.getSize(),
-        env -> TeXFont.PIXELS_PER_POINT / env.getSize(),
-        env -> (12 * TeXFont.PIXELS_PER_POINT) / env.getSize(),
+        env -> PIXELS_PER_POINT / env.getSize(),
+        env -> (12 * PIXELS_PER_POINT) / env.getSize(),
         env -> {
             TeXFont tf = env.getTeXFont();
             return tf.getQuad(env.getStyle(), tf.getMuFontId()) / 18;

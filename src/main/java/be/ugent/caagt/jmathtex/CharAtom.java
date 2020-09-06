@@ -1,4 +1,4 @@
-/* CharAtom.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  * 
@@ -57,19 +57,18 @@ public class CharAtom extends CharSymbol {
       return new CharBox(ch);
    }
 
-   /*
-    * Get the Char-object representing this character ("c") in the right text style
+   /**
+    * Get the {@link Char} object representing this object's character in the
+    * font style defined by the given {@link TeXFont}.
     */
    private Char getChar(TeXFont tf, int style) {
-      if (textStyle == null) // default text style
-         return tf.getDefaultChar(c, style);
-      else
-         return tf.getChar(c, textStyle, style);
+      return textStyle == null
+          ? tf.getDefaultChar( c, style )
+          : tf.getChar( c, textStyle, style );
    }
 
    public CharFont getCharFont(TeXFont tf) {
       // style doesn't matter here 
       return getChar(tf, TeXConstants.STYLE_DISPLAY).getCharFont();
    }
-
 }

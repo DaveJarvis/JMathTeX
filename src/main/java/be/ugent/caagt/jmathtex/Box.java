@@ -1,4 +1,4 @@
-/* Box.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  * 
@@ -28,8 +28,7 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,6 +96,26 @@ public abstract class Box {
    protected List<Box> children = new LinkedList<>();
 
    /**
+    * Creates an empty box (no children) with all dimensions set to 0 and no
+    * foreground and background color set (default values will be used: null)
+    */
+   protected Box() {
+      this (null, null);
+   }
+
+   /**
+    * Creates an empty box (no children) with all dimensions set to 0 and sets
+    * the foreground and background color of the box.
+    *
+    * @param fg the foreground color
+    * @param bg the background color
+    */
+   protected Box(Color fg, Color bg) {
+      foreground = fg;
+      background = bg;
+   }
+
+   /**
     * Inserts the given box at the end of the list of child boxes.
     * 
     * @param b the box to be inserted
@@ -113,26 +132,6 @@ public abstract class Box {
     */
    public void add(int pos, Box b) {
       children.add(pos, b);
-   }
-
-   /**
-    * Creates an empty box (no children) with all dimensions set to 0 and no
-    * foreground and background color set (default values will be used: null)
-    */
-   protected Box() {
-       this (null, null);
-   }
-
-   /**
-    * Creates an empty box (no children) with all dimensions set to 0 and sets
-    * the foreground and background color of the box.
-    * 
-    * @param fg the foreground color
-    * @param bg the background color
-    */
-   protected Box(Color fg, Color bg) {
-      foreground = fg;
-      background = bg;
    }
 
    /**
@@ -215,6 +214,19 @@ public abstract class Box {
    public abstract int getLastFontId();
 
    /**
+    * Returns the total width and height of this {@link Box} object, which
+    * includes the depth.
+    *
+    * @return A new {@link Dimension} instance that represents the bounding
+    * width and height for this {@link Box} object.
+    */
+   public Dimension toDimension() {
+      final int width = (int) getWidth();
+      final int height = (int) (getHeight() + getDepth());
+      return new Dimension( width, height );
+   }
+
+   /**
     * Stores the old color setting, draws the background of the box (if not null) 
     * and sets the foreground color (if not null).
     * 
@@ -223,18 +235,16 @@ public abstract class Box {
     * @param y the y-coordinate
     */
    protected void startDraw(Graphics2D g2, float x, float y) {
-      // old color
       prevColor = g2.getColor();
 
-      if (background != null) { // draw background
-         g2.setColor(background);
-         g2.fill(new Rectangle2D.Float(x, y - height, getWidth(), height
-               + getDepth()));
+      if( background != null ) {
+         g2.setColor( background );
+         g2.fill( new Rectangle2D.Float(
+             x, y - height, getWidth(), getHeight() + getDepth() )
+         );
       }
-      if (foreground == null)
-         g2.setColor(prevColor); // old foreground color
-      else
-         g2.setColor(foreground); // overriding foreground color
+
+      g2.setColor( foreground == null ? prevColor : foreground );
    }
 
    /**

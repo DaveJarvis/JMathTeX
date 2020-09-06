@@ -333,13 +333,6 @@
 
   <FontDescriptions>
 
-    <!-- Old font ids:
-    0 = jlm_cmmi10_unchanged
-    1 = jlm_cmr10
-    2 = jlm_cmex10
-    3 = jlm_cmsy10
-    -->
-
     <Font name="jlm_msbm10.ttf" id="jlm_msbm10" space="0.300003" xHeight="0.462964" quad="1.0">
       <Char code="161" width="0.777781" height="0.757257" depth="0.251422"/>
       <Char code="162" width="0.777781" height="0.757257" depth="0.251422"/>

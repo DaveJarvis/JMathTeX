@@ -30,18 +30,17 @@ import org.junit.Test;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Map;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.STYLE_DISPLAY;
 import static java.awt.Color.BLACK;
-import static java.awt.Color.WHITE;
 import static java.awt.RenderingHints.*;
-import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.batik.dom.GenericDOMImplementation.getDOMImplementation;
 
@@ -87,28 +86,12 @@ public class TeXFormulaTest {
 
   @Test
   public void test_MathML_SimpleFormula_Success() throws IOException {
-    //    DefaultTeXFont.registerAlphabet(new CyrillicRegistration());
-    //    DefaultTeXFont.registerAlphabet(new GreekRegistration());
-
     final var size = 100f;
 
     final var formula = new TeXFormula( TEX );
     final var font = new DefaultTeXFont( size );
     final var env = new TeXEnvironment( STYLE_DISPLAY, font );
     final var box = formula.createBox( env );
-    final var width = (int) (box.getWidth() * size);
-    final var height = (int) ((box.getHeight() + box.getDepth()) * size);
-    final var image = new BufferedImage( width, height, TYPE_INT_ARGB );
-    final var g = image.createGraphics();
-    g.setRenderingHints( DEFAULT_HINTS );
-    g.setColor( WHITE );
-    g.fillRect( 0, 0, width, height );
-    g.setColor( BLACK );
-    g.scale( size, size );
-    box.draw( g, 0, box.getHeight() );
-
-    final int w = (int) (width / size);
-    final int h = (int) (height / size);
 
     final var dom = getDOMImplementation();
     final var ns = "http://www.w3.org/2000/svg";
@@ -116,8 +99,7 @@ public class TeXFormulaTest {
     final var context = SVGGeneratorContext.createDefault( doc );
     final var svgg = new SVGGraphics2D( context, true );
 
-    final var dim = new Dimension( w, h );
-    svgg.setSVGCanvasSize( dim );
+    svgg.setSVGCanvasSize( box.toDimension() );
     svgg.setColor( BLACK );
 
     box.draw( svgg, 0, box.getHeight() );
@@ -126,9 +108,6 @@ public class TeXFormulaTest {
     final var out = new OutputStreamWriter( fos, UTF_8 );
     svgg.stream( out, false );
     fos.close();
-
-    final var png = new File( "/tmp/saved.png" );
-    ImageIO.write( image, "png", png );
   }
 
   @Test
@@ -146,8 +125,6 @@ public class TeXFormulaTest {
     icon.setInsets( new Insets( 5, 5, 5, 5 ) );
     g2.setSVGCanvasSize( new Dimension( icon.getIconWidth(),
                                         icon.getIconHeight() ) );
-    g2.setColor( WHITE );
-    g2.fillRect( 0, 0, icon.getIconWidth(), icon.getIconHeight() );
 
     final JLabel jl = new JLabel();
     jl.setForeground( BLACK );

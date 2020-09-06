@@ -24,7 +24,11 @@ import be.ugent.caagt.jmathtex.exceptions.XMLResourceParseException;
 import java.awt.*;
 import java.nio.file.Path;
 
+import static be.ugent.caagt.jmathtex.TeXFormula.FONT_SCALE_FACTOR;
+import static be.ugent.caagt.jmathtex.TeXFormula.PIXELS_PER_POINT;
 import static java.awt.Font.TRUETYPE_FONT;
+import static java.awt.Font.createFont;
+import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
 
 /**
  * Responsible for reading font resources located in the {@code fonts}
@@ -51,7 +55,11 @@ public class FontResourceReader extends ResourceReader<Font> {
   public Font read() {
     return super.read( ( stream ) -> {
       try {
-        return Font.createFont( TRUETYPE_FONT, stream );
+        final var font = createFont( TRUETYPE_FONT, stream )
+            .deriveFont( PIXELS_PER_POINT * FONT_SCALE_FACTOR );
+        getLocalGraphicsEnvironment().registerFont( font );
+
+        return font;
       } catch( final Exception e ) {
         throw new XMLResourceParseException( e.getMessage() );
       }

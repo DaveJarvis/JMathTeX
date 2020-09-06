@@ -28,60 +28,26 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-
-import static be.ugent.caagt.jmathtex.TeXFormula.FONT_SCALE_FACTOR;
-import static be.ugent.caagt.jmathtex.TeXFormula.PREC;
-
 /**
- * A box representing a single character.
+ * Represents a paring of two characters.
  */
-public class CharBox extends Box {
+public class CharTuple {
+  private final char left, right;
 
-  /**
-   * The font use when drawing the character.
-   */
-  private final int fontId;
-
-  /**
-   * The character to draw.
-   */
-  private final char textChar;
-
-  /**
-   * Create a new {@link CharBox} that will represent the character defined
-   * by the given {@link Char} object.
-   *
-   * @param c a Char-object containing the character's font information.
-   */
-  public CharBox( Char c ) {
-    width = c.getWidth();
-    height = c.getHeight();
-    depth = c.getDepth();
-    fontId = c.getFontId();
-    textChar = c.getChar();
+  CharTuple( char l, char r ) {
+    left = l;
+    right = r;
   }
 
-  public void draw( Graphics2D g2, float x, float y ) {
-    AffineTransform at = g2.getTransform();
-    g2.translate( x, y );
-
-    if( Math.abs( 1 - FONT_SCALE_FACTOR ) > PREC ) {
-      g2.scale( 1 / FONT_SCALE_FACTOR, 1 / FONT_SCALE_FACTOR );
+  public boolean equals( final Object o ) {
+    if( !(o instanceof CharTuple) ) {
+      return false;
     }
-
-    final Font font = FontInfo.getFont( fontId );
-
-    if( g2.getFont() != font ) {
-      g2.setFont( font );
-    }
-
-    g2.drawChars( new char[]{textChar}, 0, 1, 0, 0 );
-    g2.setTransform( at );
+    final CharTuple lig = (CharTuple) o;
+    return left == lig.left && right == lig.right;
   }
 
-  public int getLastFontId() {
-    return fontId;
+  public int hashCode() {
+    return (left + right) % 128;
   }
 }

@@ -1,4 +1,4 @@
-/* TeXEnvironment.java
+/*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
  *
@@ -56,12 +56,16 @@ public class TeXEnvironment {
     private TeXEnvironment(int style, TeXFont tf, Color bg, Color c) {
         // check if style is valid
         // if not : DISPLAY = default value
-        if (style == TeXConstants.STYLE_DISPLAY || style == TeXConstants.STYLE_TEXT
-                || style == TeXConstants.STYLE_SCRIPT || style == TeXConstants.STYLE_SCRIPT_SCRIPT)
+        if( style == TeXConstants.STYLE_DISPLAY ||
+            style == TeXConstants.STYLE_TEXT ||
+            style == TeXConstants.STYLE_SCRIPT ||
+            style == TeXConstants.STYLE_SCRIPT_SCRIPT ) {
             this.style = style;
-        else
+        }
+        else {
             this.style = TeXConstants.STYLE_DISPLAY;
-        
+        }
+
         this.tf = tf;
         background = bg;
         color = c;
