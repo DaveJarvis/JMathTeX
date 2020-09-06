@@ -102,7 +102,7 @@ public class NthRoot extends Atom {
          Box res = new HorizontalBox();
          float pos = r.getWidth() + negativeKern.getWidth();
          if (pos < 0)
-            res.add(new StrutBox(-pos, 0, 0, 0));
+            res.add(new StrutBox(-pos));
 
          res.add(r);
          res.add(negativeKern);

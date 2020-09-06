@@ -28,78 +28,98 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.ListIterator;
+
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
+import static java.lang.Float.NEGATIVE_INFINITY;
+import static java.lang.Math.max;
 
 /**
  * A box composed of a horizontal row of child boxes.
  */
 public class HorizontalBox extends Box {
-    
-    private float curPos = 0; // NOPMD
-    
-    public HorizontalBox(Box b, float w, int alignment) {
-        float rest = w - b.getWidth();
-        if (alignment == TeXConstants.ALIGN_CENTER) {
-            StrutBox s = new StrutBox(rest / 2, 0, 0, 0);
-            add(s);
-            add(b);
-            add(s);
-        } else if (alignment == TeXConstants.ALIGN_LEFT) {
-            add(b);
-            add(new StrutBox(rest, 0, 0, 0));
-        } else if (alignment == TeXConstants.ALIGN_RIGHT) {
-            add(new StrutBox(rest, 0, 0, 0));
-            add(b);
-        }
+
+  private float curPos; // NOPMD
+
+  /**
+   * Basic horizontal box.
+   */
+  public HorizontalBox() {
+  }
+
+  public HorizontalBox( final Box b ) {
+    add( b );
+  }
+
+  public HorizontalBox( final Box b, final float w, final int alignment ) {
+    final float rest = w - b.getWidth();
+    switch( alignment ) {
+      case ALIGN_CENTER -> {
+        final var s = new StrutBox( rest / 2 );
+        add( s );
+        add( b );
+        add( s );
+      }
+      case ALIGN_LEFT -> {
+        add( b );
+        add( new StrutBox( rest ) );
+      }
+      case ALIGN_RIGHT -> {
+        add( new StrutBox( rest ) );
+        add( b );
+      }
     }
-    
-    public HorizontalBox(Box b) {
-        add(b);
+  }
+
+  public HorizontalBox( final Color fg, final Color bg ) {
+    super( fg, bg );
+  }
+
+  public void draw( final Graphics2D g, final float x, final float y ) {
+    startDraw( g, x, y );
+    float xPos = x;
+    for( final Box box : children ) {
+      box.draw( g, xPos, y + box.getShift() );
+      xPos += box.getWidth();
     }
-    
-    public HorizontalBox() {
-        // basic horizontal box
+    endDraw( g );
+  }
+
+  public final void add( final Box b ) {
+    recalculate( b );
+    super.add( b );
+  }
+
+  private void recalculate( final Box b ) {
+    curPos += b.getWidth();
+    width = max( width, curPos );
+    height = max(
+        children.isEmpty() ? NEGATIVE_INFINITY : height,
+        b.height - b.shift );
+    depth = max(
+        children.isEmpty() ? NEGATIVE_INFINITY : depth,
+        b.depth + b.shift );
+  }
+
+  /**
+   * Iterates from the last child box (the lowest) to the first (the
+   * highest) until a font id is found that's not equal to
+   * {@link TeXFont#NO_FONT}.
+   *
+   * @return {@link TeXFont#NO_FONT} if there's no font ID in this
+   * {@link Box}'s list of child instances.
+   */
+  @Override
+  public int getLastFontId() {
+    int fontId = TeXFont.NO_FONT;
+
+    final ListIterator<Box> it = children.listIterator( children.size() );
+
+    while( fontId == TeXFont.NO_FONT && it.hasPrevious() ) {
+      fontId = it.previous().getLastFontId();
     }
-    
-    public HorizontalBox(Color fg, Color bg) {
-        super(fg, bg);
-    }
-    
-    public void draw(Graphics2D g2, float x, float y) {
-        startDraw(g2, x, y);
-        float xPos = x;
-        for (Box box: children) {
-            box.draw(g2, xPos, y + box.shift);
-            xPos += box.getWidth();
-        }
-        endDraw(g2);
-    }
-    
-    public final void add(Box b) {
-        recalculate(b);
-        super.add(b);
-    }
-    
-    private void recalculate(Box b) {
-        curPos += b.getWidth();
-        width = Math.max(width, curPos);
-        height = Math.max((children.size() == 0 ? Float.NEGATIVE_INFINITY
-                : height), b.height - b.shift);
-        depth = Math.max(
-                (children.size() == 0 ? Float.NEGATIVE_INFINITY : depth), b.depth
-                + b.shift);
-    }
-    
-    public int getLastFontId() {
-        // iterate from the last child box to the first untill a font id is found
-        // that's not equal to NO_FONT
-        int fontId = TeXFont.NO_FONT;
-        for (ListIterator it = children.listIterator(children.size()); fontId == TeXFont.NO_FONT
-                && it.hasPrevious();)
-            fontId = ((Box) it.previous()).getLastFontId();
-        
-        return fontId;
-    }
+
+    return fontId;
+  }
 }

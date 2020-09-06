@@ -189,9 +189,9 @@ public class FractionAtom extends Atom {
             thickness = (defFactorSet ? defFactor * drt : drt);
         
         // create equal width boxes (in appropriate styles)
-        Box num = (numerator == null ? new StrutBox(0, 0, 0, 0) : numerator
+        Box num = (numerator == null ? new StrutBox() : numerator
                 .createBox(env.numStyle()));
-        Box denom = (denominator == null ? new StrutBox(0, 0, 0, 0) : denominator
+        Box denom = (denominator == null ? new StrutBox() : denominator
                 .createBox(env.denomStyle()));
         
         if (num.getWidth() < denom.getWidth())

@@ -108,10 +108,10 @@ public class BigOperatorAtom extends Atom {
                 // include delta in width
                 delta = c.getItalic();
                 if (delta > TeXFormula.PREC)
-                    y.add(new StrutBox(delta, 0, 0, 0));
+                    y.add(new StrutBox(delta));
             } else { // formula
                 delta = 0;
-                y = new HorizontalBox(base == null ? new StrutBox(0, 0, 0, 0)
+                y = new HorizontalBox(base == null ? new StrutBox()
                 : base.createBox(env));
             }
             

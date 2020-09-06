@@ -86,7 +86,7 @@ public class DefaultTeXFont implements TeXFont {
     }
     
     private final float size;
-    
+
     public DefaultTeXFont(float pointSize) {
         size = pointSize;
     }
@@ -94,28 +94,28 @@ public class DefaultTeXFont implements TeXFont {
     private float getResizedParameter(final String p, final int style) {
         return getParameter( p ) * getSizeFactor( style ) * PIXELS_PER_POINT;
     }
-    
-    public float getAxisHeight(int style) {
+
+    public float getAxisHeight( int style ) {
         return getResizedParameter( "axisheight", style );
     }
-    
-    public float getBigOpSpacing1(int style) {
+
+    public float getBigOpSpacing1( int style ) {
         return getResizedParameter( "bigopspacing1", style );
     }
-    
-    public float getBigOpSpacing2(int style) {
+
+    public float getBigOpSpacing2( int style ) {
         return getResizedParameter( "bigopspacing2", style );
     }
-    
-    public float getBigOpSpacing3(int style) {
+
+    public float getBigOpSpacing3( int style ) {
         return getResizedParameter( "bigopspacing3", style );
     }
-    
-    public float getBigOpSpacing4(int style) {
+
+    public float getBigOpSpacing4( int style ) {
         return getResizedParameter( "bigopspacing4", style );
     }
-    
-    public float getBigOpSpacing5(int style) {
+
+    public float getBigOpSpacing5( int style ) {
         return getResizedParameter( "bigopspacing5", style );
     }
 
@@ -131,50 +131,50 @@ public class DefaultTeXFont implements TeXFont {
         return getResizedParameter( "denom2", style );
     }
 
-    public float getSub1(int style) {
-        return getResizedParameter("sub1", style);
+    public float getSub1( int style ) {
+        return getResizedParameter( "sub1", style );
     }
 
-    public float getSub2(int style) {
-        return getResizedParameter("sub2", style);
+    public float getSub2( int style ) {
+        return getResizedParameter( "sub2", style );
     }
 
-    public float getSubDrop(int style) {
-        return getResizedParameter("subdrop", style);
+    public float getSubDrop( int style ) {
+        return getResizedParameter( "subdrop", style );
     }
 
-    public float getSup1(int style) {
-        return getResizedParameter("sup1", style);
+    public float getSup1( int style ) {
+        return getResizedParameter( "sup1", style );
     }
 
-    public float getSup2(int style) {
-        return getResizedParameter("sup2", style);
+    public float getSup2( int style ) {
+        return getResizedParameter( "sup2", style );
     }
 
-    public float getSup3(int style) {
-        return getResizedParameter("sup3", style);
+    public float getSup3( int style ) {
+        return getResizedParameter( "sup3", style );
     }
 
-    public float getSupDrop(int style) {
-        return getResizedParameter("supdrop", style);
+    public float getSupDrop( int style ) {
+        return getResizedParameter( "supdrop", style );
     }
 
-    public float getNum1(int style) {
-        return getResizedParameter("num1", style);
+    public float getNum1( int style ) {
+        return getResizedParameter( "num1", style );
     }
 
-    public float getNum2(int style) {
-        return getResizedParameter("num2", style);
+    public float getNum2( int style ) {
+        return getResizedParameter( "num2", style );
     }
 
-    public float getNum3(int style) {
-        return getResizedParameter("num3", style);
+    public float getNum3( int style ) {
+        return getResizedParameter( "num3", style );
     }
 
-    public float getSpace(int style) {
+    public float getSpace( int style ) {
         int spaceFontId = generalSettings.get( SPACEFONTID_ATTR ).intValue();
-        FontInfo info = getFontInfo(spaceFontId);
-        return info.getSpace(getScaledSizeFactor(style));
+        FontInfo info = getFontInfo( spaceFontId );
+        return info.getSpace( getScaledSizeFactor( style ) );
     }
 
     private Char getChar(char c, CharFont[] cf, int style) {
@@ -211,10 +211,7 @@ public class DefaultTeXFont implements TeXFont {
     
     public Char getChar(CharFont cf, int style) {
         float size = getSizeFactor(style);
-        final FontInfo info = fontInfo.get(cf.fontId);
-        final Font font = info.getFont();
-        return new Char( cf.c, font.deriveFont( size ), cf.fontId,
-                         getMetrics( cf, size ) );
+        return new Char( cf.c, cf.fontId, getMetrics( cf, size ) );
     }
     
     public Char getChar(String symbolName, int style)
@@ -239,7 +236,6 @@ public class DefaultTeXFont implements TeXFont {
     }
     
     public Extension getExtension(Char c, int style) {
-        Font f = c.getFont();
         int fc = c.getFontId();
         float s = getSizeFactor(style);
         
@@ -251,7 +247,7 @@ public class DefaultTeXFont implements TeXFont {
             if (ext[i] == NONE)
                 parts[i] = null;
             else
-                parts[i] = new Char((char) ext[i], f, fc, getMetrics(new CharFont(
+                parts[i] = new Char((char) ext[i], fc, getMetrics(new CharFont(
                         (char) ext[i], fc), s));
         }
         
@@ -297,11 +293,9 @@ public class DefaultTeXFont implements TeXFont {
     public Char getNextLarger(Char c, int style) {
         final FontInfo info = getFontInfo(c.getFontId());
         final CharFont ch = info.getNextLarger(c.getChar());
-        final FontInfo newInfo = getFontInfo(ch.fontId);
         final var sizeFactor = getSizeFactor(style);
 
-        return new Char(ch.c, newInfo.getFont().deriveFont(sizeFactor),
-                ch.fontId, getMetrics(ch, sizeFactor));
+        return new Char(ch.c, ch.fontId, getMetrics(ch, sizeFactor));
     }
 
     public float getQuad(int style, int fontId) {

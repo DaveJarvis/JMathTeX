@@ -28,25 +28,34 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 
 /**
  * A box representing whitespace.
  */
 public class StrutBox extends Box {
-    
-    public StrutBox(float w, float h, float d, float s) {
-        width = w;
-        height = h;
-        depth = d;
-        shift = s;
-    }
-    
-    public void draw(Graphics2D g2, float x, float y) {
-        // no visual effect
-    }
-    
-    public int getLastFontId() {
-        return TeXFont.NO_FONT;
-    }
+  /**
+   * Constructs a new instance with all dimensions and shifts set to zero.
+   */
+  public StrutBox() {
+  }
+
+  public StrutBox( float w ) {
+    width = w;
+  }
+
+  public StrutBox( float w, float h, float d, float s ) {
+    width = w;
+    height = h;
+    depth = d;
+    shift = s;
+  }
+
+  public void draw( final Graphics2D g, final float x, final float y ) {
+    // no visual effect
+  }
+
+  public int getLastFontId() {
+    return TeXFont.NO_FONT;
+  }
 }

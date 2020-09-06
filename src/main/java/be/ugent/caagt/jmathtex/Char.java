@@ -37,14 +37,11 @@ public class Char {
 
    private final char c;
 
-   private final Font font;
-
    private final Metrics m;
 
    private final int fontId;
 
-   public Char(char c, Font f, int fontId, Metrics m) {
-      font = f;
+   public Char(char c, int fontId, Metrics m) {
       this.fontId = fontId;
       this.c = c;
       this.m = m;
@@ -56,10 +53,6 @@ public class Char {
 
    public char getChar() {
       return c;
-   }
-
-   public Font getFont() {
-      return font;
    }
 
    public int getFontId() {

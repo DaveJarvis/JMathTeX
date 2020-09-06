@@ -103,7 +103,7 @@ public class AccentedAtom extends Atom {
         int style = env.getStyle();
         
         // set base in cramped style
-        Box b = (base == null ? new StrutBox(0, 0, 0, 0) : base.createBox(env
+        Box b = (base == null ? new StrutBox() : base.createBox(env
                 .crampStyle()));
         
         float u = b.getWidth();
@@ -133,7 +133,7 @@ public class AccentedAtom extends Atom {
         float italic = ch.getItalic();
         if (italic > TeXFormula.PREC) {
             y = new HorizontalBox(new CharBox(ch));
-            y.add(new StrutBox(italic, 0, 0, 0));
+            y.add(new StrutBox(italic));
         } else
             y = new CharBox(ch);
         

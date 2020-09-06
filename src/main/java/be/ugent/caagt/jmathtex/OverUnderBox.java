@@ -78,23 +78,23 @@ public class OverUnderBox extends Box {
             + (!over && script == null ? 0 : script.height + script.depth + kern);
    }
 
-   public void draw(Graphics2D g2, float x, float y) {
-      base.draw(g2, x, y);
+   public void draw( Graphics2D g, float x, float y) {
+      base.draw( g, x, y);
 
       float yVar = y - base.height;
       if (over) { // draw delimiter and script above base box
          double transX = x + del.getWidth() / 2, transY = yVar - del.getWidth()
                / 2;
-         AffineTransform oldAt = g2.getTransform();
-         g2.translate(transX, transY);
-         g2.rotate(Math.PI / 2);
-         del.draw(g2, -del.getWidth() / 2, -del.depth + del.getWidth() / 2);
-         g2.setTransform(oldAt);
+         AffineTransform oldAt = g.getTransform();
+         g.translate( transX, transY);
+         g.rotate( Math.PI / 2);
+         del.draw( g, -del.getWidth() / 2, -del.depth + del.getWidth() / 2);
+         g.setTransform( oldAt);
          yVar -= del.getWidth();
 
          // draw superscript
          if (script != null)
-            script.draw(g2, x, yVar - kern - script.depth);
+            script.draw( g, x, yVar - kern - script.depth);
       }
 
       yVar = y + base.depth;
@@ -102,15 +102,15 @@ public class OverUnderBox extends Box {
          yVar += del.getWidth();
          double transX = x + del.getWidth() / 2, transY = yVar - del.getWidth()
                / 2;
-         AffineTransform oldAt = g2.getTransform();
-         g2.translate(transX, transY);
-         g2.rotate(Math.PI / 2);
-         del.draw(g2, -del.getWidth() / 2, -del.depth + del.getWidth() / 2);
-         g2.setTransform(oldAt);
+         AffineTransform oldAt = g.getTransform();
+         g.translate( transX, transY);
+         g.rotate( Math.PI / 2);
+         del.draw( g, -del.getWidth() / 2, -del.depth + del.getWidth() / 2);
+         g.setTransform( oldAt);
 
          // draw subscript
          if (script != null)
-            script.draw(g2, x, yVar + kern + script.height);
+            script.draw( g, x, yVar + kern + script.height);
       }
 
    }

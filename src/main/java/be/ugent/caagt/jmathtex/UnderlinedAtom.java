@@ -45,7 +45,7 @@ public class UnderlinedAtom extends Atom {
       float drt = env.getTeXFont().getDefaultRuleThickness(env.getStyle());
 
       // create formula box in same style
-      Box b = (base == null ? new StrutBox(0, 0, 0, 0) : base.createBox(env));
+      Box b = (base == null ? new StrutBox() : base.createBox(env));
 
       // create vertical box
       VerticalBox vBox = new VerticalBox();

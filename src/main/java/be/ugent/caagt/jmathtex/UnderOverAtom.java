@@ -107,7 +107,7 @@ public class UnderOverAtom extends Atom {
     public Box createBox(TeXEnvironment env) {
         
         // create boxes in right style and calculate maximum width
-        Box b = (base == null ? new StrutBox(0, 0, 0, 0) : base.createBox(env));
+        Box b = (base == null ? new StrutBox() : base.createBox(env));
         Box o = null, u = null;
         float max = b.getWidth();
         if (over != null) {

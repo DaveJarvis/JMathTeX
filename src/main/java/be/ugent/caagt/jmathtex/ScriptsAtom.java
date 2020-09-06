@@ -50,7 +50,7 @@ public class ScriptsAtom extends Atom {
    }
 
    public Box createBox(TeXEnvironment env) {
-      Box b = (base == null ? new StrutBox(0, 0, 0, 0) : base.createBox(env));
+      Box b = (base == null ? new StrutBox() : base.createBox(env));
       if (subscript == null && superscript == null)
          return b;
       else {
@@ -90,7 +90,7 @@ public class ScriptsAtom extends Atom {
             // include delta in width or not?
             delta = c.getItalic();
             if (delta > TeXFormula.PREC && subscript == null)
-               hor.add(new StrutBox(delta, 0, 0, 0));
+               hor.add(new StrutBox(delta));
 
             shiftUp = hor.getHeight() - tf.getSupDrop(supStyle.getStyle());
             shiftDown = hor.getDepth() + tf.getSubDrop(subStyle.getStyle());
@@ -101,7 +101,7 @@ public class ScriptsAtom extends Atom {
                   || !tf.hasSpace(cf.fontId))
                delta = tf.getChar(cf, style).getItalic();
             if (delta > TeXFormula.PREC && subscript == null) {
-               hor.add(new StrutBox(delta, 0, 0, 0));
+               hor.add(new StrutBox(delta));
                delta = 0;
             }
          } else {

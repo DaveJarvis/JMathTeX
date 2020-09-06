@@ -936,7 +936,7 @@ public class TeXFormula {
     */
     public Box createBox(TeXEnvironment style) {
         if (root == null)
-            return new StrutBox(0, 0, 0, 0);
+            return new StrutBox();
 
         return root.createBox(style);
     }

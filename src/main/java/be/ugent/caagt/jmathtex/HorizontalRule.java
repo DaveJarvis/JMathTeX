@@ -42,8 +42,8 @@ public class HorizontalRule extends Box {
       shift = s;
    }
 
-   public void draw(Graphics2D g2, float x, float y) {
-      g2.fill(new Rectangle2D.Float(x, y - height, width, height));
+   public void draw( Graphics2D g, float x, float y) {
+      g.fill( new Rectangle2D.Float( x, y - height, width, height));
    }
 
    public int getLastFontId() {

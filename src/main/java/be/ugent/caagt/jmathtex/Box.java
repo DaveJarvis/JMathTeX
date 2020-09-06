@@ -110,7 +110,7 @@ public abstract class Box {
     * @param fg the foreground color
     * @param bg the background color
     */
-   protected Box(Color fg, Color bg) {
+   protected Box(final Color fg, final Color bg) {
       foreground = fg;
       background = bg;
    }
@@ -120,7 +120,7 @@ public abstract class Box {
     * 
     * @param b the box to be inserted
     */
-   public void add(Box b) {
+   public void add(final Box b) {
       children.add(b);
    }
 
@@ -130,7 +130,7 @@ public abstract class Box {
     * @param pos the position at which to insert the given box
     * @param b the box to be inserted
     */
-   public void add(int pos, Box b) {
+   public void add(final int pos, final Box b) {
       children.add(pos, b);
    }
 
@@ -175,7 +175,7 @@ public abstract class Box {
     * 
     * @param d the depth
     */
-   public void setDepth(float d) {
+   public void setDepth(final float d) {
       depth = d;
    }
 
@@ -184,7 +184,7 @@ public abstract class Box {
     * 
     * @param h the height
     */
-   public void setHeight(float h) {
+   public void setHeight(final float h) {
       height = h;
    }
 
@@ -193,18 +193,18 @@ public abstract class Box {
     * 
     * @param s the shift amount
     */
-   public void setShift(float s) {
+   public void setShift(final float s) {
       shift = s;
    }
 
    /**
     * Paints this box at the given coordinates using the given graphics context.
     * 
-    * @param g2 the graphics (2D) context to use for painting
+    * @param g the graphics (2D) context to use for painting
     * @param x the x-coordinate
     * @param y the y-coordinate
     */
-   public abstract void draw(Graphics2D g2, float x, float y);
+   public abstract void draw(Graphics2D g, float x, float y);
 
    /**
     * Get the id of the font that will be used the last when this box will be painted.
@@ -230,29 +230,30 @@ public abstract class Box {
     * Stores the old color setting, draws the background of the box (if not null) 
     * and sets the foreground color (if not null).
     * 
-    * @param g2 the graphics (2D) context
+    * @param g the graphics (2D) context
     * @param x the x-coordinate
     * @param y the y-coordinate
     */
-   protected void startDraw(Graphics2D g2, float x, float y) {
-      prevColor = g2.getColor();
+   protected void startDraw(
+       final Graphics2D g, final float x, final float y ) {
+      prevColor = g.getColor();
 
       if( background != null ) {
-         g2.setColor( background );
-         g2.fill( new Rectangle2D.Float(
+         g.setColor( background );
+         g.fill( new Rectangle2D.Float(
              x, y - height, getWidth(), getHeight() + getDepth() )
          );
       }
 
-      g2.setColor( foreground == null ? prevColor : foreground );
+      g.setColor( foreground == null ? prevColor : foreground );
    }
 
    /**
     * Restores the previous color setting.
     * 
-    * @param g2 the graphics (2D) context
+    * @param g the graphics (2D) context
     */
-   protected void endDraw(Graphics2D g2) {
-      g2.setColor(prevColor);
+   protected void endDraw(final Graphics2D g) {
+      g.setColor(prevColor);
    }
 }

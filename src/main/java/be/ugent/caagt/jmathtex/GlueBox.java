@@ -43,7 +43,7 @@ public class GlueBox extends Box {
       this.shrink = shrink;
    }
 
-   public void draw(Graphics2D g2, float x, float y) {
+   public void draw( Graphics2D g, float x, float y) {
        // no visible effect
    }
 

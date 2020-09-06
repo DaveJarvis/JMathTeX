@@ -29,13 +29,18 @@
 package be.ugent.caagt.jmathtex;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 
+import static be.ugent.caagt.jmathtex.FontInfo.getFont;
 import static be.ugent.caagt.jmathtex.TeXFormula.FONT_SCALE_FACTOR;
 import static be.ugent.caagt.jmathtex.TeXFormula.PREC;
+import static java.lang.Math.abs;
 
 /**
  * A box representing a single character.
+ *
+ * <p>
+ * <strong>Caution:</strong> This class is not thread-safe.
+ * </p>>
  */
 public class CharBox extends Box {
 
@@ -51,32 +56,26 @@ public class CharBox extends Box {
    *
    * @param c a Char-object containing the character's font information.
    */
-  public CharBox( Char c ) {
+  public CharBox( final Char c ) {
     this.width = c.getWidth();
     this.height = c.getHeight();
     this.depth = c.getDepth();
     this.c = c;
   }
 
-  public void draw( Graphics2D g2, float x, float y ) {
-    final var at = g2.getTransform();
-    g2.translate( x, y );
+  public void draw( final Graphics2D g, final float x, final float y ) {
+    final var at = g.getTransform();
+    g.translate( x, y );
 
     final var size = c.getSize();
 
-    if (Math.abs(size - FONT_SCALE_FACTOR) > PREC) {
-      g2.scale(size / FONT_SCALE_FACTOR,
-               size / FONT_SCALE_FACTOR);
+    if( abs( size - FONT_SCALE_FACTOR ) > PREC ) {
+      g.scale( size / FONT_SCALE_FACTOR, size / FONT_SCALE_FACTOR );
     }
 
-    final Font font = FontInfo.getFont( c.getFontId() );
-
-    if( g2.getFont() != font ) {
-      g2.setFont( font );
-    }
-
-    g2.drawChars( new char[]{c.getChar()}, 0, 1, 0, 0 );
-    g2.setTransform( at );
+    g.setFont( getFont( c.getFontId() ) );
+    g.drawChars( new char[]{c.getChar()}, 0, 1, 0, 0 );
+    g.setTransform( at );
   }
 
   public int getLastFontId() {

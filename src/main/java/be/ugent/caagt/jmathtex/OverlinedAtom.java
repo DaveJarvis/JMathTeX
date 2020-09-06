@@ -45,7 +45,7 @@ public class OverlinedAtom extends Atom {
       float drt = env.getTeXFont().getDefaultRuleThickness(env.getStyle());
 
       // cramp the style of the formula to be overlined and create vertical box
-      Box b = (base == null ? new StrutBox(0, 0, 0, 0) : base.createBox(env
+      Box b = (base == null ? new StrutBox() : base.createBox(env
             .crampStyle()));
       OverBar ob = new OverBar(b, 3 * drt, drt);
 
