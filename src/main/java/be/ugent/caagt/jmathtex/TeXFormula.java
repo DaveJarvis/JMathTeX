@@ -131,7 +131,7 @@ public class TeXFormula {
         commands.add("sqrt");
         
         // predefined TeXFormula's
-        new PredefinedTeXFormulaParser().parse( predefinedTeXFormulas);
+        new PredefinedTeXFormulaParser().parse( predefinedTeXFormulas );
     }
     
     // the string to be parsed
@@ -1460,22 +1460,13 @@ public class TeXFormula {
                 buf.append(ch);
                 pos++;
             }
-            
-            String command = buf.toString();
-            
-            SymbolAtom s = null;
-            TeXFormula predef = null;
-            try { // check if 'command' is a valid symbolname
-                s = SymbolAtom.get(command);
-            } catch (SymbolNotFoundException e) { // symbol not found
-                // check if a predefined TeXFormula exists with that name
-                try {
-                    predef = TeXFormula.get(command);
-                } catch ( FormulaNotFoundException e1) {
-                    // ignored, none found
-                }
-            }
-            
+
+            final String command = buf.toString();
+
+            // check if 'command' is a valid symbolname
+            final SymbolAtom s = SymbolAtom.getNullable( command );
+            final TeXFormula predef = s == null ? getNullable( command ) : null;
+
             if (s != null) { // symbol found!   // NOPMD
                 if (endOfEscape) {
                     // no longer symbol name or predefined TeXFormula name possible
@@ -2146,11 +2137,16 @@ public class TeXFormula {
      * 			given name
      */
     public static TeXFormula get(String name) throws FormulaNotFoundException {
-        TeXFormula formula = predefinedTeXFormulas.get( name);
-        if (formula == null)
-            throw new FormulaNotFoundException(name);
+      TeXFormula formula = getNullable( name );
+      if( formula == null ) {
+        throw new FormulaNotFoundException( name );
+      }
 
-        return new TeXFormula( formula );
+      return new TeXFormula( formula );
+    }
+
+    private static TeXFormula getNullable( String name ) {
+      return predefinedTeXFormulas.get( name );
     }
     
    /*

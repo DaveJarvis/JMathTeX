@@ -83,30 +83,31 @@ public class TeXFormulaTest {
     final var size = 20f;
     String svg = "";
 
-//    for( int j = 0; j < EQUATIONS.length; j++ ) {
-//      final String filename = "/tmp/equation-" + j + ".svg";
+    for( int j = 0; j < EQUATIONS.length; j++ ) {
+      final String filename = "/tmp/equation-" + j + ".svg";
 
-    final StringBuilder buffer = new StringBuilder( 16384 );
+      final StringBuilder buffer = new StringBuilder( 16384 );
 
-    for( int i = 0; i < 1_000_000; i++ ) {
-      final var formula = new TeXFormula( TEX );
-      final var font = new DefaultTeXFont( size );
-      final var env = new TeXEnvironment( STYLE_DISPLAY, font );
-      final var box = formula.createBox( env );
-      final var dim = box.toDimension();
-      final var svgg = new SVGGraphics2D( dim.width, dim.height, PT, buffer );
-      svgg.setRenderingHints( DEFAULT_HINTS );
+      for( int i = 0; i < 1; i++ ) {
+        final var formula = new TeXFormula( EQUATIONS[j] );
+        final var font = new DefaultTeXFont( size );
+        final var env = new TeXEnvironment( STYLE_DISPLAY, font );
+        final var box = formula.createBox( env );
+        final var dim = box.toDimension();
 
-      box.draw( svgg, 0, box.getHeight() );
-      svg = svgg.getSVGElement( null, true, null, null, null );
-      buffer.setLength( 0 );
+        final var svgg = new SVGGraphics2D( dim.width, dim.height, PT, buffer );
+        svgg.setRenderingHints( DEFAULT_HINTS );
+
+        box.draw( svgg, 0, box.getHeight() );
+        svg = svgg.getSVGElement( null, true, null, null, null );
+        buffer.setLength( 0 );
+      }
+
+      try( final var fos = new FileOutputStream( filename );
+           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
+        out.write( svg );
+      }
     }
-
-    try( final var fos = new FileOutputStream( "/tmp/saved.svg" );
-         final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
-      out.write( svg );
-    }
-//    }
   }
 
   public static void main( String[] args ) throws IOException {

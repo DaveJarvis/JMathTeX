@@ -100,12 +100,18 @@ public class SymbolAtom extends CharSymbol {
      * @return a SymbolAtom representing the found symbol
      * @throws SymbolNotFoundException if no symbol with the given name was found
      */
-    public static SymbolAtom get(String name) throws SymbolNotFoundException {
-        SymbolAtom obj = symbols.get( name);
-        if (obj == null) // not found
-            throw new SymbolNotFoundException(name);
+    public static SymbolAtom get(final String name)
+        throws SymbolNotFoundException {
+        final SymbolAtom obj = getNullable( name );
+        if (obj == null) {
+            throw new SymbolNotFoundException( name );
+        }
 
         return obj;
+    }
+
+    public static SymbolAtom getNullable( final String name ) {
+        return symbols.get( name );
     }
     
     /**
