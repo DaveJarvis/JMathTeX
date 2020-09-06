@@ -31,13 +31,10 @@ package be.ugent.caagt.jmathtex;
 /**
  * Used by RowAtom. The "textSymbol"-property and the type of an atom can change
  * (according to the TeX-algorithms used). Or this atom can be replaced by a
- * ligature,
- * (if it was a CharAtom). But atoms cannot be changed, otherwise
+ * ligature, (if it was a CharAtom). But atoms cannot be changed, otherwise
  * different boxes could be made from the same TeXFormula, and that is not
- * desired!
- * This "dummy atom" makes sure that changes to an atom (during the
- * createBox-method of
- * a RowAtom) will be reset.
+ * desired! This "dummy atom" makes sure that changes to an atom (during the
+ * createBox-method of a RowAtom) will be reset.
  */
 public class Dummy {
 
@@ -125,7 +122,7 @@ public class Dummy {
   /**
    * Only for Row-elements
    */
-  public void setPreviousAtom(final Dummy prev ) {
+  public void setPreviousAtom( final Dummy prev ) {
     if( el instanceof Row ) {
       ((Row) el).setPreviousAtom( prev );
     }

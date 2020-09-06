@@ -50,6 +50,12 @@ import static java.lang.String.format;
  */
 public class DefaultTeXFontParser {
 
+    /**
+     * Maximum number of font descriptions that can be loaded. This is an
+     * optimization to avoid the overhead of a {@link Map}.
+     */
+    public static final int MAX_FONT_DESCRIPTIONS = 32;
+
     private static interface CharChildParser { // NOPMD
         public void parse(Element el, char ch, FontInfo info) throws
             XMLResourceParseException;
@@ -179,9 +185,9 @@ public class DefaultTeXFontParser {
         parsedTextStyles = parseStyleMappings();
     }
 
-    public Map<Integer, FontInfo> parseFontDescriptions()
+    public FontInfo[] parseFontDescriptions()
         throws ResourceParseException {
-        final var res = new HashMap<Integer, FontInfo>(32);
+        final var res = new FontInfo[MAX_FONT_DESCRIPTIONS];
         final Element fontDescriptions = root.getChild( "FontDescriptions" );
 
         if (fontDescriptions != null) {
@@ -206,7 +212,7 @@ public class DefaultTeXFontParser {
                 }
 
                 // parsing OK, add to table
-                res.put( id, info );
+                res[id] = info;
             }
         }
 

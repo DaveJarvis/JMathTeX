@@ -89,21 +89,21 @@ public class TeXFormulaTest {
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var filename = "/tmp/eq-" + j + ".svg";
 
-      for( int i = 0; i < 1000; i++ ) {
+      for( int i = 0; i < 2_000_000; i++ ) {
         final var formula = new TeXFormula( EQUATIONS[ j ] );
         final var font = new DefaultTeXFont( size );
         final var env = new TeXEnvironment( STYLE_DISPLAY, font );
         final var box = formula.createBox( env );
         final var layout = new TeXLayout( box, size );
 
-        final var g = new SVGGraphics2D(
-            layout.getWidth(), layout.getHeight(), PX, buffer );
-        g.setRenderingHints( DEFAULT_HINTS );
-        g.scale( size, size );
-
-        box.draw( g, layout.getX(), layout.getY() );
-        svg = g.getSVGElement( null, true, null, null, null );
-        buffer.setLength( 0 );
+//        final var g = new SVGGraphics2D(
+//            layout.getWidth(), layout.getHeight(), PX, buffer );
+//        g.setRenderingHints( DEFAULT_HINTS );
+//        g.scale( size, size );
+//
+//        box.draw( g, layout.getX(), layout.getY() );
+//        svg = g.getSVGElement( null, true, null, null, null );
+//        buffer.setLength( 0 );
       }
 
 //      try( final var fos = new FileOutputStream( filename );

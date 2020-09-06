@@ -36,6 +36,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Character.isWhitespace;
+import static java.lang.String.format;
+
 /**
  * Represents a logical mathematical formula that will be displayed (by creating a
  * {@link TeXIcon} from it and painting it) using algorithms that are based on the
@@ -135,7 +138,10 @@ public class TeXFormula {
     }
     
     // the string to be parsed
-    private String parseString;
+    private String texString;
+
+    // Length of string to be parsed.
+    private int texStringLen;
     
     // current position in the parse string
     private int pos;
@@ -147,11 +153,9 @@ public class TeXFormula {
     private String textStyle;
     
     /**
-     * Creates an empty TeXFormula.
-     *
+     * Creates an empty instance.
      */
     public TeXFormula() {
-        // do nothing
     }
     
     /**
@@ -864,14 +868,14 @@ public class TeXFormula {
         skipWhiteSpace();
         Atom f = atom;
         
-        if (pos < parseString.length()) {
+        if (pos < texStringLen ) {
             // attach script(s) if present
-            char ch = parseString.charAt(pos);
+            char ch = texString.charAt( pos);
             
             // ' = ^{\prime... so first replace this, then attach this script
             if (ch == PRIME) {
                 replaceAccents();
-                ch = parseString.charAt(pos);
+                ch = texString.charAt( pos);
             }
             
             // look for scripts and attach them
@@ -880,8 +884,8 @@ public class TeXFormula {
                 if (ch == SUPER_SCRIPT) { // superscript
                     TeXFormula sup = getScript(), sub = new TeXFormula();
                     skipWhiteSpace();
-                    if (pos < parseString.length()
-                    && parseString.charAt(pos) == SUB_SCRIPT) { // both
+                    if (pos < texStringLen
+                    && texString.charAt( pos) == SUB_SCRIPT) { // both
                         pos++;
                         sub = getScript();
                     }
@@ -892,8 +896,8 @@ public class TeXFormula {
                 } else { // subscript
                     TeXFormula sub = getScript(), sup = new TeXFormula();
                     skipWhiteSpace();
-                    if (pos < parseString.length()
-                    && parseString.charAt(pos) == SUPER_SCRIPT) { // both
+                    if (pos < texStringLen
+                    && texString.charAt( pos) == SUPER_SCRIPT) { // both
                         pos++;
                         sup = getScript();
                     }
@@ -1241,21 +1245,21 @@ public class TeXFormula {
     */
     private String getGroup(char open, char close) throws ParseException {
         int group = 0;
-        if (pos < parseString.length()) {
-            char ch = parseString.charAt(pos);
+        if (pos < texStringLen ) {
+            char ch = texString.charAt( pos);
             if (ch == open) {
                 pos++;
                 StringBuilder buf = new StringBuilder();
-                while (pos < parseString.length()
-                && !(parseString.charAt(pos) == close && group == 0)) {
-                    if (parseString.charAt(pos) == open)
+                while (pos < texStringLen
+                && !(texString.charAt( pos) == close && group == 0)) {
+                    if ( texString.charAt( pos) == open)
                         group++;
-                    else if (parseString.charAt(pos) == close)
+                    else if ( texString.charAt( pos) == close)
                         group--;
-                    buf.append(parseString.charAt(pos));
+                    buf.append( texString.charAt( pos));
                     pos++;
                 }
-                if (pos == parseString.length())
+                if (pos == texStringLen )
                     // end of string reached, but not processed properly
                     throw new ParseException("Illegal end,  missing '" + close
                             + "'!");
@@ -1279,8 +1283,8 @@ public class TeXFormula {
     private TeXFormula getScript() throws ParseException {
         skipWhiteSpace();
         char ch;
-        if (pos < parseString.length()) {
-            ch = parseString.charAt(pos);
+        if (pos < texStringLen ) {
+            ch = texString.charAt( pos);
             if (ch == L_GROUP) {
                 return new TeXFormula(getGroup(L_GROUP, R_GROUP));
             } else {
@@ -1359,36 +1363,56 @@ public class TeXFormula {
         root = new OverlinedAtom(root);
         return this;
     }
-    
-   /*
-    * Starts parsing the given string (at position 0).
-    */
-    private void parse(String s) throws ParseException {
-        parseString = s;
-        if (parseString.length() != 0) {
-            while (pos < parseString.length()) {
-                char ch = parseString.charAt(pos);
-                if (isWhiteSpace(ch))
-                    pos++; // ignore white space
-                else if (ch == ESCAPE)
-                    processEscape();
-                else if (ch == L_GROUP)
-                    add(attachScripts(new TeXFormula(getGroup(L_GROUP, R_GROUP)).root));
-                else if (ch == R_GROUP)
-                    throw new ParseException("Found a closing '" + R_GROUP
-                            + "' without an opening '" + L_GROUP + "'!");
-                else if (ch == SUPER_SCRIPT || ch == SUB_SCRIPT || ch == PRIME) // ' = ^{\prime...
-                    if (pos == 0) // first character
-                        throw new ParseException("Every script needs a base: \""
-                                + SUPER_SCRIPT + "\", \"" + SUB_SCRIPT + "\" and \""
-                                + PRIME + "\" can't be the first character!");
-                    else
-                        throw new ParseException(
-                                "Double scripts found! Try using more braces.");
-                else
-                    add(attachScripts(convertCharacter(ch)));
-            }
+
+    /*
+     * Starts parsing the given string (at position 0).
+     */
+    private void parse( String s ) throws ParseException {
+      texString = s;
+      texStringLen = s.length();
+
+      // Break early to avoid nesting deeply.
+      if( texStringLen == 0 ) {
+        return;
+      }
+
+      final int l = texStringLen;
+      while( pos < l ) {
+        final char ch = texString.charAt( pos );
+
+        // ignore white space
+        if( isWhitespace( ch ) ) {
+          pos++;
         }
+        else if( ch == ESCAPE ) {
+          processEscape();
+        }
+        else if( ch == L_GROUP ) {
+          add( attachScripts(
+              new TeXFormula( getGroup( L_GROUP, R_GROUP ) ).root ) );
+        }
+        else if( ch == R_GROUP ) {
+          final String msg = format(
+              "Found closing '%s' without opening '%s'", R_GROUP, L_GROUP );
+          throw new ParseException( msg );
+        }
+        else if( ch == SUPER_SCRIPT || ch == SUB_SCRIPT || ch == PRIME ) {
+          // ' = ^{\prime...
+          if( pos == 0 ) {
+            throw new ParseException(
+                "Every script needs a base: \""
+                    + SUPER_SCRIPT + "\", \"" + SUB_SCRIPT + "\" and \""
+                    + PRIME + "\" can't be the first character" );
+          }
+          else {
+            final String msg = "Double scripts found, use more braces.";
+            throw new ParseException( msg );
+          }
+        }
+        else {
+          add( attachScripts( convertCharacter( ch ) ) );
+        }
+      }
     }
     
    /*
@@ -1407,12 +1431,12 @@ public class TeXFormula {
             return new FractionAtom(num.root, denom.root, true);
         } else { // sqrt
             skipWhiteSpace();
-            if (pos == parseString.length())
+            if (pos == texStringLen )
                 // end of string reached, but not processed properly
                 throw new ParseException("illegal end!");
             
             final TeXFormula nRoot;
-            if (parseString.charAt(pos) == L_BRACK) { // n-th root
+            if ( texString.charAt( pos) == L_BRACK) { // n-th root
                 nRoot = new TeXFormula(getGroup(L_BRACK, R_BRACK));
                 skipWhiteSpace();
             }
@@ -1442,14 +1466,14 @@ public class TeXFormula {
         // what was the longest match: symbol or predefined TeXFormula?
         boolean symbolLongest = true;
         
-        while (pos < parseString.length()) {
-            char ch = parseString.charAt(pos);
-            boolean isEnd = (pos == parseString.length() - 1);
+        while (pos < texStringLen ) {
+            char ch = texString.charAt( pos);
+            boolean isEnd = (pos == texStringLen - 1);
             
             // the following characters can't be part of a command or symbol, so
             // if there's no command or symbol found, then an exception is
             // thrown
-            if (isWhiteSpace(ch) || ch == ESCAPE || ch == SUB_SCRIPT
+            if ( isWhitespace( ch) || ch == ESCAPE || ch == SUB_SCRIPT
                     || ch == SUPER_SCRIPT || isEnd) {
                 endOfEscape = true;
                 if (isEnd) {
@@ -1896,21 +1920,25 @@ public class TeXFormula {
     * current position in the parse string.
     */
     private void replaceAccents() {
-        StringBuilder buf = new StringBuilder( "" + SUPER_SCRIPT);
+        final StringBuilder buf = new StringBuilder();
+        buf.append(SUPER_SCRIPT);
         buf.append(L_GROUP);
         buf.append("\\prime");
         int i = pos + 1;
-        while (i < parseString.length()) {
-            if (parseString.charAt(i) == PRIME)
-                buf.append("\\prime");
-            else if (!isWhiteSpace(parseString.charAt(i)))
-                break;
-            i++;
+        while (i < texStringLen ) {
+          if( texString.charAt( i ) == PRIME ) {
+            buf.append( "\\prime" );
+          }
+          else if( !isWhitespace( texString.charAt( i ) ) ) {
+            break;
+          }
+          i++;
         }
         buf.append(R_GROUP);
         // construct the new parsing string
-        parseString = parseString.substring(0, pos) + buf.toString()
-        + parseString.substring(i);
+        texString = texString.substring( 0, pos ) + buf.toString()
+            + texString.substring( i );
+        texStringLen = texString.length();
     }
     
     /**
@@ -2102,9 +2130,9 @@ public class TeXFormula {
     * non-whitespace character
     */
     private void skipWhiteSpace() {
-        while (pos < parseString.length()
-        && isWhiteSpace(parseString.charAt(pos)))
-            pos++;
+      while( pos < texStringLen && isWhitespace( texString.charAt( pos ) ) ) {
+        pos++;
+      }
     }
     
     /**
@@ -2185,12 +2213,5 @@ public class TeXFormula {
     */
     private static boolean isSymbol(char c) {
       return !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
-    }
-    
-   /*
-    * Tests if the given character is a whitespace character.
-    */
-    private static boolean isWhiteSpace(char ch) {
-      return (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
     }
 }

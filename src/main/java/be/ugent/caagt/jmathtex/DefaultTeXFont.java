@@ -57,13 +57,14 @@ public class DefaultTeXFont implements TeXFont {
 
     private static final Map<String, CharFont[]> textStyleMappings;
     private static final Map<String, CharFont> symbolMappings;
-    private static final Map<Integer, FontInfo> fontInfo;
     private static final Map<String, Float> parameters;
     private static final Map<String, Number> generalSettings;
+    private static final FontInfo[] fontInfo;
 
     private static final int sMuFontId;
     private static final float sScriptFactor;
     private static final float sScriptScriptFactor;
+    private static final Integer sSpaceFontId;
 
     static {
         final var parser = new DefaultTeXFontParser();
@@ -81,7 +82,7 @@ public class DefaultTeXFont implements TeXFont {
         fontInfo = parser.parseFontDescriptions();
 
         sMuFontId = generalSettings.get( MUFONTID_ATTR ).intValue();
-        if( fontInfo.get( sMuFontId ) == null ) {
+        if( fontInfo[ sMuFontId ] == null ) {
             throw new XMLResourceParseException(
                 RESOURCE_NAME, GEN_SET_EL, MUFONTID_ATTR,
                 "contains an unknown font for %s: " + sMuFontId );
@@ -89,6 +90,7 @@ public class DefaultTeXFont implements TeXFont {
 
         sScriptFactor = generalSettings.get( "scriptfactor" ).floatValue();
         sScriptScriptFactor = generalSettings.get( "scriptscriptfactor" ).floatValue();
+        sSpaceFontId = generalSettings.get( SPACEFONTID_ATTR ).intValue();
     }
 
     private final float size;
@@ -178,8 +180,7 @@ public class DefaultTeXFont implements TeXFont {
     }
 
     public float getSpace( int style ) {
-        int spaceFontId = generalSettings.get( SPACEFONTID_ATTR ).intValue();
-        FontInfo info = getFontInfo( spaceFontId );
+        final FontInfo info = getFontInfo( sSpaceFontId );
         return info.getSpace( getScaledSizeFactor( style ) );
     }
 
@@ -242,23 +243,29 @@ public class DefaultTeXFont implements TeXFont {
         return getChar(c, defaultTextStyleMappings[CAPITALS], style);
     }
 
-    public Extension getExtension(Char c, int style) {
-        int fc = c.getFontId();
-        float s = getSizeFactor(style);
+    public Extension getExtension( Char c, int style ) {
+        final int fontId = c.getFontId();
+        final float s = getSizeFactor( style );
 
         // construct Char for every part
-        FontInfo info = fontInfo.get(fc);
-        int[] ext = info.getExtension(c.getChar());
-        Char[] parts = new Char[ext.length];
-        for (int i = 0; i < ext.length; i++) {
-            if (ext[i] == NONE)
-                parts[i] = null;
-            else
-                parts[i] = new Char((char) ext[i], fc, getMetrics(new CharFont(
-                        (char) ext[i], fc), s));
+        final FontInfo info = getFontInfo( fontId );
+        final int[] ext = info.getExtension( c.getChar() );
+        final Char[] parts = new Char[ ext.length ];
+
+        for( int i = 0; i < ext.length; i++ ) {
+            if( ext[ i ] == NONE ) {
+                parts[ i ] = null;
+            }
+            else {
+                parts[ i ] = new Char(
+                    (char) ext[ i ],
+                    fontId,
+                    getMetrics( new CharFont( (char) ext[ i ], fontId ), s ) );
+            }
         }
 
-        return new Extension(parts[TOP], parts[MID], parts[REP], parts[BOT]);
+        return new Extension(
+            parts[ TOP ], parts[ MID ], parts[ REP ], parts[ BOT ] );
     }
 
     public float getKern(CharFont left, CharFont right, int style) {
@@ -336,7 +343,7 @@ public class DefaultTeXFont implements TeXFont {
     }
 
     public FontInfo getFontInfo(final int fontId) {
-        return fontInfo.get( fontId );
+        return fontInfo[ fontId ];
     }
 
     private static float getParameter(String parameterName) {
