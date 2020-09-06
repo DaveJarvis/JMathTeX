@@ -34,6 +34,7 @@ import be.ugent.caagt.jmathtex.parsers.TeXSymbolParser;
 
 import java.util.BitSet;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A box representing a symbol (a non-alphanumeric character).
@@ -91,25 +92,39 @@ public class SymbolAtom extends CharSymbol {
         this.type = type;
         delimiter = del;
     }
-    
+
     /**
-     * Looks up the name in the table and returns the corresponding SymbolAtom representing
-     * the symbol (if it's found).
+     * Looks up the name in the table and returns the corresponding
+     * {@link SymbolAtom} representing the symbol, if found.
+     * <p>
+     * TODO: Use {@link Optional} instead.
+     * </p>
      *
-     * @param name the name of the symbol
-     * @return a SymbolAtom representing the found symbol
-     * @throws SymbolNotFoundException if no symbol with the given name was found
+     * @param name Symbol name.
+     * @return An existing {@link SymbolAtom} representing the found symbol.
+     * @throws SymbolNotFoundException No symbol matches the given name.
      */
-    public static SymbolAtom get(final String name)
+    public static SymbolAtom get( final String name )
         throws SymbolNotFoundException {
         final SymbolAtom obj = getNullable( name );
-        if (obj == null) {
+        if( obj == null ) {
             throw new SymbolNotFoundException( name );
         }
 
         return obj;
     }
 
+    /**
+     * Looks up the name in the table and returns the corresponding
+     * {@link SymbolAtom} representing the symbol, if found.
+     * <p>
+     * TODO: Use {@link Optional} instead.
+     * </p>
+     *
+     * @param name Symbol name.
+     * @return An existing {@link SymbolAtom} representing the found symbol,
+     * or {@code null} if not found.
+     */
     public static SymbolAtom getNullable( final String name ) {
         return symbols.get( name );
     }

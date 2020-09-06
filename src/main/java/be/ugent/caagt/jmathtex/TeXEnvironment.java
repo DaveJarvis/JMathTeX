@@ -79,7 +79,7 @@ public class TeXEnvironment {
      * @return a copy of the environment, but in a cramped style.
      */
     public TeXEnvironment crampStyle() {
-        TeXEnvironment s = copy();
+        final var s = copy();
         s.style = (style % 2 == 1 ? style : style + 1);
         return s;
     }
@@ -88,7 +88,7 @@ public class TeXEnvironment {
      * @return a copy of the environment, but in denominator style.
      */
     public TeXEnvironment denomStyle() {
-        TeXEnvironment s = copy();
+        final var s = copy();
         s.style = 2 * (style / 2) + 1 + 2 - 2 * (style / 6);
         return s;
     }
@@ -132,7 +132,7 @@ public class TeXEnvironment {
      * @return a copy of the environment, but in numerator style.
      */
     public TeXEnvironment numStyle() {
-        TeXEnvironment s = copy();
+        final var s = copy();
         s.style = style + 2 - 2 * (style / 6);
         return s;
     }
@@ -149,7 +149,7 @@ public class TeXEnvironment {
      * @return a copy of the environment, but with the style changed for roots
      */
     public TeXEnvironment rootStyle() {
-        TeXEnvironment s = copy();
+        final var s = copy();
         s.style = TeXConstants.STYLE_SCRIPT_SCRIPT;
         return s;
     }
@@ -172,7 +172,7 @@ public class TeXEnvironment {
      * @return a copy of the environment, but in subscript style.
      */
     public TeXEnvironment subStyle() {
-        TeXEnvironment s = copy();
+        final var s = copy();
         s.style = 2 * (style / 4) + 4 + 1;
         return s;
     }
@@ -181,11 +181,11 @@ public class TeXEnvironment {
      * @return a copy of the environment, but in superscript style.
      */
     public TeXEnvironment supStyle() {
-        TeXEnvironment s = copy();
+        final var s = copy();
         s.style = 2 * (style / 4) + 4 + (style % 2);
         return s;
     }
-    
+
     public float getSpace() {
         return tf.getSpace(style);
     }

@@ -22,6 +22,7 @@ package com.whitemagicsoftware.tex;
 import be.ugent.caagt.jmathtex.DefaultTeXFont;
 import be.ugent.caagt.jmathtex.TeXEnvironment;
 import be.ugent.caagt.jmathtex.TeXFormula;
+import be.ugent.caagt.jmathtex.TeXLayout;
 import org.jfree.svg.SVGGraphics2D;
 
 import java.io.FileOutputStream;
@@ -34,7 +35,7 @@ import static java.awt.RenderingHints.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.jfree.svg.SVGHints.KEY_DRAW_STRING_TYPE;
 import static org.jfree.svg.SVGHints.VALUE_DRAW_STRING_TYPE_VECTOR;
-import static org.jfree.svg.SVGUnits.PT;
+import static org.jfree.svg.SVGUnits.PX;
 
 public class TeXFormulaTest {
   private final static Map<Object, Object> DEFAULT_HINTS = Map.of(
@@ -83,30 +84,32 @@ public class TeXFormulaTest {
     final var size = 20f;
     String svg = "";
 
+    final var buffer = new StringBuilder( 16384 );
+
     for( int j = 0; j < EQUATIONS.length; j++ ) {
-      final String filename = "/tmp/equation-" + j + ".svg";
+      final var filename = "/tmp/eq-" + j + ".svg";
 
-      final StringBuilder buffer = new StringBuilder( 16384 );
-
-      for( int i = 0; i < 1; i++ ) {
-        final var formula = new TeXFormula( EQUATIONS[j] );
+      for( int i = 0; i < 1000; i++ ) {
+        final var formula = new TeXFormula( EQUATIONS[ j ] );
         final var font = new DefaultTeXFont( size );
         final var env = new TeXEnvironment( STYLE_DISPLAY, font );
         final var box = formula.createBox( env );
-        final var dim = box.toDimension();
+        final var layout = new TeXLayout( box, size );
 
-        final var svgg = new SVGGraphics2D( dim.width, dim.height, PT, buffer );
-        svgg.setRenderingHints( DEFAULT_HINTS );
+        final var g = new SVGGraphics2D(
+            layout.getWidth(), layout.getHeight(), PX, buffer );
+        g.setRenderingHints( DEFAULT_HINTS );
+        g.scale( size, size );
 
-        box.draw( svgg, 0, box.getHeight() );
-        svg = svgg.getSVGElement( null, true, null, null, null );
+        box.draw( g, layout.getX(), layout.getY() );
+        svg = g.getSVGElement( null, true, null, null, null );
         buffer.setLength( 0 );
       }
 
-      try( final var fos = new FileOutputStream( filename );
-           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
-        out.write( svg );
-      }
+//      try( final var fos = new FileOutputStream( filename );
+//           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
+//        out.write( svg );
+//      }
     }
   }
 

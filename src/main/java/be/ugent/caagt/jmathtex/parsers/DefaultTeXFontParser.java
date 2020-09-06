@@ -181,7 +181,7 @@ public class DefaultTeXFontParser {
 
     public Map<Integer, FontInfo> parseFontDescriptions()
         throws ResourceParseException {
-        final Map<Integer, FontInfo> res = new HashMap<>();
+        final var res = new HashMap<Integer, FontInfo>(32);
         final Element fontDescriptions = root.getChild( "FontDescriptions" );
 
         if (fontDescriptions != null) {
@@ -347,7 +347,7 @@ public class DefaultTeXFontParser {
         return result;
     }
 
-    public Map<String, CharFont[]> parseTextStyleMappings() {
+    public Map<String, CharFont[]> getParsedTextStyleMappings() {
         return parsedTextStyles;
     }
 
@@ -360,7 +360,7 @@ public class DefaultTeXFontParser {
                 RESOURCE_NAME, "TextStyleMappings" );
         }
 
-        final Map<String,CharFont[]> res = new HashMap<>();
+        final Map<String, CharFont[]> res = new HashMap<>();
 
         for (final var mapping : textStyleMappings.getChildren(STYLE_MAPPING_EL)) {
             // get required string attribute
@@ -388,7 +388,6 @@ public class DefaultTeXFontParser {
         }
         return res;
     }
-
 
     public static float parseFloatElement( String attrName, Element element )
         throws ResourceParseException {

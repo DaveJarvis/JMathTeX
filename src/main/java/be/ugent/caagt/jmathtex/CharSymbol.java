@@ -38,7 +38,7 @@ abstract class CharSymbol extends Atom {
     * Mrow will mark certain CharSymbol atoms as a text symbol.
     * Msubsup wil use this property for a certain spacing rule.
     */
-   private boolean textSymbol = false;
+   private boolean textSymbol;
 
    /**
     * Mark as text symbol (used by Dummy)
@@ -68,7 +68,6 @@ abstract class CharSymbol extends Atom {
     * by this atom.
     * 
     * @param tf the TeXFont containing all font related information
-    * @return
     */
    public abstract CharFont getCharFont(TeXFont tf);
 }

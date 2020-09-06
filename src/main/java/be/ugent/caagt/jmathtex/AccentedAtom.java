@@ -33,6 +33,8 @@ import be.ugent.caagt.jmathtex.exceptions.InvalidTeXFormulaException;
 import be.ugent.caagt.jmathtex.exceptions.SymbolNotFoundException;
 import be.ugent.caagt.jmathtex.parsers.TeXSymbolParser;
 
+import static java.lang.Math.min;
+
 /**
  * An atom representing another atom with an accent symbol above it.
  */
@@ -99,14 +101,14 @@ public class AccentedAtom extends Atom {
     }
     
     public Box createBox(TeXEnvironment env) {
-        TeXFont tf = env.getTeXFont();
-        int style = env.getStyle();
+        final TeXFont tf = env.getTeXFont();
+        final int style = env.getStyle();
         
         // set base in cramped style
         Box b = (base == null ? new StrutBox() : base.createBox(env
                 .crampStyle()));
-        
-        float u = b.getWidth();
+
+        final float u = b.getWidth();
         float s = 0;
         if (base instanceof CharSymbol)
             s = tf.getSkew(((CharSymbol) base).getCharFont(tf), style);
@@ -114,7 +116,7 @@ public class AccentedAtom extends Atom {
         // retrieve best Char from the accent symbol
         Char ch = tf.getChar(accent.getName(), style);
         while (tf.hasNextLarger(ch)) {
-            Char larger = tf.getNextLarger(ch, style);
+            final Char larger = tf.getNextLarger(ch, style);
             if (larger.getWidth() <= u)
                 ch = larger;
             else
@@ -122,11 +124,11 @@ public class AccentedAtom extends Atom {
         }
         
         // calculate delta
-        float delta = Math.min(b.getHeight(), tf.getXHeight(style, ch
+        final float delta = min(b.getHeight(), tf.getXHeight(style, ch
                 .getFontId()));
         
         // create vertical box
-        VerticalBox vBox = new VerticalBox();
+        final VerticalBox vBox = new VerticalBox();
         
         // accent
         Box y;
@@ -150,7 +152,8 @@ public class AccentedAtom extends Atom {
         vBox.add(b);
         
         // set height and depth vertical box
-        float total = vBox.getHeight() + vBox.getDepth(), d = b.getDepth();
+        final var total = vBox.getHeight() + vBox.getDepth();
+        final var d = b.getDepth();
         vBox.setDepth(d);
         vBox.setHeight(total - d);
         return vBox;

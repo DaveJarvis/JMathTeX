@@ -35,6 +35,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
+
 /**
  * An atom representing a horizontal row of other atoms, to be separated by glue.
  * It's also responsible for inserting kerns and ligatures.
@@ -57,21 +59,21 @@ public class RowAtom extends Atom implements Row {
     static {
         // fill binSet
         binSet = new BitSet (16);
-        binSet.set(TeXConstants.TYPE_BINARY_OPERATOR);
-        binSet.set(TeXConstants.TYPE_BIG_OPERATOR);
-        binSet.set(TeXConstants.TYPE_RELATION);
-        binSet.set(TeXConstants.TYPE_OPENING);
-        binSet.set(TeXConstants.TYPE_PUNCTUATION);
+        binSet.set( TYPE_BINARY_OPERATOR);
+        binSet.set( TYPE_BIG_OPERATOR);
+        binSet.set( TYPE_RELATION);
+        binSet.set( TYPE_OPENING);
+        binSet.set( TYPE_PUNCTUATION);
         
         // fill ligKernSet
         ligKernSet = new BitSet (16);
-        ligKernSet.set(TeXConstants.TYPE_ORDINARY);
-        ligKernSet.set(TeXConstants.TYPE_BIG_OPERATOR);
-        ligKernSet.set(TeXConstants.TYPE_BINARY_OPERATOR);
-        ligKernSet.set(TeXConstants.TYPE_RELATION);
-        ligKernSet.set(TeXConstants.TYPE_OPENING);
-        ligKernSet.set(TeXConstants.TYPE_CLOSING);
-        ligKernSet.set(TeXConstants.TYPE_PUNCTUATION);
+        ligKernSet.set( TYPE_ORDINARY);
+        ligKernSet.set( TYPE_BIG_OPERATOR);
+        ligKernSet.set( TYPE_BINARY_OPERATOR);
+        ligKernSet.set( TYPE_RELATION);
+        ligKernSet.set( TYPE_OPENING);
+        ligKernSet.set( TYPE_CLOSING);
+        ligKernSet.set( TYPE_PUNCTUATION);
     }
     
     protected RowAtom() {
@@ -118,28 +120,30 @@ public class RowAtom extends Atom implements Row {
      */
     private void changeToOrd(Dummy cur, Dummy prev, Atom next) {
         int type = cur.getLeftType();
-        if (type == TeXConstants.TYPE_BINARY_OPERATOR
+        if (type == TYPE_BINARY_OPERATOR
                 && (prev == null || binSet.get(prev.getRightType())))
-            cur.setType(TeXConstants.TYPE_ORDINARY);
+            cur.setType( TYPE_ORDINARY);
         else if (next != null
-                && cur.getRightType() == TeXConstants.TYPE_BINARY_OPERATOR) {
+                && cur.getRightType() == TYPE_BINARY_OPERATOR) {
             int nextType = next.getLeftType();
-            if (nextType == TeXConstants.TYPE_RELATION
-                    || nextType == TeXConstants.TYPE_CLOSING
-                    || nextType == TeXConstants.TYPE_PUNCTUATION)
-                cur.setType(TeXConstants.TYPE_ORDINARY);
+            if (nextType == TYPE_RELATION
+                    || nextType == TYPE_CLOSING
+                    || nextType == TYPE_PUNCTUATION)
+                cur.setType( TYPE_ORDINARY);
         }
     }
     
-    public Box createBox(TeXEnvironment env) {
-        TeXFont tf = env.getTeXFont();
-        HorizontalBox hBox = new HorizontalBox(env.getColor(), env
-                .getBackground());
+    public Box createBox(final TeXEnvironment env) {
+        final TeXFont tf = env.getTeXFont();
+        final HorizontalBox hBox = new HorizontalBox(
+            env.getColor(), env.getBackground());
         env.reset();
         
+        final ListIterator<Atom> it = elements.listIterator();
+
         // convert atoms to boxes and add to the horizontal box
-        for (ListIterator<Atom> it = elements.listIterator(); it.hasNext();) {
-            Dummy atom = new Dummy( it.next() );
+        while( it.hasNext() ) {
+            final Dummy atom = new Dummy( it.next() );
             
             // if necessary, change BIN type to ORD
             Atom nextAtom = null;
@@ -151,25 +155,28 @@ public class RowAtom extends Atom implements Row {
             
             // check for ligatures or kerning
             float kern = 0;
-            if (it.hasNext() && atom.getRightType() == TeXConstants.TYPE_ORDINARY
+            if (it.hasNext() && atom.getRightType() == TYPE_ORDINARY
                     && atom.isCharSymbol()) {
-                Atom next = it.next();
+                final Atom next = it.next();
                 if (next instanceof CharSymbol
                         && ligKernSet.get(next.getLeftType())) {
                     atom.markAsTextSymbol();
-                    CharFont l = atom.getCharFont(tf), r = ((CharSymbol) next)
-                    .getCharFont(tf);
-                    CharFont lig = tf.getLigature(l, r);
+                    final CharFont l = atom.getCharFont(tf);
+                    final CharFont r = ((CharSymbol) next).getCharFont(tf);
+                    final CharFont lig = tf.getLigature(l, r);
                     if (lig == null) {
                         kern = tf.getKern(l, r, env.getStyle());
-                        it.previous(); // iterator remains unchanged (no ligature!)
+                        // iterator remains unchanged (no ligature!)
+                        it.previous();
                     } 
-                    else { // ligature
-                        atom.changeAtom(new FixedCharAtom(lig)); // go on with the
-                        // ligature
+                    else {
+                        // go on with the ligature
+                        atom.changeAtom(new FixedCharAtom(lig));
                     }
-                } else
-                    it.previous();// iterator remains unchanged
+                } else {
+                    // iterator remains unchanged
+                    it.previous();
+                }
             }
             
             // insert glue, unless it's the first element of the row
@@ -188,13 +195,16 @@ public class RowAtom extends Atom implements Row {
             env.setLastFontId(b.getLastFontId());
             
             // insert kern
-            if (kern > TeXFormula.PREC)
-                hBox.add(new StrutBox(0, kern, 0, 0));
+            if( kern > TeXFormula.PREC ) {
+                hBox.add( new StrutBox( 0, kern, 0, 0 ) );
+            }
             
             // kerns do not interfere with the normal glue-rules without kerns
-            if (!atom.isKern())
+            if( !atom.isKern() ) {
                 previousAtom = atom;
+            }
         }
+
         // reset previousAtom
         previousAtom = null;
         
@@ -208,14 +218,14 @@ public class RowAtom extends Atom implements Row {
     
     public int getLeftType() {
         if (elements.isEmpty())
-            return TeXConstants.TYPE_ORDINARY;
+            return TYPE_ORDINARY;
         else
             return elements.get(0).getLeftType();
     }
     
     public int getRightType() {
         if (elements.isEmpty())
-            return TeXConstants.TYPE_ORDINARY;
+            return TYPE_ORDINARY;
         else
             return elements.get(elements.size() - 1).getRightType();
     }

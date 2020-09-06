@@ -214,19 +214,6 @@ public abstract class Box {
    public abstract int getLastFontId();
 
    /**
-    * Returns the total width and height of this {@link Box} object, which
-    * includes the depth.
-    *
-    * @return A new {@link Dimension} instance that represents the bounding
-    * width and height for this {@link Box} object.
-    */
-   public Dimension toDimension() {
-      final int width = (int) getWidth();
-      final int height = (int) (getHeight() + getDepth());
-      return new Dimension( width, height );
-   }
-
-   /**
     * Stores the old color setting, draws the background of the box (if not null) 
     * and sets the foreground color (if not null).
     * 

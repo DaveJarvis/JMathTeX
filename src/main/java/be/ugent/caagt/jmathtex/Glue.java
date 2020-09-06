@@ -30,29 +30,31 @@ package be.ugent.caagt.jmathtex;
 
 import be.ugent.caagt.jmathtex.parsers.GlueSettingsParser;
 
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
+
 /**
  * Represents glue by its 3 components. Contains the "glue rules".
  */
 public class Glue {
-    
+
+    // contains the different glue types
+    private static final Glue[] glueTypes;
+
+    // the glue table representing the "glue rules" (as in TeX)
+    private static final int[][][] glueTable;
+
+    static {
+        final GlueSettingsParser parser = new GlueSettingsParser();
+        glueTypes = parser.getGlueTypes();
+        glueTable = parser.createGlueTable();
+    }
+
     // the glue components
     private final float space;
     private final float stretch;
     private final float shrink;
     
     private final String name;
-    
-    // contains the different glue types
-    private static final Glue[] glueTypes;
-    
-    // the glue table representing the "glue rules" (as in TeX)
-    private static final int[][][] glueTable;
-    
-    static {
-        GlueSettingsParser parser = new GlueSettingsParser();
-        glueTypes = parser.getGlueTypes();
-        glueTable = parser.createGlueTable();
-    }
     
     public Glue(float space, float stretch, float shrink, String name) {
         this.space = space;
@@ -79,19 +81,23 @@ public class Glue {
      */
     public static Box get(int lType, int rType, TeXEnvironment env) {
         // types > INNER are considered of type ORD for glue calculations
-        int l = (lType > 7 ? TeXConstants.TYPE_ORDINARY : lType);
-        int r = (rType > 7 ? TeXConstants.TYPE_ORDINARY : rType);
+        final int l = lType > 7 ? TYPE_ORDINARY : lType;
+        final int r = rType > 7 ? TYPE_ORDINARY : rType;
         
         // search right glue-type in "glue-table"
         int glueType = glueTable[l][r][env.getStyle() / 2];        
         return glueTypes[glueType].createBox(env);
     }
-    
-    private Box createBox(TeXEnvironment env) {
-        TeXFont tf = env.getTeXFont();
-        // use "quad" from a font marked as an "mu font"
-        float quad = tf.getQuad(env.getStyle(), tf.getMuFontId());
-        return new GlueBox((space / 18.0f) * quad, (stretch / 18.0f) * quad,
-                (shrink / 18.0f) * quad);
+
+    /**
+     * Use "quad" from a font marked as a "mu font"
+     */
+    private Box createBox(final TeXEnvironment env) {
+        final TeXFont tf = env.getTeXFont();
+        float quad = tf.getQuad( env.getStyle(), tf.getMuFontId() );
+        return new GlueBox(
+            space / 18.0f * quad,
+            stretch / 18.0f * quad,
+            shrink / 18.0f * quad );
     }
 }
