@@ -91,7 +91,7 @@ public class TeXFormulaTest {
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var filename = "/tmp/eq-" + j + ".svg";
 
-      for( int i = 0; i < 1_000_000 / EQUATIONS.length; i++ ) {
+      for( int i = 0; i < 100 / EQUATIONS.length; i++ ) {
         final var formula = new TeXFormula( EQUATIONS[ j ] );
         final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
         final var box = formula.createBox( env );
@@ -116,8 +116,16 @@ public class TeXFormulaTest {
     System.out.println( System.currentTimeMillis() - startTime );
   }
 
+  public void test_vec() {
+    final var texFont = new DefaultTeXFont( 20f );
+    final var formula = new TeXFormula( EQUATIONS[ 6 ] );
+    final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
+    final var box = formula.createBox( env );
+  }
+
   public static void main( String[] args ) throws IOException {
     final var test = new TeXFormulaTest();
     test.test_MathML_SimpleFormula_Success();
+    test.test_vec();
   }
 }

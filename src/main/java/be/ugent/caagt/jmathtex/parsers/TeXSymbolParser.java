@@ -51,14 +51,14 @@ public class TeXSymbolParser {
    private static final Map<String, Integer> typeMappings = new HashMap<>();
 
    static {
-      typeMappings.put( "ord", TYPE_ORDINARY);
-      typeMappings.put("op", TYPE_BIG_OPERATOR);
-      typeMappings.put("bin", TYPE_BINARY_OPERATOR);
-      typeMappings.put("rel", TYPE_RELATION);
-      typeMappings.put("open", TYPE_OPENING);
-      typeMappings.put("close", TYPE_CLOSING);
-      typeMappings.put("punct", TYPE_PUNCTUATION);
-      typeMappings.put("acc", TYPE_ACCENT);
+      typeMappings.put( "ord", TYPE_ORDINARY );
+      typeMappings.put( "op", TYPE_BIG_OPERATOR );
+      typeMappings.put( "bin", TYPE_BINARY_OPERATOR );
+      typeMappings.put( "rel", TYPE_RELATION );
+      typeMappings.put( "open", TYPE_OPENING );
+      typeMappings.put( "close", TYPE_CLOSING );
+      typeMappings.put( "punct", TYPE_PUNCTUATION );
+      typeMappings.put( "acc", TYPE_ACCENT );
    }
 
    private final Element root;

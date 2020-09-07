@@ -36,6 +36,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Character.isAlphabetic;
 import static java.lang.Character.isWhitespace;
 import static java.lang.String.format;
 
@@ -1460,11 +1461,73 @@ public class TeXFormula {
         }
     }
 
+    private String parseCommand() {
+      final int startPos = ++pos;
+      char ch = '\0';
+
+      while( pos < texStringLen &&
+          isAlphabetic( ch = texString.charAt( pos ) ) ) {
+        pos++;
+      }
+
+      if (ch == '\0') {
+        return "";
+      }
+
+      if (pos == startPos) {
+        pos++;
+      }
+
+      final String command = texString.substring(startPos, pos);
+
+      if ("cr".equals(command) && pos < texStringLen && texString.charAt(pos) == ' ') {
+        pos++;
+      }
+
+      return command;
+    }
+
     /**
      * Tries to find a TeX command or TeX symbol name at the current position
      * in the parse string (just after an escape character was found).
      */
     private void processEscape() throws ParseException {
+      final String command = parseCommand();
+      final SymbolAtom symbolAtom = SymbolAtom.getNullable( command );
+
+      if( symbolAtom != null ) {
+        add( attachScripts( symbolAtom ) );
+        return;
+      }
+
+      final TeXFormula formula = getNullable( command );
+
+      if( formula != null ) {
+        add( attachScripts( formula.root ) );
+        return;
+      }
+
+      if( textStyles.contains( command ) ) {
+        skipWhitespace();
+        final var tf = new TeXFormula( getGroup( L_GROUP, R_GROUP ), command );
+        add( attachScripts( tf.root ) );
+      }
+
+      if( commands.contains( command ) ) {
+        add( attachScripts( processCommands( command ) ) );
+        return;
+      }
+
+      final String msg = format(
+          "Unknown symbol or command or predefined formula: '%s'", command );
+      throw new ParseException( msg );
+    }
+
+    /**
+     * Tries to find a TeX command or TeX symbol name at the current position
+     * in the parse string (just after an escape character was found).
+     */
+    private void processEscape3() throws ParseException {
         pos++;
         StringBuilder buf = new StringBuilder();
         // no longer symbol name or predefined TeXFormula name possible
@@ -1557,7 +1620,7 @@ public class TeXFormula {
         throw new ParseException("The escape-character '" + ESCAPE
                 + "' can't be the last one!");
     }
-    
+
     /**
      * Puts the given accent above the current TeXFormula and changes the current
      * TeXFormula into the resulting accent construction.
