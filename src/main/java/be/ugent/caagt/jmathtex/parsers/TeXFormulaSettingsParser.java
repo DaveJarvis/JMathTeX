@@ -33,9 +33,9 @@ import be.ugent.caagt.jmathtex.TeXFormula;
 import be.ugent.caagt.jmathtex.exceptions.ResourceParseException;
 import be.ugent.caagt.jmathtex.exceptions.XMLResourceParseException;
 import be.ugent.caagt.jmathtex.resources.XMLResourceReader;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jdom2.Element;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -97,7 +97,7 @@ public class TeXFormulaSettingsParser {
     }
     
     public Set<String> parseTextStyles() throws ResourceParseException {
-        final Set<String> res = new ObjectOpenHashSet<>();
+        final Set<String> res = new HashSet<>();
         final Element textStyles = root.getChild("TextStyles");
         if (textStyles != null) {
             for (final var style : textStyles.getChildren("TextStyle")) {

@@ -16,7 +16,6 @@ dependencies {
   implementation 'org.jdom:jdom2:2.0.6'
   implementation 'org.apache.commons:commons-math3:3.6.1'
   implementation 'org.jfree:org.jfree.svg:4.1'
-  implementation 'it.unimi.dsi:fastutil:8.4.1'
 
   testImplementation 'junit:junit:4.13'
 }
