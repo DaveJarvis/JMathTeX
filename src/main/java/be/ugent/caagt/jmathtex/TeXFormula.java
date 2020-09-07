@@ -122,7 +122,7 @@ public class TeXFormula {
     
     static {
         // character-to-symbol and character-to-delimiter mappings
-        TeXFormulaSettingsParser parser = new TeXFormulaSettingsParser();
+        final var parser = new TeXFormulaSettingsParser();
         symbolMappings = parser.parseSymbolMappings();
         delimiterMappings = parser.parseDelimiterMappings();
         
@@ -171,17 +171,18 @@ public class TeXFormula {
      * @param l a list of TeXFormula objects
      */
     public TeXFormula(List<TeXFormula> l) {
-        if (l != null) {
-            if (l.size() == 1)
-                addImpl(l.get(0));
-            else {
-                try {
-                    root = new RowAtom(l);
-                } catch ( EmptyFormulaException e) {
-                    root = null;
-                }
-            }
+      if( l != null ) {
+        if( l.size() == 1 ) {
+          addImpl( l.get( 0 ) );
         }
+        else {
+          try {
+            root = new RowAtom( l );
+          } catch( final EmptyFormulaException e ) {
+            root = null;
+          }
+        }
+      }
     }
     
     /**
@@ -190,65 +191,70 @@ public class TeXFormula {
      * @param s the string to be parsed
      * @throws ParseException if the string could not be parsed correctly
      */
-    public TeXFormula(String s) throws ParseException {
-        this(s, null);
+    public TeXFormula( final String s ) throws ParseException {
+      this( s, null );
     }
     
    /*
     * Creates a TeXFormula by parsing the given string in the given text style.
     * Used when a text style command was found in the parse string.
     */
-    private TeXFormula(String s, String textStyle) throws ParseException {
-        this.textStyle = textStyle;
-        if (s != null && s.length() != 0)
-            parse(s);
+    private TeXFormula(final String s, final String textStyle)
+        throws ParseException {
+      assert s != null;
+      this.textStyle = textStyle;
+      parse(s);
     }
     
     /**
      * Creates a new TeXFormula that is a copy of the given TeXFormula.
      * <p>
-     * <b>Both TeXFormula's are independent of one another!</b>
+     * <strong>Note:</strong> Both TeXFormula's are independent of one another.
+     * </p>
      *
      * @param f the formula to be copied
      */
-    public TeXFormula(TeXFormula f) {
-        if (f != null)
-            addImpl(f);
+    public TeXFormula(final TeXFormula f) {
+      assert f != null;
+      addImpl(f);
     }
     
    /*
     * Inserts an atom at the end of the current formula
     */
     private TeXFormula add(Atom el) {
-        if (el != null) {
-            if (root == null)
-                root = el;
-            else {
-                if (!(root instanceof RowAtom))
-                    root = new RowAtom(root);
-                ((RowAtom) root).add(el);
-            }
+      if( el != null ) {
+        if( root == null ) {
+          root = el;
         }
-        return this;
+        else {
+          if( !(root instanceof RowAtom) ) {
+            root = new RowAtom( root );
+          }
+          ((RowAtom) root).add( el );
+        }
+      }
+
+      return this;
     }
     
     /**
-     * Parses the given string and inserts the resulting formula
-     * at the end of the current TeXFormula.
+     * Parses the given string and inserts the resulting formula at the end
+     * of the current TeXFormula.
      *
      * @param s the string to be parsed and inserted
      * @throws ParseException if the string could not be parsed correctly
      * @return the modified TeXFormula
      */
-    public TeXFormula add(String s) throws ParseException {
-        if (s != null && s.length() != 0) {
-            // reset parsing variables
-            textStyle = null;
-            pos = 0;
-            // parse and add the string
-            parse(s);
-        }
-        return this;
+    public TeXFormula add(final String s) throws ParseException {
+      if( s != null && !s.isEmpty() ) {
+        // reset parsing variables
+        textStyle = null;
+        pos = 0;
+        // parse and add the string
+        parse( s );
+      }
+      return this;
     }
     
     /**
@@ -257,19 +263,16 @@ public class TeXFormula {
      * @param f the TeXFormula to be inserted
      * @return the modified TeXFormula
      */
-    public TeXFormula add(TeXFormula f) {
-        addImpl (f);
-        return this;
+    public TeXFormula add(final TeXFormula f) {
+      addImpl( f );
+      return this;
     }
-    
-    private void addImpl (TeXFormula f) {
-        if (f.root != null) {
-            // special copy-treatment for Mrow as a root!!
-            if (f.root instanceof RowAtom)
-                add(new RowAtom(f.root));
-            else
-                add(f.root);
-        }
+
+    private void addImpl( final TeXFormula f ) {
+      if( f.root != null ) {
+        // special copy-treatment for Mrow as a root.
+        add( f.root instanceof RowAtom ? new RowAtom( f.root ) : f.root );
+      }
     }
     
     /**
@@ -296,9 +299,9 @@ public class TeXFormula {
      * @throws ParseException if the string(s) could not be parsed correctly
      */
     public TeXFormula addAcc(String s, String accentName)
-    throws InvalidSymbolTypeException, SymbolNotFoundException,
-            ParseException {
-        return addAcc(new TeXFormula(s), accentName);
+        throws InvalidSymbolTypeException, SymbolNotFoundException,
+        ParseException {
+      return addAcc( new TeXFormula( s ), accentName );
     }
     
     /**
@@ -312,8 +315,8 @@ public class TeXFormula {
      * @throws SymbolNotFoundException if there's no symbol defined with the given name
      */
     public TeXFormula addAcc(TeXFormula base, String accentName)
-    throws InvalidSymbolTypeException, SymbolNotFoundException {
-        return add(new AccentedAtom((base == null ? null : base.root), accentName));
+        throws InvalidSymbolTypeException, SymbolNotFoundException {
+      return add( new AccentedAtom( base == null ? null : base.root, accentName ) );
     }
     
     /**
@@ -1367,7 +1370,7 @@ public class TeXFormula {
     /*
      * Starts parsing the given string (at position 0).
      */
-    private void parse( String s ) throws ParseException {
+    private void parse( final String s ) throws ParseException {
       texString = s;
       texStringLen = s.length();
 
@@ -1447,11 +1450,11 @@ public class TeXFormula {
             return new NthRoot(base, nRoot.root);
         }
     }
-    
-   /*
-    * Tries to find a TeX command or TeX symbol name at the current position
-    * in the parse string (just after an escape character was found).
-    */
+
+    /**
+     * Tries to find a TeX command or TeX symbol name at the current position
+     * in the parse string (just after an escape character was found).
+     */
     private void processEscape() throws ParseException {
         pos++;
         StringBuilder buf = new StringBuilder();
@@ -1465,8 +1468,8 @@ public class TeXFormula {
         int predefPos = -1;
         // what was the longest match: symbol or predefined TeXFormula?
         boolean symbolLongest = true;
-        
-        while (pos < texStringLen ) {
+
+        while( pos < texStringLen ) {
             char ch = texString.charAt( pos);
             boolean isEnd = (pos == texStringLen - 1);
             
@@ -1487,7 +1490,7 @@ public class TeXFormula {
 
             final String command = buf.toString();
 
-            // check if 'command' is a valid symbolname
+            // check if 'command' is a valid symbol name
             final SymbolAtom s = SymbolAtom.getNullable( command );
             final TeXFormula predef = s == null ? getNullable( command ) : null;
 
@@ -2164,8 +2167,9 @@ public class TeXFormula {
      * @throws FormulaNotFoundException if no predefined TeXFormula is found with the
      * 			given name
      */
-    public static TeXFormula get(String name) throws FormulaNotFoundException {
-      TeXFormula formula = getNullable( name );
+    public static TeXFormula get(final String name)
+        throws FormulaNotFoundException {
+      final TeXFormula formula = getNullable( name );
       if( formula == null ) {
         throw new FormulaNotFoundException( name );
       }
@@ -2173,7 +2177,7 @@ public class TeXFormula {
       return new TeXFormula( formula );
     }
 
-    private static TeXFormula getNullable( String name ) {
+    private static TeXFormula getNullable( final String name ) {
       return predefinedTeXFormulas.get( name );
     }
     

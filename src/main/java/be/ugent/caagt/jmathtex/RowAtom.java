@@ -98,17 +98,21 @@ public class RowAtom extends Atom implements Row {
      *           list of objects of the type Formula
      */
     public RowAtom(List<TeXFormula> l) throws EmptyFormulaException {
-        for (TeXFormula f : l) {
-            if (f.root != null)
-                elements.add(f.root);
+        for( final TeXFormula f : l ) {
+            if( f.root != null ) {
+                elements.add( f.root );
+            }
         }
-        if (elements.isEmpty())
+
+        if( elements.isEmpty() ) {
             throw new EmptyFormulaException();
+        }
     }
     
     public final void add(Atom el) {
-        if (el != null)
-            elements.add(el);
+        if( el != null ) {
+            elements.add( el );
+        }
     }
     
     /**

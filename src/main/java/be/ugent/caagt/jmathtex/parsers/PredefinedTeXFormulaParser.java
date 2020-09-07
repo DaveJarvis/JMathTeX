@@ -49,13 +49,12 @@ public class PredefinedTeXFormulaParser {
         root = new XMLResourceReader( RESOURCE_NAME ).read();
     }
     
-    public void parse(Map<String, TeXFormula> predefinedTeXFormulas) {
+    public void parse(final Map<String, TeXFormula> predefinedTeXFormulas) {
         // get required string attribute
         String enabledAll = getAttrValueAndCheckIfNotNull("enabled", root);
         if ("true".equals(enabledAll)) { // parse formula's
             // iterate all "Font"-elements
-            for (Object obj : root.getChildren("TeXFormula")) {
-                Element formula = (Element) obj;
+            for (final Element formula : root.getChildren("TeXFormula")) {
                 // get required string attribute
                 String enabled = getAttrValueAndCheckIfNotNull("enabled", formula);
                 if ("true".equals (enabled)) { // parse this formula

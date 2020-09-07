@@ -88,6 +88,8 @@ public class TeXFormulaTest {
     final var buffer = new StringBuilder( 16384 );
     final var texFont = new DefaultTeXFont( size );
 
+    final long startTime = System.currentTimeMillis();
+
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var filename = "/tmp/eq-" + j + ".svg";
 
@@ -112,6 +114,8 @@ public class TeXFormulaTest {
 //        out.write( svg );
 //      }
     }
+
+    System.out.println( System.currentTimeMillis() - startTime );
   }
 
   public static void main( String[] args ) throws IOException {
