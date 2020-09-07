@@ -288,7 +288,7 @@ public class DefaultTeXFontParser {
             if (codeMapping == null) // unknown range name
                 throw new XMLResourceParseException(RESOURCE_NAME, "MapStyle",
                         "code", "contains an unknown \"range name\" '" + code
-                        + "'!");
+                        + "'");
             // get mapped style and check if it exists
             String textStyleName = parseStringElement( "textStyle",
                                                        mapping);
@@ -296,7 +296,7 @@ public class DefaultTeXFontParser {
             if (styleMapping == null) // unknown text style
                 throw new XMLResourceParseException(RESOURCE_NAME, "MapStyle",
                         "textStyle", "contains an unknown text style '"
-                        + textStyleName + "'!");
+                        + textStyleName + "'");
             // now check if the range is defined within the mapped text style
             CharFont[] charFonts = parsedTextStyles.get(textStyleName);
 
@@ -385,7 +385,7 @@ public class DefaultTeXFontParser {
                         RESOURCE_NAME,
                         "MapRange",
                         "code",
-                        "contains an unknown \"range name\" '" + code + "'!" );
+                        "contains an unknown \"range name\" '" + code + "'" );
                 }
 
                 charFonts[ codeMapping ] = new CharFont( (char) ch, fontId );

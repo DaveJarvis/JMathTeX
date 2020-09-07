@@ -70,7 +70,7 @@ public class TeXFormulaParser {
                         PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                         ARG_OBJ_ATTR,
                         "has an unknown temporary TeXFormula name as value : '"
-                        + objectName + "'!");
+                        + objectName + "'");
             else {
                 // parse arguments
                 List<Element> args = el.getChildren("Argument");
@@ -86,7 +86,7 @@ public class TeXFormulaParser {
                             "Error invoking the method '" + methodName
                             + "' on the temporary TeXFormula '" + objectName
                             + "' while constructing the predefined TeXFormula '"
-                            + formulaName + "'!", e);
+                            + formulaName + "'", e);
                 }
             }
         }
@@ -116,7 +116,7 @@ public class TeXFormulaParser {
                 throw new XMLResourceParseException(
                         "Error creating the temporary TeXFormula '" + name
                         + "' while constructing the predefined TeXFormula '"
-                        + formulaName + "'!", e);
+                        + formulaName + "'", e);
             }
         }
     }
@@ -136,7 +136,7 @@ public class TeXFormulaParser {
                 throw new XMLResourceParseException(
                         PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                         ARG_VAL_ATTR, "has an invalid '" + type + "'-value : '"
-                        + value + "'!", e);
+                        + value + "'", e);
             }
         }
     }
@@ -177,7 +177,7 @@ public class TeXFormulaParser {
                 throw new XMLResourceParseException(
                         PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                         ARG_VAL_ATTR, "has an invalid '" + type + "'-value : '"
-                        + value + "'!");
+                        + value + "'");
             
         }
     }
@@ -198,7 +198,7 @@ public class TeXFormulaParser {
                 throw new XMLResourceParseException(
                         PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                         ARG_VAL_ATTR, "has an invalid '" + type + "'-value : '"
-                        + value + "'!", e);
+                        + value + "'", e);
             }
         }
     }
@@ -218,7 +218,7 @@ public class TeXFormulaParser {
                         PredefinedTeXFormulaParser.RESOURCE_NAME, RETURN_EL, "name",
                         "contains an unknown temporary TeXFormula variable name '"
                         + name + "' for the predefined TeXFormula '"
-                        + formulaName + "'!");
+                        + formulaName + "'");
             result = res;
         }
     }
@@ -252,7 +252,7 @@ public class TeXFormulaParser {
                             PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                             ARG_VAL_ATTR,
                             "has an unknown temporary TeXFormula name as value : '"
-                            + value + "'!");
+                            + value + "'");
                 else
                     return formula;
             }
@@ -277,7 +277,7 @@ public class TeXFormulaParser {
                 throw new XMLResourceParseException(
                         PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                         ARG_VAL_ATTR, "has an unknown constant name as value : '"
-                        + value + "'!", e);
+                        + value + "'", e);
             }
         }
     }
@@ -299,7 +299,7 @@ public class TeXFormulaParser {
                         PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                         ARG_VAL_ATTR,
                         "has an unknown color constant name as value : '" + value
-                        + "'!", e);
+                        + "'", e);
             }
         }
     }
@@ -406,7 +406,7 @@ public class TeXFormulaParser {
             throw new XMLResourceParseException(
                     PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
                     ARG_VAL_ATTR, "is required for an argument of type '" + type
-                    + "'!");
+                    + "'");
     }
 
     private static String getAttrValueAndCheckIfNotNull(String attrName,

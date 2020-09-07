@@ -30,7 +30,7 @@ package be.ugent.caagt.jmathtex;
 
 import be.ugent.caagt.jmathtex.parsers.GlueSettingsParser;
 
-import static be.ugent.caagt.jmathtex.TeXConstants.*;
+import static be.ugent.caagt.jmathtex.TeXConstants.TYPE_ORDINARY;
 
 /**
  * Represents glue by its 3 components. Contains the "glue rules".
@@ -79,14 +79,14 @@ public class Glue {
      * @param env the TeXEnvironment
      * @return a box containing representing the glue
      */
-    public static Box get(int lType, int rType, TeXEnvironment env) {
+    public static Box get(
+        final int lType, final int rType, final TeXEnvironment env) {
         // types > INNER are considered of type ORD for glue calculations
         final int l = lType > 7 ? TYPE_ORDINARY : lType;
         final int r = rType > 7 ? TYPE_ORDINARY : rType;
-        
+
         // search right glue-type in "glue-table"
-        int glueType = glueTable[l][r][env.getStyle() / 2];        
-        return glueTypes[glueType].createBox(env);
+        return glueTypes[glueTable[l][r][env.getStyle() / 2]].createBox(env);
     }
 
     /**
@@ -95,9 +95,6 @@ public class Glue {
     private Box createBox(final TeXEnvironment env) {
         final TeXFont tf = env.getTeXFont();
         float quad = tf.getQuad( env.getStyle(), tf.getMuFontId() );
-        return new GlueBox(
-            space / 18.0f * quad,
-            stretch / 18.0f * quad,
-            shrink / 18.0f * quad );
+        return new GlueBox( space / 18.0f * quad );
     }
 }

@@ -42,7 +42,7 @@ import static java.lang.Math.abs;
  * <strong>Caution:</strong> This class is not thread-safe.
  * </p>>
  */
-public class CharBox extends Box {
+public final class CharBox extends Box {
 
   /**
    * The font to use when drawing the character, the character to draw,

@@ -29,7 +29,6 @@
 package be.ugent.caagt.jmathtex.parsers;
 
 import be.ugent.caagt.jmathtex.SymbolAtom;
-import be.ugent.caagt.jmathtex.TeXConstants;
 import be.ugent.caagt.jmathtex.exceptions.ResourceParseException;
 import be.ugent.caagt.jmathtex.exceptions.XMLResourceParseException;
 import be.ugent.caagt.jmathtex.resources.XMLResourceReader;
@@ -37,6 +36,8 @@ import org.jdom2.Element;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
 
 /**
  * Parses TeX symbol definitions from an XML-file.
@@ -47,17 +48,17 @@ public class TeXSymbolParser {
    public static final String DELIMITER_ATTR = "del";
    public static final String TYPE_ATTR = "type";
 
-   private static final Map<String,Integer> typeMappings = new HashMap<>();
+   private static final Map<String, Integer> typeMappings = new HashMap<>();
 
    static {
-      typeMappings.put( "ord", TeXConstants.TYPE_ORDINARY);
-      typeMappings.put("op", TeXConstants.TYPE_BIG_OPERATOR);
-      typeMappings.put("bin", TeXConstants.TYPE_BINARY_OPERATOR);
-      typeMappings.put("rel", TeXConstants.TYPE_RELATION);
-      typeMappings.put("open", TeXConstants.TYPE_OPENING);
-      typeMappings.put("close", TeXConstants.TYPE_CLOSING);
-      typeMappings.put("punct", TeXConstants.TYPE_PUNCTUATION);
-      typeMappings.put("acc", TeXConstants.TYPE_ACCENT);
+      typeMappings.put( "ord", TYPE_ORDINARY);
+      typeMappings.put("op", TYPE_BIG_OPERATOR);
+      typeMappings.put("bin", TYPE_BINARY_OPERATOR);
+      typeMappings.put("rel", TYPE_RELATION);
+      typeMappings.put("open", TYPE_OPENING);
+      typeMappings.put("close", TYPE_CLOSING);
+      typeMappings.put("punct", TYPE_PUNCTUATION);
+      typeMappings.put("acc", TYPE_ACCENT);
    }
 
    private final Element root;
@@ -69,19 +70,17 @@ public class TeXSymbolParser {
    public Map<String, SymbolAtom> readSymbols() throws ResourceParseException {
       Map<String,SymbolAtom> res = new HashMap<>();
       // iterate all "symbol"-elements
-      for (Object obj : root.getChildren("Symbol")) {
-         Element symbol = (Element) obj;
-         // retrieve and check required attributes
-         String name = getAttrValueAndCheckIfNotNull("name", symbol), type = getAttrValueAndCheckIfNotNull(
-               TYPE_ATTR, symbol);
-         // retrieve optional attribute
+      for (final Element symbol : root.getChildren("Symbol")) {
+         String name = getAttrValueAndCheckIfNotNull("name", symbol);
+         String type = getAttrValueAndCheckIfNotNull(TYPE_ATTR, symbol);
          String del = symbol.getAttributeValue(DELIMITER_ATTR);
+
          boolean isDelimiter = (del != null && del.equals("true"));
          // check if type is known
          Integer typeVal = typeMappings.get( type);
          if (typeVal == null) // unknown type
             throw new XMLResourceParseException(RESOURCE_NAME, "Symbol",
-                  "type", "has an unknown value '" + type + "'!");
+                  "type", "has an unknown value '" + type + "'");
          // add symbol to the hash table
          res.put(name, new SymbolAtom( name, typeVal, isDelimiter));
       }

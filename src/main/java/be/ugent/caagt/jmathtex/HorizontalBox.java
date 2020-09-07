@@ -32,13 +32,14 @@ import java.awt.*;
 import java.util.ListIterator;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.*;
+import static be.ugent.caagt.jmathtex.TeXFont.NO_FONT;
 import static java.lang.Float.NEGATIVE_INFINITY;
 import static java.lang.Math.max;
 
 /**
  * A box composed of a horizontal row of child boxes.
  */
-public class HorizontalBox extends Box {
+public final class HorizontalBox extends Box {
 
   private float curPos; // NOPMD
 
@@ -103,20 +104,19 @@ public class HorizontalBox extends Box {
   }
 
   /**
-   * Iterates from the last child box (the lowest) to the first (the
-   * highest) until a font id is found that's not equal to
-   * {@link TeXFont#NO_FONT}.
+   * Iterates from the last child box (the lowest) to the first (the highest)
+   * until a font id is found that's not equal to {@link TeXFont#NO_FONT}.
    *
    * @return {@link TeXFont#NO_FONT} if there's no font ID in this
    * {@link Box}'s list of child instances.
    */
   @Override
   public int getLastFontId() {
-    int fontId = TeXFont.NO_FONT;
+    int fontId = NO_FONT;
 
     final ListIterator<Box> it = children.listIterator( children.size() );
 
-    while( fontId == TeXFont.NO_FONT && it.hasPrevious() ) {
+    while( fontId == NO_FONT && it.hasPrevious() ) {
       fontId = it.previous().getLastFontId();
     }
 

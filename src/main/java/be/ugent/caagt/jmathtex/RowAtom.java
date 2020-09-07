@@ -140,7 +140,7 @@ public class RowAtom extends Atom implements Row {
     public Box createBox(final TeXEnvironment env) {
         final TeXFont tf = env.getTeXFont();
         final HorizontalBox hBox = new HorizontalBox(
-            env.getColor(), env.getBackground());
+            env.getColor(), env.getBackground() );
         env.reset();
         
         final ListIterator<Atom> it = elements.listIterator();

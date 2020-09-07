@@ -34,6 +34,7 @@ import be.ugent.caagt.jmathtex.parsers.DefaultTeXFontParser;
 
 import java.util.Map;
 
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
 import static be.ugent.caagt.jmathtex.TeXFormula.PIXELS_PER_POINT;
 import static be.ugent.caagt.jmathtex.parsers.DefaultTeXFontParser.MUFONTID_ATTR;
 import static be.ugent.caagt.jmathtex.parsers.DefaultTeXFontParser.SPACEFONTID_ATTR;
@@ -62,7 +63,7 @@ public class DefaultTeXFont implements TeXFont {
     private static final int sMuFontId;
     private static final float sScriptFactor;
     private static final float sScriptScriptFactor;
-    private static final Integer sSpaceFontId;
+    private static final int sSpaceFontId;
 
     static {
         final var parser = new DefaultTeXFontParser();
@@ -201,8 +202,9 @@ public class DefaultTeXFont implements TeXFont {
         return getParameter( p ) * getSizeFactor( style ) * PIXELS_PER_POINT;
     }
 
-    private Char getChar(char c, CharFont[] cf, int style) {
-        final int kind, offset;
+    private Char getChar( final char c, final CharFont[] cf, final int style ) {
+        int kind = CAPITALS;
+        int offset = c - 'A';
 
         if (c >= '0' && c <= '9') {
             kind = NUMBERS;
@@ -210,9 +212,6 @@ public class DefaultTeXFont implements TeXFont {
         } else if (c >= 'a' && c <= 'z') {
             kind = SMALL;
             offset = c - 'a';
-        } else {
-            kind = CAPITALS;
-            offset = c - 'A';
         }
 
         // if the mapping for the character's range, then use the default style
@@ -259,7 +258,7 @@ public class DefaultTeXFont implements TeXFont {
      * @param style the style in which the atom should be drawn
      */
     @Override
-    public Char getDefaultChar(char c, int style) {
+    public Char getDefaultChar(final char c, final int style) {
         if (c >= '0' && c <= '9')
             return getChar(c, defaultTextStyleMappings[NUMBERS], style);
         else if (c >= 'a' && c <= 'z')
@@ -269,7 +268,7 @@ public class DefaultTeXFont implements TeXFont {
     }
 
     @Override
-    public Extension getExtension( Char c, int style ) {
+    public Extension getExtension( final Char c, final int style ) {
         final int fontId = c.getFontId();
         final float s = getSizeFactor( style );
 
@@ -295,7 +294,8 @@ public class DefaultTeXFont implements TeXFont {
     }
 
     @Override
-    public float getKern(CharFont left, CharFont right, int style) {
+    public float getKern(
+        final CharFont left, final CharFont right, final int style ) {
         if (left.fontId == right.fontId){
             final FontInfo info = getFontInfo(left.fontId);
             return info.getKern(left.c, right.c, getScaledSizeFactor(style) );
@@ -304,7 +304,7 @@ public class DefaultTeXFont implements TeXFont {
     }
 
     @Override
-    public CharFont getLigature(CharFont left, CharFont right) {
+    public CharFont getLigature( final CharFont left, final CharFont right ) {
         if (left.fontId == right.fontId) {
             final FontInfo info =  getFontInfo(left.fontId);
             return info.getLigature(left.c, right.c);
@@ -313,7 +313,7 @@ public class DefaultTeXFont implements TeXFont {
         return null;
     }
 
-    private Metrics getMetrics(CharFont cf, float size) {
+    private Metrics getMetrics( final CharFont cf, final float size ) {
         final FontInfo info = getFontInfo(cf.fontId);
         final float[] m = info.getMetrics(cf.c);
 
@@ -328,7 +328,7 @@ public class DefaultTeXFont implements TeXFont {
     }
 
     @Override
-    public Char getNextLarger(Char c, int style) {
+    public Char getNextLarger( final Char c, final int style ) {
         final FontInfo info = getFontInfo(c.getFontId());
         final CharFont ch = info.getNextLarger(c.getChar());
         final var sizeFactor = getSizeFactor(style);
@@ -351,25 +351,25 @@ public class DefaultTeXFont implements TeXFont {
     }
 
     @Override
-    public float getXHeight(int style, int fontCode) {
+    public float getXHeight(final int style, final int fontCode) {
         final FontInfo info = getFontInfo(fontCode);
         return info.getXHeight(getScaledSizeFactor(style));
     }
 
     @Override
-    public boolean hasNextLarger(Char c) {
+    public boolean hasNextLarger(final Char c) {
         final FontInfo info = getFontInfo(c.getFontId());
         return info.getNextLarger(c.getChar()) != null;
     }
 
     @Override
-    public boolean hasSpace(int font) {
+    public boolean hasSpace(final int font) {
         final FontInfo info = getFontInfo(font);
         return info.hasSpace();
     }
 
     @Override
-    public boolean isExtensionChar(Char c) {
+    public boolean isExtensionChar(final Char c) {
         final FontInfo info = getFontInfo(c.getFontId());
         return info.getExtension(c.getChar()) != null;
     }
@@ -379,16 +379,16 @@ public class DefaultTeXFont implements TeXFont {
         return fontInfo[ fontId ];
     }
 
-    private static float getParameter(String parameterName) {
+    private static float getParameter(final String parameterName) {
         final Float param = parameters.get( parameterName);
         return param == null ? 0 : param;
     }
 
-    private static float getSizeFactor(int style) {
-        if( style < TeXConstants.STYLE_SCRIPT ) {
+    private static float getSizeFactor(final int style) {
+        if( style < STYLE_SCRIPT ) {
             return 1;
         }
-        else if( style < TeXConstants.STYLE_SCRIPT_SCRIPT ) {
+        else if( style < STYLE_SCRIPT_SCRIPT ) {
             return sScriptFactor;
         }
 

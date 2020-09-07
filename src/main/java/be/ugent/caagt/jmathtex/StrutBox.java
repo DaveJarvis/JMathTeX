@@ -33,9 +33,9 @@ import java.awt.*;
 /**
  * A box representing whitespace.
  */
-public class StrutBox extends Box {
+public final class StrutBox extends Box {
   /**
-   * Constructs a new instance with all dimensions and shifts set to zero.
+   * Constructs a new instance with dimensions and shift set to zero.
    */
   public StrutBox() {
   }

@@ -29,7 +29,6 @@
 package be.ugent.caagt.jmathtex;
 
 import java.awt.*;
-import java.util.ListIterator;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.*;
 import static be.ugent.caagt.jmathtex.TeXFont.NO_FONT;
@@ -52,7 +51,7 @@ public class VerticalBox extends Box {
     add( b );
     switch( alignment ) {
       case ALIGN_CENTER -> {
-        StrutBox s = new StrutBox( 0, rest / 2, 0, 0 );
+        final StrutBox s = new StrutBox( 0, rest / 2, 0, 0 );
         super.add( 0, s );
         height += rest / 2;
         depth += rest / 2;
@@ -93,7 +92,7 @@ public class VerticalBox extends Box {
     recalculateWidth( b );
   }
 
-  private void recalculateWidth( Box b ) {
+  private void recalculateWidth( final Box b ) {
     leftMostPos = min( leftMostPos, b.shift );
     rightMostPos = max( rightMostPos, b.shift + (b.width > 0 ? b.width : 0) );
     width = rightMostPos - leftMostPos;
@@ -123,7 +122,7 @@ public class VerticalBox extends Box {
   @Override
   public int getLastFontId() {
     int fontId = NO_FONT;
-    final ListIterator<Box> it = children.listIterator( children.size() );
+    final var it = children.listIterator( children.size() );
     while( fontId == NO_FONT && it.hasPrevious() ) {
       fontId = it.previous().getLastFontId();
     }

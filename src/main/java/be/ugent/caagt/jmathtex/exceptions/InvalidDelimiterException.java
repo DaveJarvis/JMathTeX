@@ -42,13 +42,13 @@ public class InvalidDelimiterException extends JMathTeXException {
       super("The symbol with the name '" + symbolName
             + "' is not defined as a delimiter ("
             + TeXSymbolParser.DELIMITER_ATTR + "='true') in '"
-            + TeXSymbolParser.RESOURCE_NAME + "'!");
+            + TeXSymbolParser.RESOURCE_NAME + "'");
    }
 
    public InvalidDelimiterException(char ch, String symbolName) {
       super("The character '" + ch + "' is mapped to a symbol with the name '"
             + symbolName + "', but that symbol is not defined as a delimiter ("
             + TeXSymbolParser.DELIMITER_ATTR + "='true') in '"
-            + TeXSymbolParser.RESOURCE_NAME + "'!");
+            + TeXSymbolParser.RESOURCE_NAME + "'");
    }
 }

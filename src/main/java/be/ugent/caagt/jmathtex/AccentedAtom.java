@@ -63,7 +63,7 @@ public class AccentedAtom extends Atom {
             throw new InvalidSymbolTypeException("The symbol with the name '"
                     + accentName + "' is not defined as an accent ("
                     + TeXSymbolParser.TYPE_ATTR + "='acc') in '"
-                    + TeXSymbolParser.RESOURCE_NAME + "'!");
+                    + TeXSymbolParser.RESOURCE_NAME + "'");
     }
     
     /**
@@ -93,7 +93,7 @@ public class AccentedAtom extends Atom {
                             + accent.getName()
                             + "', but this symbol is not defined as an accent ("
                             + TeXSymbolParser.TYPE_ATTR + "='acc') in '"
-                            + TeXSymbolParser.RESOURCE_NAME + "'!");
+                            + TeXSymbolParser.RESOURCE_NAME + "'");
             } else
                 throw new InvalidTeXFormulaException(
                         "The accent TeXFormula does not represent a single symbol!");

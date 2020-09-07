@@ -64,7 +64,8 @@ public abstract class Box {
     */
    protected Color background;
 
-   private Color prevColor; // used temporarily in startDraw and endDraw
+   // used temporarily in startDraw and endDraw
+   private Color prevColor;
 
    /**
     * The width of this box, i.e. the value that will be used for further 

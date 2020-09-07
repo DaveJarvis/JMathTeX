@@ -868,7 +868,7 @@ public class TeXFormula {
     * and attach them to the given atom (if found)
     */
     private Atom attachScripts(Atom atom) throws ParseException {
-        skipWhiteSpace();
+        skipWhitespace();
         Atom f = atom;
         
         if (pos < texStringLen ) {
@@ -886,7 +886,7 @@ public class TeXFormula {
                 pos++;
                 if (ch == SUPER_SCRIPT) { // superscript
                     TeXFormula sup = getScript(), sub = new TeXFormula();
-                    skipWhiteSpace();
+                    skipWhitespace();
                     if (pos < texStringLen
                     && texString.charAt( pos) == SUB_SCRIPT) { // both
                         pos++;
@@ -898,7 +898,7 @@ public class TeXFormula {
                         f = new ScriptsAtom(f, sub.root, sup.root);
                 } else { // subscript
                     TeXFormula sub = getScript(), sup = new TeXFormula();
-                    skipWhiteSpace();
+                    skipWhitespace();
                     if (pos < texStringLen
                     && texString.charAt( pos) == SUPER_SCRIPT) { // both
                         pos++;
@@ -920,24 +920,24 @@ public class TeXFormula {
     private Atom convertCharacter(char c) throws ParseException {
         pos++;
         if (isSymbol(c)) {
-            String symbolName = symbolMappings[c];
+            final String symbolName = symbolMappings[c];
             if (symbolName == null)
-                throw new ParseException("Unknown character : '"
-                        + c + "'");
+                throw new ParseException("Unknown character: '" + c + "'");
             else
                 try {
                     return SymbolAtom.get(symbolName);
-                } catch (SymbolNotFoundException e) {
+                } catch (final SymbolNotFoundException e) {
                     throw new ParseException( "The character '"
                             + c
                             + "' was mapped to an unknown symbol with the name '"
-                            + symbolName + "'!", e);
+                            + symbolName + "'", e);
                 }
-        } else
-            // alphanumeric character
-            return new CharAtom(c, textStyle);
+        }
+
+        // alphanumeric character
+        return new CharAtom(c, textStyle);
     }
-    
+
    /*
     * Convert this TeXFormula into a box, starting form the given style
     */
@@ -1241,40 +1241,49 @@ public class TeXFormula {
         return this;
     }
     
-   /*
+   /**
     * Get the next group (between the given opening and closing characters)
     * at the current position in the parse string, return it as a string and
     * adjust the current position (after the group).
     */
-    private String getGroup(char open, char close) throws ParseException {
-        int group = 0;
-        if (pos < texStringLen ) {
-            char ch = texString.charAt( pos);
-            if (ch == open) {
-                pos++;
-                StringBuilder buf = new StringBuilder();
-                while (pos < texStringLen
-                && !(texString.charAt( pos) == close && group == 0)) {
-                    if ( texString.charAt( pos) == open)
-                        group++;
-                    else if ( texString.charAt( pos) == close)
-                        group--;
-                    buf.append( texString.charAt( pos));
-                    pos++;
-                }
-                if (pos == texStringLen )
-                    // end of string reached, but not processed properly
-                    throw new ParseException("Illegal end,  missing '" + close
-                            + "'!");
-                else { // end of group
-                    pos++;
-                    return buf.toString();
-                }
-            } else
-                throw new ParseException("missing '" + open + "'!");
+    private String getGroup(final char open, final char close)
+        throws ParseException {
+      int group = 0;
+
+      if( pos < texStringLen ) {
+        char ch = texString.charAt( pos );
+
+        if( ch == open ) {
+          final StringBuilder buf = new StringBuilder();
+          pos++;
+          while( pos < texStringLen && !((ch = texString.charAt( pos )) == close && group == 0) ) {
+            if( ch == open ) {
+              group++;
+            }
+            else if( ch == close ) {
+              group--;
+            }
+            buf.append( ch );
+            pos++;
+          }
+
+          // end of string reached, but not processed properly
+          if( pos == texStringLen ) {
+            throw new ParseException( "Illegal end, missing '" + close
+                                          + "'" );
+          }
+          else {
+            // end of group
+            pos++;
+            return buf.toString();
+          }
         }
-        // end of string reached, but not processed properly
-        throw new ParseException("Illegal end, missing '" + close + "'!");
+        else {
+          throw new ParseException( "Missing '" + open + "'" );
+        }
+      }
+      // end of string reached, but not processed properly
+      throw new ParseException( "Illegal end, missing '" + close + "'" );
     }
     
    /*
@@ -1284,10 +1293,9 @@ public class TeXFormula {
     * the current position.
     */
     private TeXFormula getScript() throws ParseException {
-        skipWhiteSpace();
-        char ch;
+        skipWhitespace();
         if (pos < texStringLen ) {
-            ch = texString.charAt( pos);
+            final char ch = texString.charAt( pos);
             if (ch == L_GROUP) {
                 return new TeXFormula(getGroup(L_GROUP, R_GROUP));
             } else {
@@ -1300,11 +1308,12 @@ public class TeXFormula {
     }
     
     /**
-     * Changes this TeXFormula into a phantom TeXFormula. It will be rendered invisibly.
-     * This means that a strut box (whitespace) will be displayed instead of the current
-     * TeXFormula, with the same width, height and depth as the current TeXFormula's
-     * box would have. Although this formula is now made invisible, it's
-     * still treated as a normal visible formula when it comes to inserting glue.
+     * Changes this TeXFormula into a phantom TeXFormula. It will be rendered
+     * invisibly. This means that a strut box (whitespace) will be displayed
+     * instead of the current TeXFormula, with the same width, height and
+     * depth as the current TeXFormula's  box would have. Although this
+     * formula is now made invisible, it's still treated as a normal visible
+     * formula when it comes to inserting glue.
      *
      * @return the modified TeXFormula
      */
@@ -1374,7 +1383,7 @@ public class TeXFormula {
       texString = s;
       texStringLen = s.length();
 
-      // Break early to avoid nesting deeply.
+      // Break early for make source code easier to understand (less nesting).
       if( texStringLen == 0 ) {
         return;
       }
@@ -1423,25 +1432,25 @@ public class TeXFormula {
     * in the parse string).
     */
     private Atom processCommands(String command) throws ParseException {
-        skipWhiteSpace();
+        skipWhitespace();
         if ("frac".equals(command)) {
             TeXFormula num = new TeXFormula(getGroup(L_GROUP, R_GROUP));
-            skipWhiteSpace();
+            skipWhitespace();
             TeXFormula denom = new TeXFormula(getGroup(L_GROUP, R_GROUP));
             if (num.root == null || denom.root == null)
                 throw new ParseException(
-                        "Both numerator and denominator of a fraction can't be empty!");
+                        "Either a numerator or denominator must be present");
             return new FractionAtom(num.root, denom.root, true);
         } else { // sqrt
-            skipWhiteSpace();
+            skipWhitespace();
             if (pos == texStringLen )
                 // end of string reached, but not processed properly
-                throw new ParseException("illegal end!");
+                throw new ParseException("Unrecognized command: '"+command+"'");
             
             final TeXFormula nRoot;
             if ( texString.charAt( pos) == L_BRACK) { // n-th root
                 nRoot = new TeXFormula(getGroup(L_BRACK, R_BRACK));
-                skipWhiteSpace();
+                skipWhitespace();
             }
             else {
               nRoot = new TeXFormula();
@@ -1518,7 +1527,7 @@ public class TeXFormula {
                 add(attachScripts(new SpaceAtom()));
                 return;
             } else if (textStyles.contains(command)) { // textstyle found
-                skipWhiteSpace();
+                skipWhitespace();
                 add(attachScripts(new TeXFormula(getGroup(L_GROUP, R_GROUP),
                         command).root));
                 return;
@@ -2132,7 +2141,7 @@ public class TeXFormula {
     * change the current position (in the parse string) to the first following
     * non-whitespace character
     */
-    private void skipWhiteSpace() {
+    private void skipWhitespace() {
       while( pos < texStringLen && isWhitespace( texString.charAt( pos ) ) ) {
         pos++;
       }
@@ -2199,7 +2208,7 @@ public class TeXFormula {
     * and checks if it's a valid delimiter.
     */
     private static SymbolAtom getDelimiterSymbol(String delName)
-    throws SymbolNotFoundException, InvalidDelimiterException {
+        throws SymbolNotFoundException, InvalidDelimiterException {
         SymbolAtom res = null;
         // null means no delimiter
         if (delName != null) {
@@ -2211,11 +2220,11 @@ public class TeXFormula {
         return res;
     }
     
-   /*
+   /**
     * Tests if the given character is a symbol character. A character is a
     * symbol character if it is not alphanumeric.
     */
-    private static boolean isSymbol(char c) {
+    private static boolean isSymbol(final char c) {
       return !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
     }
 }

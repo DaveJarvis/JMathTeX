@@ -51,13 +51,13 @@ public class SpaceAtom extends Atom {
         env -> PIXELS_PER_POINT / env.getFontPointSize(),
         env -> (12 * PIXELS_PER_POINT) / env.getFontPointSize(),
         env -> {
-            TeXFont tf = env.getTeXFont();
+            final TeXFont tf = env.getTeXFont();
             return tf.getQuad(env.getStyle(), tf.getMuFontId()) / 18;
         }
     };
     
     // whether a hard space should be represented
-    private boolean blankSpace = false;
+    private boolean blankSpace;
     
     // dimensions
     private float width;
@@ -74,9 +74,9 @@ public class SpaceAtom extends Atom {
     }
     
     public SpaceAtom(int unit, float width, float height, float depth)
-    throws InvalidUnitException {
+        throws InvalidUnitException {
         // check if unit is valid
-        checkUnit(unit);
+        checkUnit( unit );
         
         // unit valid
         this.wUnit = unit;

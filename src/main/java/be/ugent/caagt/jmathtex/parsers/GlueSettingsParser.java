@@ -128,7 +128,7 @@ public class GlueSettingsParser {
                     val = Double.parseDouble(attrVal);
             } catch (NumberFormatException e) {
                 throw new XMLResourceParseException(RESOURCE_NAME, "GlueType",
-                        names[i], "has an invalid real value '" + attrVal + "'!");
+                        names[i], "has an invalid real value '" + attrVal + "'");
             }
             values[i] = (float) val;
         }
@@ -178,7 +178,7 @@ public class GlueSettingsParser {
             String attrName, String attrValue) throws ResourceParseException {
         if (val == null)
             throw new XMLResourceParseException(RESOURCE_NAME, elementName,
-                    attrName, "has an unknown value '" + attrValue + "'!");
+                    attrName, "has an unknown value '" + attrValue + "'");
     }
     
     private static String getAttrValueAndCheckIfNotNull(String attrName,

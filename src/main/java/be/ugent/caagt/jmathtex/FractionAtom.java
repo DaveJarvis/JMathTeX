@@ -30,20 +30,23 @@ package be.ugent.caagt.jmathtex;
 
 import be.ugent.caagt.jmathtex.exceptions.InvalidUnitException;
 
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
+
 /**
  * An atom representing a fraction.
  */
 public class FractionAtom extends Atom {
     
     // whether the default thickness should not be used for the fraction line
-    private boolean noDefault = false;
+    private final boolean noDefault;
     
     // unit used for the thickness of the fraction line
     private final int unit;
     
-    // alignment settings for the numerator and denominator
-    private int numAlign = TeXConstants.ALIGN_CENTER,
-            denomAlign = TeXConstants.ALIGN_CENTER;
+    // alignment settings for the numerator
+    private int numAlign = ALIGN_CENTER;
+    // alignment settings for the denominator
+    private int denomAlign = ALIGN_CENTER;
     
     // the atoms representing the numerator and denominator
     private final Atom numerator;
@@ -56,18 +59,8 @@ public class FractionAtom extends Atom {
     private float defFactor;
     
     // whether the "defFactor" value should be used
-    private boolean defFactorSet = false;
-    
-    /**
-     * Uses the default thickness for the fraction line
-     *
-     * @param num the numerator
-     * @param den the denominator
-     */
-    public FractionAtom(Atom num, Atom den) {
-        this(num, den, true);
-    }
-    
+    private boolean defFactorSet;
+
     /**
      * Uses the default thickness for the fraction line
      *
@@ -76,7 +69,7 @@ public class FractionAtom extends Atom {
      * @param rule whether the fraction line should be drawn
      */
     public FractionAtom(Atom num, Atom den, boolean rule) {
-        this(num, den, !rule, TeXConstants.UNIT_PIXEL, 0f);
+        this(num, den, !rule, UNIT_PIXEL, 0f);
     }
     
     /**
@@ -91,9 +84,9 @@ public class FractionAtom extends Atom {
      * @throws InvalidUnitException if the given integer is not a valid unit constant
      */
     public FractionAtom(Atom num, Atom den, boolean noDef, int unit, float t)
-    throws InvalidUnitException {
+        throws InvalidUnitException {
         // check unit
-        SpaceAtom.checkUnit(unit);
+        SpaceAtom.checkUnit( unit );
         
         // unit ok
         numerator = num;
@@ -101,7 +94,7 @@ public class FractionAtom extends Atom {
         noDefault = noDef;
         thickness = t;
         this.unit = unit;
-        type = TeXConstants.TYPE_INNER;
+        type = TYPE_INNER;
     }
     
     /**
@@ -170,11 +163,11 @@ public class FractionAtom extends Atom {
     // Checks if the alignment constant is valid.
     // If not, a default value will be used.
     private int checkAlignment(int align) {
-        if (align == TeXConstants.ALIGN_LEFT ||
-                align == TeXConstants.ALIGN_RIGHT)
+        if (align == ALIGN_LEFT ||
+                align == ALIGN_RIGHT)
             return align;
         else
-            return TeXConstants.ALIGN_CENTER;
+            return ALIGN_CENTER;
     }
     
     public Box createBox(TeXEnvironment env) {
@@ -201,7 +194,7 @@ public class FractionAtom extends Atom {
         
         // calculate default shift amounts
         float shiftUp, shiftDown;
-        if (style < TeXConstants.STYLE_TEXT) {
+        if (style < STYLE_TEXT) {
             shiftUp = tf.getNum1(style);
             shiftDown = tf.getDenom1(style);
         } else {
@@ -221,7 +214,7 @@ public class FractionAtom extends Atom {
         
         if (thickness > 0) { // WITH fraction rule
             // clearance clr
-            if (style < TeXConstants.STYLE_TEXT)
+            if (style < STYLE_TEXT)
                 clr = 3 * thickness;
             else
                 clr = thickness;
@@ -246,7 +239,7 @@ public class FractionAtom extends Atom {
             vBox.add(new StrutBox(0, kern2, 0, 0));
         } else { // WITHOUT fraction rule
             // clearance clr
-            if (style < TeXConstants.STYLE_TEXT)
+            if (style < STYLE_TEXT)
                 clr = 7 * drt;
             else
                 clr = 3 * drt;

@@ -32,9 +32,9 @@ package be.ugent.caagt.jmathtex;
  * A box representing another box with a horizontal rule above it, with appropriate
  * kerning. 
  */
-public class OverBar extends VerticalBox {
+public final class OverBar extends VerticalBox {
 
-   public OverBar(Box b, float kern, float thickness) {
+   public OverBar(final Box b, final float kern, final float thickness) {
       // construct vertical box
       add(new StrutBox(0, thickness, 0, 0));
       add(new HorizontalRule(thickness, b.getWidth(), 0));
