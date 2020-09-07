@@ -78,8 +78,6 @@ public class TeXFormulaTest {
       "\\prod_{i=a}^{b} f(i)",
   };
 
-  private final String TEX = EQUATIONS[ EQUATIONS.length - 1 ];
-
   //@Test
   public void test_MathML_SimpleFormula_Success() throws IOException {
     final var size = 20f;
