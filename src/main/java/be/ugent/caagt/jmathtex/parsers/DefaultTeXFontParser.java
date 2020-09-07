@@ -70,9 +70,9 @@ public class DefaultTeXFontParser {
         throws ResourceParseException {
             int[] extensionChars = new int[4];
             extensionChars[ REP ] = parseIntElement( "rep", el );
-            extensionChars[ TOP ] = parseOptionalInt( "top", el, NONE );
-            extensionChars[ MID ] = parseOptionalInt( "mid", el, NONE );
-            extensionChars[ BOT ] = parseOptionalInt( "bot", el, NONE );
+            extensionChars[ TOP ] = parseOptionalInt( "top", el, NO_EXTENSION );
+            extensionChars[ MID ] = parseOptionalInt( "mid", el, NO_EXTENSION );
+            extensionChars[ BOT ] = parseOptionalInt( "bot", el, NO_EXTENSION );
 
             // parsing OK, add extension info
             info.setExtension(ch, extensionChars);

@@ -169,9 +169,9 @@ interface TeXFont {
   float getQuad( int style, int fontCode );
 
   /**
-   * @return the point size of this TeXFont
+   * @return the point size for rendering the font.
    */
-  float getSize();
+  float getPointSize();
 
   /**
    * Get the kern amount of the character defined by the given CharFont

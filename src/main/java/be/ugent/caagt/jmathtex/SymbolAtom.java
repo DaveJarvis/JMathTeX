@@ -57,7 +57,7 @@ public class SymbolAtom extends CharSymbol {
         symbols = new TeXSymbolParser().readSymbols();
         
         // set valid symbol types
-        validSymbolTypes =  new BitSet(16);
+        validSymbolTypes = new BitSet(16);
         validSymbolTypes.set(TeXConstants.TYPE_ORDINARY);
         validSymbolTypes.set(TeXConstants.TYPE_BIG_OPERATOR);
         validSymbolTypes.set(TeXConstants.TYPE_BINARY_OPERATOR);
@@ -141,9 +141,9 @@ public class SymbolAtom extends CharSymbol {
         return name;
     }
     
-    public Box createBox(TeXEnvironment env) {
-        TeXFont tf = env.getTeXFont();
-        int style = env.getStyle();
+    public Box createBox(final TeXEnvironment env) {
+        final TeXFont tf = env.getTeXFont();
+        final int style = env.getStyle();
         return new CharBox(tf.getChar(name, style));
     }
     

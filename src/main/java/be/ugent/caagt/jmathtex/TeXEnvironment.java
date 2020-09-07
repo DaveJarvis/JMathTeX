@@ -30,49 +30,58 @@ package be.ugent.caagt.jmathtex;
 
 import java.awt.*;
 
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
+
 /**
  * Contains the used TeXFont-object, color settings and the current style in
  * which a formula must be drawn. It's used in the createBox-methods. Contains
  * methods that apply the style changing rules for subformula's.
  */
 public class TeXEnvironment {
-    
-    // colors
-    private Color background, color;
+    private Color background;
+
+    private Color foreground;
     
     // current style
     private int style;
     
     // TeXFont used
     private final TeXFont tf;
-    
+
     // last used font
     private int lastFontId = TeXFont.NO_FONT;
-    
-    public TeXEnvironment(int style, TeXFont tf) {
+
+    /**
+     * Creates a new {@link TeXEnvironment} with a default point size.
+     *
+     * @param style Controls some symbol sizes.
+     * @param tf    Font to use for rendering the text.
+     */
+    public TeXEnvironment(final int style, final TeXFont tf) {
         this(style, tf, null, null);
     }
-    
-    private TeXEnvironment(int style, TeXFont tf, Color bg, Color c) {
+
+    private TeXEnvironment(
+        final int style, final TeXFont tf, final Color bg, final Color fg) {
         // check if style is valid
         // if not : DISPLAY = default value
-        if( style == TeXConstants.STYLE_DISPLAY ||
-            style == TeXConstants.STYLE_TEXT ||
-            style == TeXConstants.STYLE_SCRIPT ||
-            style == TeXConstants.STYLE_SCRIPT_SCRIPT ) {
+        if( style == STYLE_DISPLAY ||
+            style == STYLE_TEXT ||
+            style == STYLE_SCRIPT ||
+            style == STYLE_SCRIPT_SCRIPT ) {
             this.style = style;
         }
         else {
-            this.style = TeXConstants.STYLE_DISPLAY;
+            this.style = STYLE_DISPLAY;
         }
 
         this.tf = tf;
-        background = bg;
-        color = c;
+        this.background = bg;
+        this.foreground = fg;
     }
     
     protected TeXEnvironment copy() {
-        return new TeXEnvironment(style, tf, background, color);
+        return new TeXEnvironment( style, tf, background, foreground );
     }
     
     /**
@@ -104,14 +113,14 @@ public class TeXEnvironment {
      * @return the foreground color setting
      */
     public Color getColor() {
-        return color;
+        return foreground;
     }
     
     /**
      * @return the point size of the TeXFont
      */
-    public float getSize() {
-        return tf.getSize();
+    public float getFontPointSize() {
+        return tf.getPointSize();
     }
     
     /**
@@ -141,7 +150,7 @@ public class TeXEnvironment {
      * Resets the color settings.
      */
     public void reset() {
-        color = null;
+        foreground = null;
         background = null;
     }
     
@@ -150,7 +159,7 @@ public class TeXEnvironment {
      */
     public TeXEnvironment rootStyle() {
         final var s = copy();
-        s.style = TeXConstants.STYLE_SCRIPT_SCRIPT;
+        s.style = STYLE_SCRIPT_SCRIPT;
         return s;
     }
     
@@ -165,7 +174,7 @@ public class TeXEnvironment {
      * @param c the foreground color to be set
      */
     public void setColor(Color c) {
-        color = c;
+        foreground = c;
     }
     
     /**

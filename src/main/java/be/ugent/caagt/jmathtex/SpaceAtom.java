@@ -47,9 +47,9 @@ public class SpaceAtom extends Atom {
     private static final UnitConversion[] unitConversions = new UnitConversion[] {
         env -> env.getTeXFont().getXHeight(env.getStyle(), env.getLastFontId()),
         env -> env.getTeXFont().getXHeight(env.getStyle(), env.getLastFontId()),
-        env -> 1 / env.getSize(),
-        env -> PIXELS_PER_POINT / env.getSize(),
-        env -> (12 * PIXELS_PER_POINT) / env.getSize(),
+        env -> 1 / env.getFontPointSize(),
+        env -> PIXELS_PER_POINT / env.getFontPointSize(),
+        env -> (12 * PIXELS_PER_POINT) / env.getFontPointSize(),
         env -> {
             TeXFont tf = env.getTeXFont();
             return tf.getQuad(env.getStyle(), tf.getMuFontId()) / 18;

@@ -74,6 +74,7 @@ public class TeXFormulaTest {
       "\\sum_{i=1}^n i = (\\sum_{i=1}^{n-1} i) + n =\n" +
           "\\frac{(n-1)(n)}{2} + n = \\frac{n(n+1)}{2}",
       "\\int_{a}^{b} x^2 dx",
+      "G_{\\mu \\nu} = \\frac{8 \\pi G}{c^4} T_{{\\mu \\nu}}",
       "\\prod_{i=a}^{b} f(i)",
   };
 
@@ -85,14 +86,14 @@ public class TeXFormulaTest {
     String svg = "";
 
     final var buffer = new StringBuilder( 16384 );
+    final var texFont = new DefaultTeXFont( size );
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var filename = "/tmp/eq-" + j + ".svg";
 
-      for( int i = 0; i < 2_000_000; i++ ) {
+      for( int i = 0; i < 10_000_000 / EQUATIONS.length; i++ ) {
         final var formula = new TeXFormula( EQUATIONS[ j ] );
-        final var font = new DefaultTeXFont( size );
-        final var env = new TeXEnvironment( STYLE_DISPLAY, font );
+        final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
         final var box = formula.createBox( env );
         final var layout = new TeXLayout( box, size );
 
