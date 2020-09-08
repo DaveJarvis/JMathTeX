@@ -31,7 +31,6 @@ package be.ugent.caagt.jmathtex;
 import java.awt.*;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.*;
-import static be.ugent.caagt.jmathtex.TeXFont.NO_FONT;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -114,9 +113,9 @@ public class VerticalBox extends Box {
   /**
    * Iterates from the last child box (the lowest) to the first (the
    * highest) until a font id is found that's not equal to
-   * {@link TeXFont#NO_FONT}.
+   * {@link Box#NO_FONT}.
    *
-   * @return {@link TeXFont#NO_FONT} if there's no font ID in this
+   * @return {@link Box#NO_FONT} if there's no font ID in this
    * {@link Box}'s list of child instances.
    */
   @Override
@@ -128,5 +127,13 @@ public class VerticalBox extends Box {
     }
 
     return fontId;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "leftMostPos=" + leftMostPos +
+        ", rightMostPos=" + rightMostPos +
+        '}';
   }
 }

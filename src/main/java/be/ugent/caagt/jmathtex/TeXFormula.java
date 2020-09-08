@@ -36,6 +36,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import static be.ugent.caagt.jmathtex.TeXConstants.TYPE_ACCENT;
 import static java.lang.Character.isAlphabetic;
 import static java.lang.Character.isWhitespace;
 import static java.lang.String.format;
@@ -220,10 +221,10 @@ public class TeXFormula {
       addImpl(f);
     }
     
-   /*
-    * Inserts an atom at the end of the current formula
+   /**
+    * Appends the given {@link Atom} to the formula.
     */
-    private TeXFormula add(Atom el) {
+    private TeXFormula add(final Atom el) {
       if( el != null ) {
         if( root == null ) {
           root = el;
@@ -943,8 +944,9 @@ public class TeXFormula {
     * Convert this TeXFormula into a box, starting form the given style
     */
     public Box createBox(TeXEnvironment style) {
-        if (root == null)
-            return new StrutBox();
+        if( root == null ) {
+          return new StrutBox();
+        }
 
         return root.createBox(style);
     }
@@ -1270,8 +1272,7 @@ public class TeXFormula {
 
           // end of string reached, but not processed properly
           if( pos == texStringLen ) {
-            throw new ParseException( "Illegal end, missing '" + close
-                                          + "'" );
+            throw new ParseException( "Illegal end, missing '" + close + "'" );
           }
           else {
             // end of group
@@ -1283,8 +1284,10 @@ public class TeXFormula {
           throw new ParseException( "Missing '" + open + "'" );
         }
       }
-      // end of string reached, but not processed properly
-      throw new ParseException( "Illegal end, missing '" + close + "'" );
+
+      // end of string reached, nothing was processed, so let the caller handle
+      // the situation.
+      return "";
     }
     
    /*
@@ -1384,13 +1387,13 @@ public class TeXFormula {
       texString = s;
       texStringLen = s.length();
 
-      // Break early for make source code easier to understand (less nesting).
-      if( texStringLen == 0 ) {
-        return;
-      }
+      // Tracks the most recently processed escape command so that when
+      // an L_GROUP is encountered, the previous atom can have its type
+      // checked. This is useful for wrapping accent atoms.
+      Atom atom = null;
 
-      final int l = texStringLen;
-      while( pos < l ) {
+      // The position index (pos) into texString is a non-negative integer.
+      while( pos < texStringLen ) {
         final char ch = texString.charAt( pos );
 
         // ignore white space
@@ -1398,11 +1401,28 @@ public class TeXFormula {
           pos++;
         }
         else if( ch == ESCAPE ) {
-          processEscape();
+          atom = processEscape();
+
+          // Accented characters will be added when their corresponding
+          // L_GROUP is found. If there is no L_GROUP, then the accent
+          // character will be swallowed.
+          if( !atom.isType( TYPE_ACCENT ) ) {
+            add( attachScripts( atom ) );
+          }
         }
         else if( ch == L_GROUP ) {
-          add( attachScripts(
-              new TeXFormula( getGroup( L_GROUP, R_GROUP ) ).root ) );
+          // If the previous was an accent, then add the current formula
+          // to a new accent atom.
+          final var formula = new TeXFormula( getGroup( L_GROUP, R_GROUP ) );
+
+          if( atom != null && atom.isType( TYPE_ACCENT ) ) {
+            atom = new AccentedAtom( formula.root, atom );
+          }
+          else {
+            atom = formula.root;
+          }
+
+          add( attachScripts( atom ) );
         }
         else if( ch == R_GROUP ) {
           final String msg = format(
@@ -1423,7 +1443,8 @@ public class TeXFormula {
           }
         }
         else {
-          add( attachScripts( convertCharacter( ch ) ) );
+          atom = convertCharacter( ch );
+          add( attachScripts( atom ) );
         }
       }
     }
@@ -1434,6 +1455,7 @@ public class TeXFormula {
     */
     private Atom processCommands(String command) throws ParseException {
         skipWhitespace();
+
         if ("frac".equals(command)) {
             TeXFormula num = new TeXFormula(getGroup(L_GROUP, R_GROUP));
             skipWhitespace();
@@ -1442,20 +1464,21 @@ public class TeXFormula {
                 throw new ParseException(
                         "Either a numerator or denominator must be present");
             return new FractionAtom(num.root, denom.root, true);
-        } else { // sqrt
-            skipWhitespace();
+        } else {
+            // sqrt
             if (pos == texStringLen )
                 // end of string reached, but not processed properly
                 throw new ParseException("Unrecognized command: '"+command+"'");
-            
+
             final TeXFormula nRoot;
-            if ( texString.charAt( pos) == L_BRACK) { // n-th root
-                nRoot = new TeXFormula(getGroup(L_BRACK, R_BRACK));
-                skipWhitespace();
+            if( texString.charAt( pos ) == L_BRACK ) { // n-th root
+              nRoot = new TeXFormula( getGroup( L_BRACK, R_BRACK ) );
+              skipWhitespace();
             }
             else {
               nRoot = new TeXFormula();
             }
+
             final Atom base = new TeXFormula(getGroup(L_GROUP, R_GROUP)).root;
             return new NthRoot(base, nRoot.root);
         }
@@ -1491,134 +1514,32 @@ public class TeXFormula {
      * Tries to find a TeX command or TeX symbol name at the current position
      * in the parse string (just after an escape character was found).
      */
-    private void processEscape() throws ParseException {
+    private Atom processEscape() throws ParseException {
       final String command = parseCommand();
-      final SymbolAtom symbolAtom = SymbolAtom.getNullable( command );
 
+      final SymbolAtom symbolAtom = SymbolAtom.getNullable( command );
       if( symbolAtom != null ) {
-        add( attachScripts( symbolAtom ) );
-        return;
+        return symbolAtom;
       }
 
       final TeXFormula formula = getNullable( command );
-
       if( formula != null ) {
-        add( attachScripts( formula.root ) );
-        return;
+        return formula.root;
       }
 
       if( textStyles.contains( command ) ) {
         skipWhitespace();
         final var tf = new TeXFormula( getGroup( L_GROUP, R_GROUP ), command );
-        add( attachScripts( tf.root ) );
+        return tf.root;
       }
 
       if( commands.contains( command ) ) {
-        add( attachScripts( processCommands( command ) ) );
-        return;
+        return processCommands( command );
       }
 
       final String msg = format(
           "Unknown symbol or command or predefined formula: '%s'", command );
       throw new ParseException( msg );
-    }
-
-    /**
-     * Tries to find a TeX command or TeX symbol name at the current position
-     * in the parse string (just after an escape character was found).
-     */
-    private void processEscape3() throws ParseException {
-        pos++;
-        StringBuilder buf = new StringBuilder();
-        // no longer symbol name or predefined TeXFormula name possible
-        boolean endOfEscape = false;
-        // temporarily save symbol
-        SymbolAtom symbolFound = null;
-        int symbolPos = -1;
-        // temporarily save predefined TeXFormula
-        TeXFormula predefFound = null;
-        int predefPos = -1;
-        // what was the longest match: symbol or predefined TeXFormula?
-        boolean symbolLongest = true;
-
-        while( pos < texStringLen ) {
-            char ch = texString.charAt( pos);
-            boolean isEnd = (pos == texStringLen - 1);
-            
-            // the following characters can't be part of a command or symbol, so
-            // if there's no command or symbol found, then an exception is
-            // thrown
-            if ( isWhitespace( ch) || ch == ESCAPE || ch == SUB_SCRIPT
-                    || ch == SUPER_SCRIPT || isEnd) {
-                endOfEscape = true;
-                if (isEnd) {
-                    buf.append(ch);
-                    pos++;
-                }
-            } else {
-                buf.append(ch);
-                pos++;
-            }
-
-            final String command = buf.toString();
-
-            // check if 'command' is a valid symbol name
-            final SymbolAtom s = SymbolAtom.getNullable( command );
-            final TeXFormula predef = s == null ? getNullable( command ) : null;
-
-            if (s != null) { // symbol found!   // NOPMD
-                if (endOfEscape) {
-                    // no longer symbol name or predefined TeXFormula name possible
-                    add(attachScripts(s));
-                    return;
-                } else { // could be part of another valid symbolname, like "in" and "infty"
-                    symbolFound = s;
-                    symbolPos = pos;
-                    symbolLongest = true;
-                }
-            } else if (predef != null) { // predefined TeXFormula found!   // NOPMD
-                if (endOfEscape) {
-                    // no longer symbol name or predefined TeXFormula name possible
-                    add(attachScripts(predef.root));
-                    return;
-                } else { // could be part of another valid symbolname, like "in" and "infty"
-                    predefFound = predef;
-                    predefPos = pos;
-                    symbolLongest = false;
-                }
-            } else if ("nbsp".equals(command)) { // space found (for MathML-purposes!)
-                add(attachScripts(new SpaceAtom()));
-                return;
-            } else if (textStyles.contains(command)) { // textstyle found
-                skipWhitespace();
-                add(attachScripts(new TeXFormula(getGroup(L_GROUP, R_GROUP),
-                        command).root));
-                return;
-            } else if (commands.contains(command)) { // command found
-                add(attachScripts(processCommands(command)));
-                return;
-            } else if (endOfEscape) { // searching is over
-                if (symbolLongest && symbolFound != null) {
-                    // go back to that position and add that symbol
-                    pos = symbolPos;
-                    add(attachScripts(symbolFound));
-                    return;
-                } else if ( !symbolLongest ) { // NOPMD
-                    // go back to that position and add that predefined TeXFormula
-                    pos = predefPos;
-                    add(attachScripts(predefFound.root));
-                    return;
-                } else
-                    // not a valid command or symbol or predefined TeXFormula found
-                    throw new ParseException(
-                            "Unknown symbol or command or predefined TeXFormula: '"
-                            + command + "'");
-            }
-        }
-        
-        // escape-char found at the end of the string
-        throw new ParseException("The escape-character '" + ESCAPE
-                + "' can't be the last one!");
     }
 
     /**

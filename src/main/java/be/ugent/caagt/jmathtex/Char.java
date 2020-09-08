@@ -80,4 +80,12 @@ public class Char {
    public Metrics getMetrics() {
       return m;
    }
+
+   @Override
+   public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "c=" + c +
+          ", fontId=" + fontId +
+          '}';
+   }
 }

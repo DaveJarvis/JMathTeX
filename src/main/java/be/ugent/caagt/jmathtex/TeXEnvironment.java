@@ -30,6 +30,7 @@ package be.ugent.caagt.jmathtex;
 
 import java.awt.*;
 
+import static be.ugent.caagt.jmathtex.Box.NO_FONT;
 import static be.ugent.caagt.jmathtex.TeXConstants.*;
 
 /**
@@ -49,7 +50,7 @@ public class TeXEnvironment {
     private final TeXFont tf;
 
     // last used font
-    private int lastFontId = TeXFont.NO_FONT;
+    private int lastFontId = NO_FONT;
 
     /**
      * Creates a new {@link TeXEnvironment} with a default point size.
@@ -205,6 +206,6 @@ public class TeXEnvironment {
     
     public int getLastFontId() {
         // if there was no last font id (whitespace boxes only), use default "mu font"
-        return (lastFontId == TeXFont.NO_FONT ? tf.getMuFontId() : lastFontId);
+        return (lastFontId == NO_FONT ? tf.getMuFontId() : lastFontId);
     }
 }

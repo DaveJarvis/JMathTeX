@@ -28,8 +28,6 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.*;
-
 /**
  * A box representing whitespace.
  */
@@ -49,13 +47,5 @@ public final class StrutBox extends Box {
     height = h;
     depth = d;
     shift = s;
-  }
-
-  public void draw( final Graphics2D g, final float x, final float y ) {
-    // no visual effect
-  }
-
-  public int getLastFontId() {
-    return TeXFont.NO_FONT;
   }
 }

@@ -104,12 +104,12 @@ public class TeXConstants {
    public static final int TYPE_PUNCTUATION = 6;
 
    /**
-    * Atom type: inner atom (NOT FOR SYMBOLS!!!)
+    * Atom type: inner atom (not for symbols)
     */
    public static final int TYPE_INNER = 7;
    
    /**
-    * Symbol type: accent, e.g. "hat"
+    * Symbol type: accent, e.g. "hat", "vec", etc.
     */
    public static final int TYPE_ACCENT = 10;
 

@@ -25,6 +25,7 @@ import be.ugent.caagt.jmathtex.TeXFormula;
 import be.ugent.caagt.jmathtex.TeXLayout;
 import org.jfree.svg.SVGGraphics2D;
 
+import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -70,7 +71,7 @@ public class TeXFormulaTest {
       "\\sqrt[n]{|z| . e^{i \\theta}} = " +
           "\\sqrt[n]{|z| . e^{i (\\frac{\\theta + 2 k \\pi}{n})}}," +
           " k \\in \\lbrace 0, ..., n-1 \\rbrace, n \\in NN",
-      "\\vec{u}^2",
+      "\\vec{u}^2 \\tilde{\\nu}",
       "\\sum_{i=1}^n i = (\\sum_{i=1}^{n-1} i) + n =\n" +
           "\\frac{(n-1)(n)}{2} + n = \\frac{n(n+1)}{2}",
       "\\int_{a}^{b} x^2 dx",
@@ -96,6 +97,7 @@ public class TeXFormulaTest {
         final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
         final var box = formula.createBox( env );
         final var layout = new TeXLayout( box, size );
+        layout.setInsets(new Insets( 5, 5, 5, 5));
 
         final var g = new SVGGraphics2D(
             layout.getWidth(), layout.getHeight(), PX, buffer );
@@ -116,16 +118,8 @@ public class TeXFormulaTest {
     System.out.println( System.currentTimeMillis() - startTime );
   }
 
-  public void test_vec() {
-    final var texFont = new DefaultTeXFont( 20f );
-    final var formula = new TeXFormula( EQUATIONS[ 6 ] );
-    final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
-    final var box = formula.createBox( env );
-  }
-
   public static void main( String[] args ) throws IOException {
     final var test = new TeXFormulaTest();
     test.test_MathML_SimpleFormula_Success();
-    test.test_vec();
   }
 }

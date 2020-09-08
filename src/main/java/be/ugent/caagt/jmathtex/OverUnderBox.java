@@ -28,7 +28,7 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 /**
@@ -78,7 +78,7 @@ public final class OverUnderBox extends Box {
             + (!over && script == null ? 0 : script.height + script.depth + kern);
    }
 
-   public void draw( Graphics2D g, float x, float y) {
+   public void draw( Graphics2D g, float x, float y ) {
       base.draw( g, x, y);
 
       float yVar = y - base.height;
@@ -119,4 +119,11 @@ public final class OverUnderBox extends Box {
       return base.getLastFontId();
    }
 
+   @Override
+   public String toString() {
+      return getClass().getSimpleName() + "{" +
+          ", kern=" + kern +
+          ", over=" + over +
+          '}';
+   }
 }

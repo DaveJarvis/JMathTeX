@@ -39,8 +39,6 @@ import be.ugent.caagt.jmathtex.exceptions.TextStyleMappingNotFoundException;
  */
 interface TeXFont {
 
-  int NO_FONT = -1;
-
   FontInfo getFontInfo( int fontId );
 
   float getAxisHeight( int style );

@@ -36,47 +36,46 @@ import java.util.BitSet;
 import java.util.Map;
 import java.util.Optional;
 
+import static be.ugent.caagt.jmathtex.TeXConstants.*;
+
 /**
  * A box representing a symbol (a non-alphanumeric character).
  */
 public class SymbolAtom extends CharSymbol {
-    
+
+    // contains all the possible valid symbol types
+    private static final BitSet validSymbolTypes;
+
+    // contains all defined symbols
+    private static final Map<String, SymbolAtom> symbols;
+
+    static {
+        // set valid symbol types
+        validSymbolTypes = new BitSet( 16 );
+        validSymbolTypes.set( TYPE_ORDINARY );
+        validSymbolTypes.set( TYPE_BIG_OPERATOR );
+        validSymbolTypes.set( TYPE_BINARY_OPERATOR );
+        validSymbolTypes.set( TYPE_RELATION );
+        validSymbolTypes.set( TYPE_OPENING );
+        validSymbolTypes.set( TYPE_CLOSING );
+        validSymbolTypes.set( TYPE_PUNCTUATION );
+        validSymbolTypes.set( TYPE_ACCENT );
+
+        // The parser creates instances of this class, and instances of this
+        // class will check against the validSymbolTypes, so be sure that the
+        // validSymbolTypes are initialized before reading symbols.
+        symbols = new TeXSymbolParser().readSymbols();
+    }
+
+    // symbol name
+    private final String name;
+
     // whether it's is a delimiter symbol
     private final boolean delimiter;
     
-    // symbol name
-    private final String name;
-    
-    // contains all defined symbols
-    private static final Map<String, SymbolAtom> symbols;
-    
-    // contains all the possible valid symbol types
-    private static final BitSet validSymbolTypes;
-    
-    static {
-        symbols = new TeXSymbolParser().readSymbols();
-        
-        // set valid symbol types
-        validSymbolTypes = new BitSet(16);
-        validSymbolTypes.set(TeXConstants.TYPE_ORDINARY);
-        validSymbolTypes.set(TeXConstants.TYPE_BIG_OPERATOR);
-        validSymbolTypes.set(TeXConstants.TYPE_BINARY_OPERATOR);
-        validSymbolTypes.set(TeXConstants.TYPE_RELATION);
-        validSymbolTypes.set(TeXConstants.TYPE_OPENING);
-        validSymbolTypes.set(TeXConstants.TYPE_CLOSING);
-        validSymbolTypes.set(TeXConstants.TYPE_PUNCTUATION);
-        validSymbolTypes.set(TeXConstants.TYPE_ACCENT);
-    }
-    
-    public SymbolAtom(SymbolAtom s, int type) throws
-        InvalidSymbolTypeException {
-        if (!validSymbolTypes.get(type))
-            throw new InvalidSymbolTypeException(
-                    "The symbol type was not valid! "
-                    + "Use one of the symbol type constants from the class 'TeXConstants'.");
-        name = s.name;
-        this.type = type;
-        delimiter = s.delimiter;
+    public SymbolAtom( final SymbolAtom symbolAtom, final int type )
+        throws InvalidSymbolTypeException {
+        this( symbolAtom.name, type, symbolAtom.delimiter );
     }
     
     /**
@@ -85,12 +84,18 @@ public class SymbolAtom extends CharSymbol {
      *
      * @param name symbol name
      * @param type symbol type constant
-     * @param del whether the symbol is a delimiter
+     * @param delimiter whether the symbol is a delimiter
      */
-    public SymbolAtom(String name, int type, boolean del) {
+    public SymbolAtom(String name, int type, boolean delimiter)
+        throws InvalidSymbolTypeException {
+        if (!validSymbolTypes.get(type))
+            throw new InvalidSymbolTypeException(
+                "The symbol type was not valid! "
+                    + "Use one of the symbol type constants from the class 'TeXConstants'.");
+
         this.name = name;
         this.type = type;
-        delimiter = del;
+        this.delimiter = delimiter;
     }
 
     /**
@@ -140,15 +145,24 @@ public class SymbolAtom extends CharSymbol {
     public String getName() {
         return name;
     }
-    
-    public Box createBox(final TeXEnvironment env) {
+
+    public Box createBox( final TeXEnvironment env ) {
         final TeXFont tf = env.getTeXFont();
         final int style = env.getStyle();
-        return new CharBox(tf.getChar(name, style));
+        return new CharBox( tf.getChar( name, style ) );
     }
-    
-    public CharFont getCharFont(TeXFont tf) {
+
+    public CharFont getCharFont( TeXFont tf ) {
         // style doesn't matter here
-        return tf.getChar(name, TeXConstants.STYLE_DISPLAY).getCharFont();
+        return tf.getChar( name, STYLE_DISPLAY ).getCharFont();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", delimiter=" + delimiter +
+            '}';
     }
 }

@@ -39,12 +39,23 @@ import static java.lang.Math.min;
  * An atom representing another atom with an accent symbol above it.
  */
 public class AccentedAtom extends Atom {
-    
+
     // accent symbol
     private final SymbolAtom accent;
-    
+
     protected Atom base;
-    
+
+    public AccentedAtom( final Atom base, final Atom accent )
+        throws InvalidSymbolTypeException {
+        this.base = base;
+
+        if( !(accent instanceof SymbolAtom) ) {
+            throw new InvalidSymbolTypeException( "Invalid accent" );
+        }
+
+        this.accent = (SymbolAtom) accent;
+    }
+
     /**
      * Creates an AccentedAtom from a base atom and an accent symbol defined by its name
      *
@@ -54,9 +65,9 @@ public class AccentedAtom extends Atom {
      * @throws SymbolNotFoundException if there's no symbol defined with the given name
      */
     public AccentedAtom(Atom base, String accentName)
-    throws InvalidSymbolTypeException, SymbolNotFoundException {
-        accent = SymbolAtom.get(accentName);
-        
+        throws InvalidSymbolTypeException, SymbolNotFoundException {
+        accent = SymbolAtom.get( accentName );
+
         if (accent.type == TeXConstants.TYPE_ACCENT)
             this.base = base;
         else
@@ -65,7 +76,7 @@ public class AccentedAtom extends Atom {
                     + TeXSymbolParser.TYPE_ATTR + "='acc') in '"
                     + TeXSymbolParser.RESOURCE_NAME + "'");
     }
-    
+
     /**
      * Creates an AccentedAtom from a base atom and an accent symbol defined as a TeXFormula.
      * This is used for parsing MathML.
@@ -99,20 +110,21 @@ public class AccentedAtom extends Atom {
                         "The accent TeXFormula does not represent a single symbol!");
         }
     }
-    
+
     public Box createBox(TeXEnvironment env) {
         final TeXFont tf = env.getTeXFont();
         final int style = env.getStyle();
-        
+
         // set base in cramped style
-        Box b = (base == null ? new StrutBox() : base.createBox(env
-                .crampStyle()));
+        Box b = base == null
+            ? new StrutBox()
+            : base.createBox(env.crampStyle());
 
         final float u = b.getWidth();
         float s = 0;
         if (base instanceof CharSymbol)
             s = tf.getSkew(((CharSymbol) base).getCharFont(tf), style);
-        
+
         // retrieve best Char from the accent symbol
         Char ch = tf.getChar(accent.getName(), style);
         while (tf.hasNextLarger(ch)) {
@@ -122,14 +134,14 @@ public class AccentedAtom extends Atom {
             else
                 break;
         }
-        
+
         // calculate delta
         final float delta = min(b.getHeight(), tf.getXHeight(style, ch
                 .getFontId()));
-        
+
         // create vertical box
         final VerticalBox vBox = new VerticalBox();
-        
+
         // accent
         Box y;
         float italic = ch.getItalic();
@@ -138,19 +150,19 @@ public class AccentedAtom extends Atom {
             y.add(new StrutBox(italic));
         } else
             y = new CharBox(ch);
-        
+
         // if diff > 0, center accent, otherwise center base
         float diff = (u - y.getWidth()) / 2;
         y.setShift(s + (diff > 0 ? diff : 0));
         if (diff < 0)
             b = new HorizontalBox(b, y.getWidth(), TeXConstants.ALIGN_CENTER);
         vBox.add(y);
-        
+
         // kern
         vBox.add(new StrutBox(0, -delta, 0, 0));
         // base
         vBox.add(b);
-        
+
         // set height and depth vertical box
         final var total = vBox.getHeight() + vBox.getDepth();
         final var d = b.getDepth();

@@ -81,4 +81,11 @@ public final class CharBox extends Box {
   public int getLastFontId() {
     return c.getFontId();
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "c=" + c +
+        '}';
+  }
 }

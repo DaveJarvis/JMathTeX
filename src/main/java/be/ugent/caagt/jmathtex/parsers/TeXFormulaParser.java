@@ -110,9 +110,10 @@ public class TeXFormulaParser {
             try {
                 TeXFormula f = TeXFormula.class.getConstructor(
                         argClasses).newInstance(argValues);
-                // succesfully created, so add to "temporary formula's"-hashtable
+                // Successfully created, so add to "temporary formula's"-hashtable
                 tempFormulas.put(name, f);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new XMLResourceParseException(
                         "Error creating the temporary TeXFormula '" + name
                         + "' while constructing the predefined TeXFormula '"

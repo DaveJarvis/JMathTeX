@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.*;
+import static java.lang.String.format;
 
 /**
  * Parses TeX symbol definitions from an XML-file.
@@ -68,22 +69,25 @@ public class TeXSymbolParser {
    }
 
    public Map<String, SymbolAtom> readSymbols() throws ResourceParseException {
-      Map<String,SymbolAtom> res = new HashMap<>();
-      // iterate all "symbol"-elements
-      for (final Element symbol : root.getChildren("Symbol")) {
-         String name = getAttrValueAndCheckIfNotNull("name", symbol);
-         String type = getAttrValueAndCheckIfNotNull(TYPE_ATTR, symbol);
-         String del = symbol.getAttributeValue(DELIMITER_ATTR);
+      final Map<String, SymbolAtom> res = new HashMap<>();
 
-         boolean isDelimiter = (del != null && del.equals("true"));
-         // check if type is known
-         Integer typeVal = typeMappings.get( type);
-         if (typeVal == null) // unknown type
-            throw new XMLResourceParseException(RESOURCE_NAME, "Symbol",
-                  "type", "has an unknown value '" + type + "'");
-         // add symbol to the hash table
-         res.put(name, new SymbolAtom( name, typeVal, isDelimiter));
+      for( final Element symbol : root.getChildren( "Symbol" ) ) {
+         String type = getAttrValueAndCheckIfNotNull( TYPE_ATTR, symbol );
+         final var typeVal = typeMappings.get( type );
+
+         if( typeVal == null ) {
+            final var msg = format( "has an unknown value '%s'", type );
+            throw new XMLResourceParseException(
+                RESOURCE_NAME, "Symbol", "type", msg );
+         }
+
+         String name = getAttrValueAndCheckIfNotNull( "name", symbol );
+         String del = symbol.getAttributeValue( DELIMITER_ATTR );
+         final boolean delimiter = "true".equals( del );
+
+         res.put( name, new SymbolAtom( name, typeVal, delimiter ) );
       }
+
       return res;
    }
 

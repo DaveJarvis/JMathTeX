@@ -28,7 +28,7 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -43,10 +43,6 @@ public class HorizontalRule extends Box {
    }
 
    public void draw( Graphics2D g, float x, float y) {
-      g.fill( new Rectangle2D.Float( x, y - height, width, height));
-   }
-
-   public int getLastFontId() {
-      return TeXFont.NO_FONT;
+      g.fill( new Rectangle2D.Float( x, y - height, width, height ) );
    }
 }

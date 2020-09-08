@@ -28,24 +28,17 @@
 
 package be.ugent.caagt.jmathtex;
 
-import java.awt.*;
-
-import static be.ugent.caagt.jmathtex.TeXFont.NO_FONT;
-
 /**
  * A box representing glue.
  */
 public final class GlueBox extends Box {
 
-  public GlueBox( float space ) {
+  /**
+   * @param space Amount of space between the {@link Box}es that are glued
+   *              together.
+   */
+  public GlueBox( final float space ) {
     this.width = space;
   }
 
-  public void draw( final Graphics2D g, final float x, final float y ) {
-    // no visible effect
-  }
-
-  public int getLastFontId() {
-    return NO_FONT;
-  }
 }

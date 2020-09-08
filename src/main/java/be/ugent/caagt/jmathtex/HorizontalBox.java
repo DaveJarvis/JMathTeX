@@ -32,7 +32,6 @@ import java.awt.*;
 import java.util.ListIterator;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.*;
-import static be.ugent.caagt.jmathtex.TeXFont.NO_FONT;
 import static java.lang.Float.NEGATIVE_INFINITY;
 import static java.lang.Math.max;
 
@@ -40,8 +39,6 @@ import static java.lang.Math.max;
  * A box composed of a horizontal row of child boxes.
  */
 public final class HorizontalBox extends Box {
-
-  private float curPos; // NOPMD
 
   /**
    * Basic horizontal box.
@@ -93,21 +90,18 @@ public final class HorizontalBox extends Box {
   }
 
   private void recalculate( final Box b ) {
-    curPos += b.getWidth();
-    width = max( width, curPos );
-    height = max(
-        children.isEmpty() ? NEGATIVE_INFINITY : height,
-        b.height - b.shift );
-    depth = max(
-        children.isEmpty() ? NEGATIVE_INFINITY : depth,
-        b.depth + b.shift );
+    width += b.getWidth();
+    height = max( children.size() == 0 ? NEGATIVE_INFINITY : height,
+                  b.height - b.shift );
+    depth = max( children.size() == 0 ? NEGATIVE_INFINITY : depth,
+                 b.depth + b.shift );
   }
 
   /**
    * Iterates from the last child box (the lowest) to the first (the highest)
-   * until a font id is found that's not equal to {@link TeXFont#NO_FONT}.
+   * until a font id is found that's not equal to {@link Box#NO_FONT}.
    *
-   * @return {@link TeXFont#NO_FONT} if there's no font ID in this
+   * @return {@link Box#NO_FONT} if there's no font ID in this
    * {@link Box}'s list of child instances.
    */
   @Override

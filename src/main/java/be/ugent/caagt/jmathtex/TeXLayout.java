@@ -48,10 +48,20 @@ public class TeXLayout {
 
   private final Box mBox;
   private final float mSize;
+  private final Insets mInsets = new Insets( 0, 0, 0, 0 );
 
   public TeXLayout( final Box box, final float size ) {
     mBox = box;
     mSize = size;
+  }
+
+  public void setInsets( final Insets insets ) {
+    final float size = getSize();
+
+    mInsets.top = (int) (insets.top + TWEAK_HEIGHT * size);
+    mInsets.bottom = (int) (insets.bottom + TWEAK_HEIGHT * size);
+    mInsets.left = (int) (insets.left + TWEAK_WIDTH * size);
+    mInsets.right = (int) (insets.right + TWEAK_WIDTH * size);
   }
 
   /**
@@ -60,7 +70,7 @@ public class TeXLayout {
    * @return Recommended X location for drawing the {@link Box}.
    */
   public float getX() {
-    return TWEAK_WIDTH / 2;
+    return mInsets.left / getSize();
   }
 
   /**
@@ -69,7 +79,7 @@ public class TeXLayout {
    * @return Recommended Y location for drawing the {@link Box}.
    */
   public float getY() {
-    return getBox().getHeight() + TWEAK_HEIGHT / 2;
+    return mInsets.top / getSize() + getBox().getHeight();
   }
 
   /**
@@ -78,7 +88,12 @@ public class TeXLayout {
    * @return The {@link Box} width multiplied by the size.
    */
   public int getWidth() {
-    return (int) (getBox().getWidth() * getSize() + ROUND + (TWEAK_WIDTH * getSize()));
+    final var box = getBox();
+    final var size = getSize();
+    return (int) (box.getWidth() * size + ROUND + mInsets.left + mInsets.right);
+
+    //return (int) (getBox().getWidth() * getSize() + ROUND + (TWEAK_WIDTH *
+    // getSize()));
   }
 
   /**
@@ -89,7 +104,12 @@ public class TeXLayout {
   public int getHeight() {
     final var box = getBox();
     final var size = getSize();
-    return (int) ((box.getHeight() + box.getDepth()) * size + (2 * ROUND) + (TWEAK_HEIGHT * size));
+
+    return (int) (box.getHeight() * size + ROUND + mInsets.top) +
+        (int) (box.getDepth() * size + ROUND + mInsets.bottom);
+
+    //return (int) ((box.getHeight() + box.getDepth()) * size + (2 * ROUND) +
+    // (TWEAK_HEIGHT * size));
   }
 
   private Box getBox() {

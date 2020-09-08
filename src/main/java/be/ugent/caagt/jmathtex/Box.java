@@ -1,29 +1,29 @@
 /*
  * =========================================================================
  * This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
- * 
+ *
  * Copyright (C) 2004-2007 Universiteit Gent
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * A copy of the GNU General Public License can be found in the file
  * LICENSE.txt provided with the source distribution of this program (see
  * the META-INF directory in the source jar). This license can also be
  * found on the GNU website at http://www.gnu.org/licenses/gpl.html.
- * 
+ *
  * If you did not receive a copy of the GNU General Public License along
  * with this program, contact the lead developer, or write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
- * 
+ *
  */
 
 package be.ugent.caagt.jmathtex;
@@ -44,15 +44,17 @@ import java.util.List;
  * (that paints the box). <b> This implementation must start with calling the method
  * {@link #startDraw(Graphics2D, float, float)} and end with calling the method
  * {@link #endDraw(Graphics2D)} to set and restore the color's that must be used for
- * painting the box and to draw the background!</b> They must also implement the abstract 
+ * painting the box and to draw the background!</b> They must also implement the abstract
  * {@link #getLastFontId()} method (the last font
  * that will be used when this box will be painted).
  */
 public abstract class Box {
 
+   protected static final int NO_FONT = -1;
+
    /**
     * The foreground color of the whole box. Child boxes can override this color.
-    * If it's null and it has a parent box, the foreground color of the parent will 
+    * If it's null and it has a parent box, the foreground color of the parent will
     * be used. If it has no parent, the foreground color of the component on which it
     * will be painted, will be used.
     */
@@ -68,19 +70,19 @@ public abstract class Box {
    private Color prevColor;
 
    /**
-    * The width of this box, i.e. the value that will be used for further 
-    * calculations. 
+    * The width of this box, i.e. the value that will be used for further
+    * calculations.
     */
    protected float width;
 
    /**
-    * The height of this box, i.e. the value that will be used for further 
+    * The height of this box, i.e. the value that will be used for further
     * calculations.
     */
    protected float height;
 
    /**
-    * The depth of this box, i.e. the value that will be used for further 
+    * The depth of this box, i.e. the value that will be used for further
     * calculations.
     */
    protected float depth;
@@ -118,7 +120,7 @@ public abstract class Box {
 
    /**
     * Inserts the given box at the end of the list of child boxes.
-    * 
+    *
     * @param b the box to be inserted
     */
    public void add(final Box b) {
@@ -127,7 +129,7 @@ public abstract class Box {
 
    /**
     * Inserts the given box at the given position in the list of child boxes.
-    * 
+    *
     * @param pos the position at which to insert the given box
     * @param b the box to be inserted
     */
@@ -137,7 +139,7 @@ public abstract class Box {
 
    /**
     * Get the width of this box.
-    * 
+    *
     * @return the width of this box
     */
    public float getWidth() {
@@ -145,8 +147,17 @@ public abstract class Box {
    }
 
    /**
+    * Set the width for this box.
+    *
+    * @param w the width
+    */
+   public void setWidth( float w ) {
+      width = w;
+   }
+
+   /**
     * Get the height of this box.
-    * 
+    *
     * @return the height of this box
     */
    public float getHeight() {
@@ -155,7 +166,7 @@ public abstract class Box {
 
    /**
     * Get the depth of this box.
-    * 
+    *
     * @return the depth of this box
     */
    public float getDepth() {
@@ -164,7 +175,7 @@ public abstract class Box {
 
    /**
     * Get the shift amount for this box.
-    * 
+    *
     * @return the shift amount
     */
    public float getShift() {
@@ -173,7 +184,7 @@ public abstract class Box {
 
    /**
     * Set the depth for this box.
-    * 
+    *
     * @param d the depth
     */
    public void setDepth(final float d) {
@@ -182,7 +193,7 @@ public abstract class Box {
 
    /**
     * Set the height for this box.
-    * 
+    *
     * @param h the height
     */
    public void setHeight(final float h) {
@@ -191,7 +202,7 @@ public abstract class Box {
 
    /**
     * Set the shift amount for this box.
-    * 
+    *
     * @param s the shift amount
     */
    public void setShift(final float s) {
@@ -199,25 +210,30 @@ public abstract class Box {
    }
 
    /**
-    * Paints this box at the given coordinates using the given graphics context.
-    * 
+    * Paints this box at the given coordinates using the given graphics
+    * context. The default implementation does has no effect, draws nothing.
+    *
     * @param g the graphics (2D) context to use for painting
     * @param x the x-coordinate
     * @param y the y-coordinate
     */
-   public abstract void draw(Graphics2D g, float x, float y);
+   public void draw( final Graphics2D g, final float x, final float y ) {
+   }
 
    /**
-    * Get the id of the font that will be used the last when this box will be painted.
-    * 
-    * @return the id of the last font that will be used.
+    * Get the id of the font that will be used the last when this box will be
+    * painted.
+    *
+    * @return {@link Box#NO_FONT} by default.
     */
-   public abstract int getLastFontId();
+   public int getLastFontId() {
+      return NO_FONT;
+   }
 
    /**
-    * Stores the old color setting, draws the background of the box (if not null) 
+    * Stores the old color setting, draws the background of the box (if not null)
     * and sets the foreground color (if not null).
-    * 
+    *
     * @param g the graphics (2D) context
     * @param x the x-coordinate
     * @param y the y-coordinate
@@ -238,10 +254,20 @@ public abstract class Box {
 
    /**
     * Restores the previous color setting.
-    * 
+    *
     * @param g the graphics (2D) context
     */
    protected void endDraw(final Graphics2D g) {
       g.setColor(prevColor);
+   }
+
+   @Override
+   public String toString() {
+      return  getClass().getSimpleName() + "{" +
+          ", width=" + width +
+          ", height=" + height +
+          ", depth=" + depth +
+          ", shift=" + shift +
+          '}';
    }
 }

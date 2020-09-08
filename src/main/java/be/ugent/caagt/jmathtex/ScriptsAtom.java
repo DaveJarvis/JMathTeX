@@ -28,6 +28,8 @@
 
 package be.ugent.caagt.jmathtex;
 
+import static be.ugent.caagt.jmathtex.Box.NO_FONT;
+
 /**
  * An atom representing scripts to be attached to another atom.
  */
@@ -54,15 +56,16 @@ public class ScriptsAtom extends Atom {
       if (subscript == null && superscript == null)
          return b;
       else {
-         TeXFont tf = env.getTeXFont();
-         int style = env.getStyle();
+         final TeXFont tf = env.getTeXFont();
+         final int style = env.getStyle();
 
          HorizontalBox hor = new HorizontalBox(b);
 
          int lastFontId = b.getLastFontId();
          // if no last font found (whitespace box), use default "mu font"
-         if (lastFontId == TeXFont.NO_FONT)
+         if( lastFontId == NO_FONT ) {
             lastFontId = tf.getMuFontId();
+         }
 
          TeXEnvironment subStyle = env.subStyle(), supStyle = env.supStyle();
 
@@ -70,8 +73,8 @@ public class ScriptsAtom extends Atom {
          float delta = 0, shiftUp, shiftDown;
 
          // TODO: use polymorphism?
-         if (base instanceof AccentedAtom) { // special case :
-            // accent. This positions superscripts better next to the accent!
+         if (base instanceof AccentedAtom) {
+            // improve superscript position relative to the accent.
             Box box = ((AccentedAtom) base).base.createBox(env.crampStyle());
             shiftUp = box.getHeight() - tf.getSupDrop(supStyle.getStyle());
             shiftDown = box.getDepth() + tf.getSubDrop(subStyle.getStyle());
