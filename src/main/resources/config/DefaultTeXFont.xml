@@ -1,44 +1,19 @@
 <?xml version='1.0'?>
 <!--
-  DefaultTeXFont.xml
-  =========================================================================
   This file is part of the JMathTeX Library - http://jmathtex.sourceforge.net
-  
   Copyright (C) 2004-2007 Universiteit Gent
-  
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or (at
-  your option) any later version.
-  
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  A copy of the GNU General Public License can be found in the file
-  LICENSE.txt provided with the source distribution of this program (see
-  the META-INF directory in the source jar). This license can also be
-  found on the GNU website at http://www.gnu.org/licenses/gpl.html.
-  
-  If you did not receive a copy of the GNU General Public License along
-  with this program, contact the lead developer, or write to the Free
-  Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-  02110-1301, USA.
-  
+
+  Refer to LICENSE.md for licensing terms.
 -->
 
 <TeXFont>
-
   <!-- general parameters used in the TeX algorithms, specific for the computer modern font family -->
-
   <Parameters num1="0.676508" num2="0.393732" num3="0.443731" denom1="0.685951" denom2="0.344841"
               sup1="0.412892" sup2="0.362892" sup3="0.288889" sub1="0.15" sub2="0.247217" supdrop="0.386108"
               subdrop="0.05" axisheight="0.25" defaultrulethickness="0.039999" bigopspacing1="0.111112"
               bigopspacing2="0.166667" bigopspacing3="0.2" bigopspacing4="0.6" bigopspacing5="0.1"/>
 
   <!-- general settings -->
-
   <GeneralSettings mufontid="jlm_cmsy10" spacefontid="jlm_cmr10" scriptfactor="0.7" scriptscriptfactor="0.5"/>
 
   <!-- mappings for text styles defined in "FormulaSettings.xml" -->
@@ -56,7 +31,6 @@
     <TextStyleMapping name="mathcal">
       <MapRange code="capitals" fontId="jlm_cmsy10" start="65"/>
     </TextStyleMapping>
-
   </TextStyleMappings>
 
   <!-- the default text style mappings, used when no text style is specified or when a specific mapping 
@@ -98,7 +72,6 @@
     <SymbolMapping name="widetilde" ch="101" fontId="jlm_cmex10"/>
 
     <!-- delimiters that can change size -->
-
     <SymbolMapping name="lbrace" ch="102" fontId="jlm_cmsy10"/>
     <SymbolMapping name="rbrace" ch="103" fontId="jlm_cmsy10"/>
     <SymbolMapping name="lbrack" ch="40" fontId="jlm_cmr10"/>
@@ -329,10 +302,7 @@
     <SymbolMapping name="rightharpoondown" ch="43" fontId="jlm_cmmi10_unchanged"/>
   </SymbolMappings>
 
-  <!-- font descriptions -->
-
   <FontDescriptions>
-
     <Font name="jlm_msbm10.ttf" id="jlm_msbm10" space="0.300003" xHeight="0.462964" quad="1.0">
       <Char code="161" width="0.777781" height="0.757257" depth="0.251422"/>
       <Char code="162" width="0.777781" height="0.757257" depth="0.251422"/>
@@ -1924,7 +1894,5 @@
       <Char code="126" width="0.777781" height="0.694445" depth="0.129629"/>
       <Char code="196" width="0.777781" height="0.694445" depth="0.129629"/>
     </Font>
-
   </FontDescriptions>
-
 </TeXFont>
