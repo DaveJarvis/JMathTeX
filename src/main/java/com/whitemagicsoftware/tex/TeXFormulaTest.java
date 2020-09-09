@@ -23,20 +23,14 @@ import be.ugent.caagt.jmathtex.DefaultTeXFont;
 import be.ugent.caagt.jmathtex.TeXEnvironment;
 import be.ugent.caagt.jmathtex.TeXFormula;
 import be.ugent.caagt.jmathtex.TeXLayout;
-import org.jfree.svg.SVGGraphics2D;
 
-import java.awt.*;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.Map;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.STYLE_DISPLAY;
 import static java.awt.RenderingHints.*;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.jfree.svg.SVGHints.KEY_DRAW_STRING_TYPE;
 import static org.jfree.svg.SVGHints.VALUE_DRAW_STRING_TYPE_VECTOR;
-import static org.jfree.svg.SVGUnits.PX;
 
 public class TeXFormulaTest {
   private final static Map<Object, Object> DEFAULT_HINTS = Map.of(
@@ -81,39 +75,47 @@ public class TeXFormulaTest {
 
   //@Test
   public void test_MathML_SimpleFormula_Success() throws IOException {
+//    final var buffer = new StringBuilder( 32768 );
     final var size = 20f;
-    String svg = "";
 
-    final var buffer = new StringBuilder( 16384 );
     final var texFont = new DefaultTeXFont( size );
 
     final long startTime = System.currentTimeMillis();
 
+    final var g = new FastGraphics2D();
+    g.scale( size, size );
+//    g.setRenderingHints( DEFAULT_HINTS );
+
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var filename = "/tmp/eq-" + j + ".svg";
 
-      for( int i = 0; i < 100 / EQUATIONS.length; i++ ) {
-        final var formula = new TeXFormula( EQUATIONS[ j ] );
+      for( int i = 0; i < EQUATIONS.length / EQUATIONS.length; i++ ) {
+        final var formula = new TeXFormula( EQUATIONS[ 3 ] );
         final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
         final var box = formula.createBox( env );
         final var layout = new TeXLayout( box, size );
-        layout.setInsets(new Insets( 5, 5, 5, 5));
 
-        final var g = new SVGGraphics2D(
-            layout.getWidth(), layout.getHeight(), PX, buffer );
-        g.setRenderingHints( DEFAULT_HINTS );
-        g.scale( size, size );
+//        final var g2 = new SVGGraphics2D(
+//            layout.getWidth(), layout.getHeight(), PX, buffer );
+//        g2.setRenderingHints( DEFAULT_HINTS );
 
+        g.setDimensions( layout.getWidth(), layout.getHeight() );
         box.draw( g, layout.getX(), layout.getY() );
-        svg = g.getSVGElement( null, true, null, null, null );
-        buffer.setLength( 0 );
+//        box.draw( g2, layout.getX(), layout.getY() );
+//        svg = g2.getSVGElement( null, true, null, null, null );
+//        buffer.setLength( 0 );
       }
 
-      try( final var fos = new FileOutputStream( filename );
-           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
-        out.write( svg );
-      }
+
+//      try( final var fos = new FileOutputStream( filename );
+//           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
+//        out.write( svg );
+//      }
     }
+
+    System.out.println( g );
+
+    System.out.println( g.tallies() );
 
     System.out.println( System.currentTimeMillis() - startTime );
   }

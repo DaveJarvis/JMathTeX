@@ -48,11 +48,12 @@ public class TeXLayout {
 
   private final Box mBox;
   private final float mSize;
-  private final Insets mInsets = new Insets( 0, 0, 0, 0 );
+  private final Insets mInsets;
 
   public TeXLayout( final Box box, final float size ) {
     mBox = box;
     mSize = size;
+    mInsets = new Insets( 5, 5, 5, 5 );
   }
 
   public void setInsets( final Insets insets ) {
