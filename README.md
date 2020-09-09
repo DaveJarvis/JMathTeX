@@ -83,7 +83,7 @@ to draw the TeX boxes.
 ## Generate Scalable Vector Graphics
 
 At this point, the internal buffer for `SvgGraphics2D` contains a nearly
-complete document. Extract the document by calling `toString()`:
+complete document. Finalize and extract the document by calling `toString()`:
 
 ``` java
 System.out.println( g.toString() );
