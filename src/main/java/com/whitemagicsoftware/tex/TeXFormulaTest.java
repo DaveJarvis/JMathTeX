@@ -24,11 +24,14 @@ import be.ugent.caagt.jmathtex.TeXEnvironment;
 import be.ugent.caagt.jmathtex.TeXFormula;
 import be.ugent.caagt.jmathtex.TeXLayout;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.STYLE_DISPLAY;
 import static java.awt.RenderingHints.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.jfree.svg.SVGHints.KEY_DRAW_STRING_TYPE;
 import static org.jfree.svg.SVGHints.VALUE_DRAW_STRING_TYPE_VECTOR;
 
@@ -75,22 +78,20 @@ public class TeXFormulaTest {
 
   //@Test
   public void test_MathML_SimpleFormula_Success() throws IOException {
-//    final var buffer = new StringBuilder( 32768 );
     final var size = 20f;
-
     final var texFont = new DefaultTeXFont( size );
-
-    final long startTime = System.currentTimeMillis();
-
     final var g = new FastGraphics2D();
     g.scale( size, size );
-//    g.setRenderingHints( DEFAULT_HINTS );
+
+    var svg = "";
+
+    final long startTime = System.currentTimeMillis();
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var filename = "/tmp/eq-" + j + ".svg";
 
-      for( int i = 0; i < EQUATIONS.length / EQUATIONS.length; i++ ) {
-        final var formula = new TeXFormula( EQUATIONS[ 3 ] );
+      for( int i = 0; i < 100 / EQUATIONS.length; i++ ) {
+        final var formula = new TeXFormula( EQUATIONS[ j ] );
         final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
         final var box = formula.createBox( env );
         final var layout = new TeXLayout( box, size );
@@ -101,16 +102,17 @@ public class TeXFormulaTest {
 
         g.setDimensions( layout.getWidth(), layout.getHeight() );
         box.draw( g, layout.getX(), layout.getY() );
+        svg = g.toString();
 //        box.draw( g2, layout.getX(), layout.getY() );
 //        svg = g2.getSVGElement( null, true, null, null, null );
 //        buffer.setLength( 0 );
       }
 
 
-//      try( final var fos = new FileOutputStream( filename );
-//           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
-//        out.write( svg );
-//      }
+      try( final var fos = new FileOutputStream( filename );
+           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
+        out.write( svg );
+      }
     }
 
     System.out.println( g );

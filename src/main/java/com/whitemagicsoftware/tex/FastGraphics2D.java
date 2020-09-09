@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static com.whitemagicsoftware.tex.RyuDouble.doubleToString;
 import static java.awt.Color.BLACK;
-import static java.lang.Math.min;
 
 /**
  * Responsible for building a SVG version of a TeX formula. Both Batik and
@@ -59,6 +58,11 @@ public final class FastGraphics2D extends Graphics2D {
   private final StringBuilder mSvg;
 
   /**
+   * Filled when drawing paths, not thread-safe.
+   */
+  private final float[] mCoords = new float[ 6 ];
+
+  /**
    * Transform attribute value, a matrix function.
    */
   private String mTransform = "";
@@ -98,11 +102,11 @@ public final class FastGraphics2D extends Graphics2D {
           .append( "'" );
     }
 
-    mSvg.append( ">" );
-    mSvg.append( "<path " );
-    appendPath( (Path2D)shape, mSvg );
-    mSvg.append( "/>" );
-    mSvg.append( "</g>" );
+    mSvg.append( ">" )
+        .append( "<path " );
+    appendPath( (Path2D) shape, mSvg );
+    mSvg.append( "/>" )
+        .append( "</g>" );
   }
 
   private void appendPath( final Path2D path, final StringBuilder buffer ) {
@@ -111,48 +115,41 @@ public final class FastGraphics2D extends Graphics2D {
     }
 
     buffer.append( "d='" );
-    float[] coords = new float[ 6 ];
-    boolean first = true;
-
     final var iterator = path.getPathIterator( null );
-    while( !iterator.isDone() ) {
-      int type = iterator.currentSegment( coords );
-      
-      if( !first ) {
-        buffer.append( " " );
-      }
 
-      first = false;
+    while( !iterator.isDone() ) {
+      int type = iterator.currentSegment( mCoords );
+
       switch( type ) {
-        case 0 -> buffer.append( "M " )
-                        .append( toGeometryPrecision( coords[ 0 ] ) )
+        case 0 -> buffer.append( "M" )
+                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 1 ] ) );
-        case 1 -> buffer.append( "L " )
-                        .append( toGeometryPrecision( coords[ 0 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 1 ] ) );
+        case 1 -> buffer.append( "L" )
+                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 1 ] ) );
-        case 2 -> buffer.append( "Q " )
-                        .append( toGeometryPrecision( coords[ 0 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 1 ] ) );
+        case 2 -> buffer.append( "Q" )
+                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 1 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 1 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 2 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 2 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 3 ] ) );
-        case 3 -> buffer.append( "C " )
-                        .append( toGeometryPrecision( coords[ 0 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 3 ] ) );
+        case 3 -> buffer.append( "C" )
+                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 1 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 1 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 2 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 2 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 3 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 3 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 4 ] ) )
+                        .append( toGeometryPrecision( mCoords[ 4 ] ) )
                         .append( " " )
-                        .append( toGeometryPrecision( coords[ 5 ] ) );
-        case 4 -> buffer.append( "Z " );
+                        .append( toGeometryPrecision( mCoords[ 5 ] ) );
+        case 4 -> buffer.append( "Z" );
       }
 
       iterator.next();
@@ -223,6 +220,17 @@ public final class FastGraphics2D extends Graphics2D {
   }
 
   @Override
+  public Font getFont() {
+    return mFont;
+  }
+
+  @Override
+  public void setFont( final Font font ) {
+    assert font != null;
+    mFont = font;
+  }
+
+  @Override
   public Color getColor() {
     return mColour;
   }
@@ -242,17 +250,6 @@ public final class FastGraphics2D extends Graphics2D {
   public void setXORMode( final Color c1 ) {
     tally( new Object() {
     }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public Font getFont() {
-    return mFont;
-  }
-
-  @Override
-  public void setFont( final Font font ) {
-    assert font != null;
-    mFont = font;
   }
 
   @Override
@@ -472,44 +469,6 @@ public final class FastGraphics2D extends Graphics2D {
 
   private static String toTransformPrecision( final double value ) {
     return doubleToString( value, DECIMALS_TRANSFORM );
-  }
-
-  /**
-   * Escape XML entities.
-   *
-   * @param text   Contains potential characters that must be escaped.
-   * @param buffer The given text is appended to the given buffer, but with
-   *               all XML entities escaped to ampersand form.
-   */
-  private static void escape( final String text, final StringBuilder buffer ) {
-    assert text != null;
-    assert buffer != null;
-    final int len = text.length();
-
-    for( int i = 0; i < len; i++ ) {
-      final char c = text.charAt( i );
-
-      switch( c ) {
-        case '"' -> buffer.append( "&quot;" );
-        case '&' -> {
-          final var next = text.substring( i, min( i + 6, text.length() ) );
-          if( !next.startsWith( "&lt;" ) &&
-              !next.startsWith( "&gt;" ) &&
-              !next.startsWith( "&amp;" ) &&
-              !next.startsWith( "&apos;" ) &&
-              !next.startsWith( "&quot;" ) ) {
-            buffer.append( "&amp;" );
-            break;
-          }
-
-          buffer.append( c );
-        }
-        case '\'' -> buffer.append( "&apos;" );
-        case '<' -> buffer.append( "&lt;" );
-        case '>' -> buffer.append( "&gt;" );
-        default -> buffer.append( c );
-      }
-    }
   }
 
   private void tally( final String name ) {
