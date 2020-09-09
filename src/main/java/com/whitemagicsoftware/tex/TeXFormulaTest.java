@@ -24,41 +24,11 @@ import be.ugent.caagt.jmathtex.TeXEnvironment;
 import be.ugent.caagt.jmathtex.TeXFormula;
 import be.ugent.caagt.jmathtex.TeXLayout;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Map;
 
 import static be.ugent.caagt.jmathtex.TeXConstants.STYLE_DISPLAY;
-import static java.awt.RenderingHints.*;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.jfree.svg.SVGHints.KEY_DRAW_STRING_TYPE;
-import static org.jfree.svg.SVGHints.VALUE_DRAW_STRING_TYPE_VECTOR;
 
 public class TeXFormulaTest {
-  private final static Map<Object, Object> DEFAULT_HINTS = Map.of(
-      KEY_ANTIALIASING,
-      VALUE_ANTIALIAS_ON,
-      KEY_ALPHA_INTERPOLATION,
-      VALUE_ALPHA_INTERPOLATION_QUALITY,
-      KEY_COLOR_RENDERING,
-      VALUE_COLOR_RENDER_QUALITY,
-      KEY_DITHERING,
-      VALUE_DITHER_DISABLE,
-      KEY_FRACTIONALMETRICS,
-      VALUE_FRACTIONALMETRICS_ON,
-      KEY_INTERPOLATION,
-      VALUE_INTERPOLATION_BICUBIC,
-      KEY_RENDERING,
-      VALUE_RENDER_QUALITY,
-      KEY_STROKE_CONTROL,
-      VALUE_STROKE_PURE,
-      KEY_TEXT_ANTIALIASING,
-      VALUE_TEXT_ANTIALIAS_ON,
-      KEY_DRAW_STRING_TYPE,
-      VALUE_DRAW_STRING_TYPE_VECTOR
-  );
-
   private final static String[] EQUATIONS = {
       "(a+b)^2=a^2 + 2ab + b^2",
       "S_x = sqrt((SS_x)/(N-1))",
@@ -86,8 +56,6 @@ public class TeXFormulaTest {
     final long startTime = System.currentTimeMillis();
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
-      final var filename = "/tmp/eq-" + j + ".svg";
-
       for( int i = 0; i < 1000 / EQUATIONS.length; i++ ) {
         final var formula = new TeXFormula( EQUATIONS[ j ] );
         final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
@@ -98,6 +66,7 @@ public class TeXFormulaTest {
         box.draw( g, layout.getX(), layout.getY() );
       }
 
+//      final var filename = "/tmp/eq-" + j + ".svg";
 //      try( final var fos = new FileOutputStream( filename );
 //           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
 //        out.write( g.toString() );
