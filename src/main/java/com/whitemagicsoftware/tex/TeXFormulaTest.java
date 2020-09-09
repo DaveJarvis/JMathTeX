@@ -80,44 +80,29 @@ public class TeXFormulaTest {
   public void test_MathML_SimpleFormula_Success() throws IOException {
     final var size = 20f;
     final var texFont = new DefaultTeXFont( size );
-    final var g = new FastGraphics2D();
+    final var g = new SvgGraphics2D();
     g.scale( size, size );
-
-    var svg = "";
 
     final long startTime = System.currentTimeMillis();
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var filename = "/tmp/eq-" + j + ".svg";
 
-      for( int i = 0; i < 100 / EQUATIONS.length; i++ ) {
+      for( int i = 0; i < 1000 / EQUATIONS.length; i++ ) {
         final var formula = new TeXFormula( EQUATIONS[ j ] );
         final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
         final var box = formula.createBox( env );
         final var layout = new TeXLayout( box, size );
 
-//        final var g2 = new SVGGraphics2D(
-//            layout.getWidth(), layout.getHeight(), PX, buffer );
-//        g2.setRenderingHints( DEFAULT_HINTS );
-
         g.setDimensions( layout.getWidth(), layout.getHeight() );
         box.draw( g, layout.getX(), layout.getY() );
-        svg = g.toString();
-//        box.draw( g2, layout.getX(), layout.getY() );
-//        svg = g2.getSVGElement( null, true, null, null, null );
-//        buffer.setLength( 0 );
       }
 
-
-      try( final var fos = new FileOutputStream( filename );
-           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
-        out.write( svg );
-      }
+//      try( final var fos = new FileOutputStream( filename );
+//           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
+//        out.write( g.toString() );
+//      }
     }
-
-    System.out.println( g );
-
-    System.out.println( g.tallies() );
 
     System.out.println( System.currentTimeMillis() - startTime );
   }

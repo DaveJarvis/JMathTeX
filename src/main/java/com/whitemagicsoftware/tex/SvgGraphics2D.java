@@ -1,3 +1,24 @@
+/*
+ * Copyright 2020 White Magic Software, Ltd.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
 package com.whitemagicsoftware.tex;
 
 import java.awt.*;
@@ -12,7 +33,6 @@ import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.whitemagicsoftware.tex.RyuDouble.doubleToString;
@@ -34,10 +54,7 @@ import static java.awt.Color.BLACK;
  * This class is not thread-safe, but can be reset for performance purposes.
  * </p>
  */
-public final class FastGraphics2D extends Graphics2D {
-  // Used to determine what method subset is necessary for TeX.
-  final Map<String, Long> mTallies = new HashMap<>();
-
+public final class SvgGraphics2D extends Graphics2D {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
   private static final String XML_HEADER = "<?xml version='1.0'?><svg ";
 
@@ -73,13 +90,12 @@ public final class FastGraphics2D extends Graphics2D {
   private final FontRenderContext mRenderContext =
       new FontRenderContext( null, false, true );
 
-
   /**
-   * Creates a new instance with a default buffer size. Calling classes must
+   * Creates a new instance with a default buffer size. Client classes must
    * call {@link #setDimensions(int, int)} before using the class to ensure
    * the width and height are added to the document.
    */
-  public FastGraphics2D() {
+  public SvgGraphics2D() {
     this( DEFAULT_SVG_BUFFER_SIZE );
   }
 
@@ -88,8 +104,24 @@ public final class FastGraphics2D extends Graphics2D {
    * call {@link #setDimensions(int, int)} before using the class to ensure
    * the width and height are added to the document.
    */
-  public FastGraphics2D( final int initialBufferSize ) {
+  public SvgGraphics2D( final int initialBufferSize ) {
     mSvg = new StringBuilder( initialBufferSize ).append( XML_HEADER );
+  }
+
+  /**
+   * Resets the SVG buffer to a new state. This method must be called before
+   * calling drawing primitives.
+   *
+   * @param w The final document width (in pixels).
+   * @param h The final document height (in pixels).
+   */
+  public void setDimensions( final int w, final int h ) {
+    mSvg.setLength( XML_HEADER.length() );
+    mSvg.append( "width='" )
+        .append( w )
+        .append( "px' height='" )
+        .append( h )
+        .append( "px'>" );
   }
 
   @Override
@@ -99,10 +131,10 @@ public final class FastGraphics2D extends Graphics2D {
     if( !mAffineTransform.isIdentity() ) {
       mSvg.append( " transform='" )
           .append( mTransform )
-          .append( "'" );
+          .append( '\'' );
     }
 
-    mSvg.append( ">" )
+    mSvg.append( '>' )
         .append( "<path " );
     appendPath( (Path2D) shape, mSvg );
     mSvg.append( "/>" )
@@ -121,41 +153,41 @@ public final class FastGraphics2D extends Graphics2D {
       int type = iterator.currentSegment( mCoords );
 
       switch( type ) {
-        case 0 -> buffer.append( "M" )
+        case 0 -> buffer.append( 'M' )
                         .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 1 -> buffer.append( "L" )
+        case 1 -> buffer.append( 'L' )
                         .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 2 -> buffer.append( "Q" )
+        case 2 -> buffer.append( 'Q' )
                         .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 3 ] ) );
-        case 3 -> buffer.append( "C" )
+        case 3 -> buffer.append( 'C' )
                         .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 3 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 4 ] ) )
-                        .append( " " )
+                        .append( ' ' )
                         .append( toGeometryPrecision( mCoords[ 5 ] ) );
-        case 4 -> buffer.append( "Z" );
+        case 4 -> buffer.append( 'Z' );
       }
 
       iterator.next();
     }
 
-    buffer.append( "'" );
+    buffer.append( '\'' );
   }
 
   @Override
@@ -177,6 +209,7 @@ public final class FastGraphics2D extends Graphics2D {
             .append( mTransform );
       }
 
+      // Double-duty: closes either height or transform.
       mSvg.append( "'/>" );
     }
     else {
@@ -200,192 +233,15 @@ public final class FastGraphics2D extends Graphics2D {
     drawString( glyphs, (float) x, (float) y );
   }
 
-  /**
-   * Has no effect; call {@link #setDimensions(int, int)} to reset this instance
-   * to create another SVG document.
-   */
   @Override
-  public void dispose() {
-  }
-
-  @Override
-  public void drawGlyphVector( final GlyphVector g, final float x,
-                               final float y ) {
+  public void drawGlyphVector(
+      final GlyphVector g, final float x, final float y ) {
     fill( g.getOutline( x, y ) );
   }
 
   @Override
   public void translate( final int x, final int y ) {
     translate( x, (double) y );
-  }
-
-  @Override
-  public Font getFont() {
-    return mFont;
-  }
-
-  @Override
-  public void setFont( final Font font ) {
-    assert font != null;
-    mFont = font;
-  }
-
-  @Override
-  public Color getColor() {
-    return mColour;
-  }
-
-  @Override
-  public void setColor( final Color colour ) {
-    mColour = colour;
-  }
-
-  @Override
-  public void setPaintMode() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void setXORMode( final Color c1 ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public FontMetrics getFontMetrics( final Font f ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-    return null;
-  }
-
-  @Override
-  public Rectangle getClipBounds() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-    return null;
-  }
-
-  @Override
-  public void clipRect( final int x, final int y, final int width,
-                        final int height ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void setClip( final int x, final int y, final int width,
-                       final int height ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public Shape getClip() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-    return null;
-  }
-
-  @Override
-  public void setClip( final Shape clip ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void copyArea( final int x, final int y, final int width,
-                        final int height, final int dx, final int dy ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void drawLine( final int x1, final int y1, final int x2,
-                        final int y2 ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void fillRect( final int x, final int y, final int width,
-                        final int height ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void clearRect( final int x, final int y, final int width,
-                         final int height ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void drawRoundRect( final int x, final int y, final int width,
-                             final int height, final int arcWidth,
-                             final int arcHeight ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void fillRoundRect( final int x, final int y, final int width,
-                             final int height, final int arcWidth,
-                             final int arcHeight ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void drawOval( final int x, final int y, final int width,
-                        final int height ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void fillOval( final int x, final int y, final int width,
-                        final int height ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void drawArc( final int x, final int y, final int width,
-                       final int height, final int startAngle,
-                       final int arcAngle ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void fillArc( final int x, final int y, final int width,
-                       final int height, final int startAngle,
-                       final int arcAngle ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void drawPolyline( final int[] xPoints, final int[] yPoints,
-                            final int nPoints ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void drawPolygon( final int[] xPoints, final int[] yPoints,
-                           final int nPoints ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
-  }
-
-  @Override
-  public void fillPolygon( final int[] xPoints, final int[] yPoints,
-                           final int nPoints ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
@@ -419,32 +275,25 @@ public final class FastGraphics2D extends Graphics2D {
     return mRenderContext;
   }
 
-  /**
-   * Resets the SVG buffer to a new state. This method must be called before
-   * calling drawing primitives.
-   *
-   * @param w The final document width (in pixels).
-   * @param h The final document height (in pixels).
-   */
-  public void setDimensions( final int w, final int h ) {
-    mSvg.setLength( XML_HEADER.length() );
-    mSvg.append( "width='" );
-    mSvg.append( w );
-    mSvg.append( "px' height='" );
-    mSvg.append( h );
-    mSvg.append( "px'>" );
+  @Override
+  public Font getFont() {
+    return mFont;
   }
 
-  /**
-   * Call when no more graphics operations are pending and the content is safe
-   * to convert to an SVG representation.
-   *
-   * @return A complete SVG string that can be rendered to reproduce the TeX
-   * primitives.
-   */
   @Override
-  public String toString() {
-    return mSvg.append( "</svg>" ).toString();
+  public void setFont( final Font font ) {
+    assert font != null;
+    mFont = font;
+  }
+
+  @Override
+  public Color getColor() {
+    return mColour;
+  }
+
+  @Override
+  public void setColor( final Color colour ) {
+    mColour = colour;
   }
 
   /**
@@ -455,12 +304,32 @@ public final class FastGraphics2D extends Graphics2D {
    */
   private String toString( final AffineTransform at ) {
     return "matrix(" +
-        toTransformPrecision( at.getScaleX() ) + "," +
-        toTransformPrecision( at.getShearY() ) + "," +
-        toTransformPrecision( at.getShearX() ) + "," +
-        toTransformPrecision( at.getScaleY() ) + "," +
-        toTransformPrecision( at.getTranslateX() ) + "," +
-        toTransformPrecision( at.getTranslateY() ) + ")";
+        toTransformPrecision( at.getScaleX() ) + ',' +
+        toTransformPrecision( at.getShearY() ) + ',' +
+        toTransformPrecision( at.getShearX() ) + ',' +
+        toTransformPrecision( at.getScaleY() ) + ',' +
+        toTransformPrecision( at.getTranslateX() ) + ',' +
+        toTransformPrecision( at.getTranslateY() ) + ')';
+  }
+
+  /**
+   * Call when no more graphics operations are pending and the content is safe
+   * to convert to an SVG representation. This method is idempotent.
+   *
+   * @return A complete SVG string that can be rendered to reproduce the TeX
+   * primitives.
+   */
+  @Override
+  public String toString() {
+    return mSvg.append( "</svg>" ).toString();
+  }
+
+  /**
+   * Has no effect; call {@link #setDimensions(int, int)} to reset this instance
+   * to create another SVG document.
+   */
+  @Override
+  public void dispose() {
   }
 
   private static String toGeometryPrecision( final double value ) {
@@ -471,99 +340,164 @@ public final class FastGraphics2D extends Graphics2D {
     return doubleToString( value, DECIMALS_TRANSFORM );
   }
 
-  private void tally( final String name ) {
-    mTallies.compute( name, ( k, v ) -> v == null ? 0 : v + 1 );
+  @Override
+  public void setPaintMode() {
   }
 
-  public String tallies() {
-    final var result = new StringBuilder();
+  @Override
+  public void setXORMode( final Color c1 ) {
+  }
 
-    mTallies.forEach(
-        ( key, value ) -> result.append( key )
-                                .append( " " )
-                                .append( value )
-                                .append( "\n" )
-    );
+  @Override
+  public FontMetrics getFontMetrics( final Font f ) {
+    return null;
+  }
 
-    return result.toString();
+  @Override
+  public Rectangle getClipBounds() {
+    return null;
+  }
+
+  @Override
+  public void clipRect( final int x, final int y, final int width,
+                        final int height ) {
+  }
+
+  @Override
+  public void setClip( final int x, final int y, final int width,
+                       final int height ) {
+  }
+
+  @Override
+  public Shape getClip() {
+    return null;
+  }
+
+  @Override
+  public void setClip( final Shape clip ) {
+  }
+
+  @Override
+  public void copyArea( final int x, final int y, final int width,
+                        final int height, final int dx, final int dy ) {
+  }
+
+  @Override
+  public void drawLine( final int x1, final int y1, final int x2,
+                        final int y2 ) {
+  }
+
+  @Override
+  public void fillRect( final int x, final int y, final int width,
+                        final int height ) {
+  }
+
+  @Override
+  public void clearRect( final int x, final int y, final int width,
+                         final int height ) {
+  }
+
+  @Override
+  public void drawRoundRect( final int x, final int y, final int width,
+                             final int height, final int arcWidth,
+                             final int arcHeight ) {
+  }
+
+  @Override
+  public void fillRoundRect( final int x, final int y, final int width,
+                             final int height, final int arcWidth,
+                             final int arcHeight ) {
+  }
+
+  @Override
+  public void drawOval( final int x, final int y, final int width,
+                        final int height ) {
+  }
+
+  @Override
+  public void fillOval( final int x, final int y, final int width,
+                        final int height ) {
+  }
+
+  @Override
+  public void drawArc( final int x, final int y, final int width,
+                       final int height, final int startAngle,
+                       final int arcAngle ) {
+  }
+
+  @Override
+  public void fillArc( final int x, final int y, final int width,
+                       final int height, final int startAngle,
+                       final int arcAngle ) {
+  }
+
+  @Override
+  public void drawPolyline( final int[] xPoints, final int[] yPoints,
+                            final int nPoints ) {
+  }
+
+  @Override
+  public void drawPolygon( final int[] xPoints, final int[] yPoints,
+                           final int nPoints ) {
+  }
+
+  @Override
+  public void fillPolygon( final int[] xPoints, final int[] yPoints,
+                           final int nPoints ) {
   }
 
   @Override
   public void rotate( final double theta ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void rotate( final double theta, final double x, final double y ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void shear( final double shx, final double shy ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void transform( final AffineTransform at ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public Paint getPaint() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 
   @Override
   public Composite getComposite() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 
   @Override
   public void setBackground( final Color color ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public Color getBackground() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 
   @Override
   public Stroke getStroke() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 
   @Override
   public void clip( final Shape s ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void drawString( final AttributedCharacterIterator iterator,
                           final int x, final int y ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() + "(ACIterator, int, int)" );
   }
 
   @Override
   public boolean drawImage( final Image img, final int x, final int y,
                             final ImageObserver observer ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
@@ -571,8 +505,6 @@ public final class FastGraphics2D extends Graphics2D {
   public boolean drawImage( final Image img, final int x, final int y,
                             final int width, final int height,
                             final ImageObserver observer ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
@@ -580,8 +512,6 @@ public final class FastGraphics2D extends Graphics2D {
   public boolean drawImage( final Image img, final int x, final int y,
                             final Color bgcolor,
                             final ImageObserver observer ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
@@ -590,8 +520,6 @@ public final class FastGraphics2D extends Graphics2D {
                             final int width, final int height,
                             final Color bgcolor,
                             final ImageObserver observer ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
@@ -601,8 +529,6 @@ public final class FastGraphics2D extends Graphics2D {
                             final int sx1, final int sy1, final int sx2,
                             final int sy2,
                             final ImageObserver observer ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
@@ -612,118 +538,84 @@ public final class FastGraphics2D extends Graphics2D {
                             final int sx1, final int sy1, final int sx2,
                             final int sy2, final Color bgcolor,
                             final ImageObserver observer ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
   @Override
   public boolean drawImage( final Image img, final AffineTransform xform,
                             final ImageObserver obs ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
   @Override
   public void drawImage( final BufferedImage img, final BufferedImageOp op,
                          final int x, final int y ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void drawRenderedImage( final RenderedImage img,
                                  final AffineTransform xform ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void drawRenderableImage( final RenderableImage img,
                                    final AffineTransform xform ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void drawString( final AttributedCharacterIterator iterator,
                           final float x,
                           final float y ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public boolean hit( final Rectangle rect, final Shape s,
                       final boolean onStroke ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return false;
   }
 
   @Override
   public GraphicsConfiguration getDeviceConfiguration() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 
   @Override
   public void setComposite( final Composite comp ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void setPaint( final Paint paint ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void setStroke( final Stroke s ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void setRenderingHint( final RenderingHints.Key hintKey,
                                 final Object hintValue ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public Object getRenderingHint( final RenderingHints.Key hintKey ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 
   @Override
   public void setRenderingHints( final Map<?, ?> hints ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public void addRenderingHints( final Map<?, ?> hints ) {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
   }
 
   @Override
   public RenderingHints getRenderingHints() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 
   @Override
   public Graphics create() {
-    tally( new Object() {
-    }.getClass().getEnclosingMethod().getName() );
     return null;
   }
 }
