@@ -50,7 +50,7 @@ public class TeXFormulaTest {
 
   @Test
   public void test_MathML_SimpleFormula_Success() throws IOException {
-    final var size = 20f;
+    final var size = 100f;
     final var texFont = new DefaultTeXFont( size );
     final var g = new SvgGraphics2D();
     g.scale( size, size );
