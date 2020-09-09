@@ -37,7 +37,7 @@ import com.whitemagicsoftware.tex.exceptions.TextStyleMappingNotFoundException;
  *
  * @author Kurt Vermeulen
  */
-interface TeXFont {
+public interface TeXFont {
 
   FontInfo getFontInfo( int fontId );
 

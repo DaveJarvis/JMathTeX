@@ -30,7 +30,7 @@ package com.whitemagicsoftware.tex;
 
 import java.awt.*;
 
-import static com.whitemagicsoftware.tex.Box.NO_FONT;
+import static com.whitemagicsoftware.tex.boxes.Box.NO_FONT;
 import static com.whitemagicsoftware.tex.TeXConstants.*;
 
 /**
@@ -81,7 +81,7 @@ public class TeXEnvironment {
         this.foreground = fg;
     }
     
-    protected TeXEnvironment copy() {
+    public TeXEnvironment copy() {
         return new TeXEnvironment( style, tf, background, foreground );
     }
     

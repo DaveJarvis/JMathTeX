@@ -28,7 +28,9 @@
 
 package com.whitemagicsoftware.tex;
 
-import be.ugent.caagt.jmathtex.exceptions.*;
+import com.whitemagicsoftware.tex.atoms.*;
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.StrutBox;
 import com.whitemagicsoftware.tex.exceptions.*;
 import com.whitemagicsoftware.tex.parsers.PredefinedTeXFormulaParser;
 import com.whitemagicsoftware.tex.parsers.TeXFormulaSettingsParser;
@@ -108,7 +110,7 @@ public class TeXFormula {
     public static float PIXELS_PER_POINT = 1f;
 
     // for comparing floats with 0
-    protected static final float PREC = 0.0000001f;
+    public static final float PREC = 0.0000001f;
     
     // predefined TeXFormula's
     private static final Map<String,TeXFormula> predefinedTeXFormulas = new HashMap<>();
@@ -616,8 +618,8 @@ public class TeXFormula {
      * @return the modified TeXFormula
      */
     public TeXFormula addNthRoot(TeXFormula base, TeXFormula nthRoot) {
-        return add(new NthRoot((base == null ? null : base.root),
-                (nthRoot == null ? null : nthRoot.root)));
+        return add(new NthRootAtom( (base == null ? null : base.root),
+                                    (nthRoot == null ? null : nthRoot.root)));
     }
     
     /**
@@ -685,8 +687,8 @@ public class TeXFormula {
      * @return the modified TeXFormula
      */
     public TeXFormula addOp(TeXFormula op, TeXFormula low, TeXFormula up) {
-        return add(new BigOperatorAtom((op == null ? null : op.root),
-                (low == null ? null : low.root), (up == null ? null : up.root)));
+        return add(new BigOperatorAtom( (op == null ? null : op.root),
+                                        (low == null ? null : low.root), (up == null ? null : up.root)));
     }
     
     /**
@@ -937,13 +939,13 @@ public class TeXFormula {
         }
 
         // alphanumeric character
-        return new CharAtom(c, textStyle);
+        return new CharAtom( c, textStyle);
     }
 
    /*
     * Convert this TeXFormula into a box, starting form the given style
     */
-    public Box createBox(TeXEnvironment style) {
+    public Box createBox( TeXEnvironment style) {
         if( root == null ) {
           return new StrutBox();
         }
@@ -1365,7 +1367,7 @@ public class TeXFormula {
      * @return the modified TeXFormula
      */
     public TeXFormula nthRoot(TeXFormula nthRoot) {
-        root = new NthRoot(root, (nthRoot == null ? null : nthRoot.root));
+        root = new NthRootAtom( root, (nthRoot == null ? null : nthRoot.root));
         return this;
     }
     
@@ -1480,7 +1482,7 @@ public class TeXFormula {
             }
 
             final Atom base = new TeXFormula(getGroup(L_GROUP, R_GROUP)).root;
-            return new NthRoot(base, nRoot.root);
+            return new NthRootAtom( base, nRoot.root);
         }
     }
 
@@ -1575,8 +1577,8 @@ public class TeXFormula {
             throw new InvalidDelimiterTypeException();
         
         String name = delimiterNames[delimiter][OVER_DEL];
-        root = new OverUnderDelimiter(root, null, SymbolAtom.get(name),
-                TeXConstants.UNIT_EX, 0, true);
+        root = new OverUnderDelimiterAtom( root, null, SymbolAtom.get( name),
+                                           TeXConstants.UNIT_EX, 0, true);
         return this;
     }
     
@@ -1640,8 +1642,8 @@ public class TeXFormula {
             throw new InvalidDelimiterTypeException();
         
         String name = delimiterNames[delimiter][OVER_DEL];
-        root = new OverUnderDelimiter(root, (sup == null ? null : sup.root),
-                SymbolAtom.get(name), kernUnit, kern, true);
+        root = new OverUnderDelimiterAtom( root, (sup == null ? null : sup.root),
+                                           SymbolAtom.get(name), kernUnit, kern, true);
         return this;
     }
     
@@ -1664,8 +1666,8 @@ public class TeXFormula {
             throw new InvalidDelimiterTypeException();
         
         String name = delimiterNames[delimiter][UNDER_DEL];
-        root = new OverUnderDelimiter(root, null, SymbolAtom.get(name),
-                TeXConstants.UNIT_EX, 0, false);
+        root = new OverUnderDelimiterAtom( root, null, SymbolAtom.get( name),
+                                           TeXConstants.UNIT_EX, 0, false);
         return this;
     }
     
@@ -1729,8 +1731,8 @@ public class TeXFormula {
             throw new InvalidDelimiterTypeException();
         
         String name = delimiterNames[delimiter][UNDER_DEL];
-        root = new OverUnderDelimiter(root, (sub == null ? null : sub.root),
-                SymbolAtom.get(name), kernUnit, kern, false);
+        root = new OverUnderDelimiterAtom( root, (sub == null ? null : sub.root),
+                                           SymbolAtom.get(name), kernUnit, kern, false);
         return this;
     }
     
@@ -1950,7 +1952,7 @@ public class TeXFormula {
      */
     public TeXFormula setBackground(Color c) {
         if (c != null) {
-            if (root instanceof ColorAtom)
+            if (root instanceof ColorAtom )
                 root = new ColorAtom(c, null, (ColorAtom) root);
             else
                 root = new ColorAtom(root, c, null);
@@ -2210,5 +2212,9 @@ public class TeXFormula {
     */
     private static boolean isSymbol(final char c) {
       return !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+    }
+
+    public Atom getRoot() {
+      return root;
     }
 }

@@ -19,9 +19,15 @@
  */
 package com.whitemagicsoftware.tex;
 
+import com.whitemagicsoftware.tex.graphics.SvgGraphics2D;
+import org.junit.Test;
+
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import static com.whitemagicsoftware.tex.TeXConstants.STYLE_DISPLAY;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TeXFormulaTest {
   private final static String[] EQUATIONS = {
@@ -41,7 +47,7 @@ public class TeXFormulaTest {
       "\\prod_{i=a}^{b} f(i)",
   };
 
-  //@Test
+  @Test
   public void test_MathML_SimpleFormula_Success() throws IOException {
     final var size = 20f;
     final var texFont = new DefaultTeXFont( size );
@@ -51,7 +57,7 @@ public class TeXFormulaTest {
     final long startTime = System.currentTimeMillis();
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
-      for( int i = 0; i < 1_000_000 / EQUATIONS.length; i++ ) {
+      for( int i = 0; i < 100 / EQUATIONS.length; i++ ) {
         final var formula = new TeXFormula( EQUATIONS[ j ] );
         final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
         final var box = formula.createBox( env );
@@ -61,11 +67,11 @@ public class TeXFormulaTest {
         box.draw( g, layout.getX(), layout.getY() );
       }
 
-//      final var filename = "/tmp/eq-" + j + ".svg";
-//      try( final var fos = new FileOutputStream( filename );
-//           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
-//        out.write( g.toString() );
-//      }
+      final var filename = "/tmp/eq-" + j + ".svg";
+      try( final var fos = new FileOutputStream( filename );
+           final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
+        out.write( g.toString() );
+      }
     }
 
     System.out.println( System.currentTimeMillis() - startTime );

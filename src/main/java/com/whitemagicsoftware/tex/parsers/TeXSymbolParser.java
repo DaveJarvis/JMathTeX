@@ -28,7 +28,7 @@
 
 package com.whitemagicsoftware.tex.parsers;
 
-import com.whitemagicsoftware.tex.SymbolAtom;
+import com.whitemagicsoftware.tex.atoms.SymbolAtom;
 import com.whitemagicsoftware.tex.exceptions.ResourceParseException;
 import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
 import com.whitemagicsoftware.tex.resources.XMLResourceReader;

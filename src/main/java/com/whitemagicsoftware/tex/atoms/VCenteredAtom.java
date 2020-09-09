@@ -26,22 +26,35 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.atoms;
+
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.HorizontalBox;
+import com.whitemagicsoftware.tex.TeXEnvironment;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * An atom representing another atom vertically centered with respect to the axis 
+ * (determined by a general TeXFont parameter)
  */
-public interface Row {
+public class VCenteredAtom extends Atom {
 
-   /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
-    */
-   void setPreviousAtom( Dummy dummy );
+   // atom to be centered vertically with respect to the axis
+   private final Atom atom;
+
+   public VCenteredAtom(Atom atom) {
+      this.atom = atom;
+   }
+
+   public Box createBox( TeXEnvironment env) {
+      Box b = atom.createBox(env);
+
+      float total = b.getHeight() + b.getDepth(), axis = env.getTeXFont()
+            .getAxisHeight(env.getStyle());
+
+      // center on axis
+      b.setShift(-(total / 2) - axis);
+      
+      // put in horizontal box, so shifting will be vertically!
+      return new HorizontalBox( b);
+   }
 }

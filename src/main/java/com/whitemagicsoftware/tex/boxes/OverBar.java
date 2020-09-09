@@ -26,22 +26,19 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.boxes;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * A box representing another box with a horizontal rule above it, with appropriate
+ * kerning. 
  */
-public interface Row {
+public final class OverBar extends VerticalBox {
 
-   /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
-    */
-   void setPreviousAtom( Dummy dummy );
+   public OverBar(final Box b, final float kern, final float thickness) {
+      // construct vertical box
+      add(new StrutBox(0, thickness, 0, 0));
+      add(new HorizontalRuleBox( thickness, b.getWidth(), 0));
+      add(new StrutBox(0, kern, 0, 0));
+      add(b);
+   }
 }

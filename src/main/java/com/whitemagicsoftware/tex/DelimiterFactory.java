@@ -28,6 +28,10 @@
 
 package com.whitemagicsoftware.tex; // NOPMD
 
+import com.whitemagicsoftware.tex.boxes.CharBox;
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.VerticalBox;
+
 /**
  * Responsible for creating a box containing a delimiter symbol that exists
  * in different sizes.
@@ -41,7 +45,7 @@ public class DelimiterFactory {
      * @return the box representing the delimiter variant that fits best according to
      * 			the required minimum size.
      */
-    public static Box create(String symbol, TeXEnvironment env, float minHeight) {
+    public static Box create( String symbol, TeXEnvironment env, float minHeight) {
         TeXFont tf = env.getTeXFont();
         int style = env.getStyle();
         Char c = tf.getChar(symbol, style);
@@ -58,7 +62,7 @@ public class DelimiterFactory {
             total = m.getHeight() + m.getDepth();
         }
         if (total >= minHeight) { // tall enough character found
-            return new CharBox(c);
+            return new CharBox( c);
         } else if (tf.isExtensionChar(c)) {
             // construct tall enough vertical box
             VerticalBox vBox = new VerticalBox();

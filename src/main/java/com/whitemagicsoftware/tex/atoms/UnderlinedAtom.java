@@ -26,22 +26,44 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.atoms;
+
+import com.whitemagicsoftware.tex.*;
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.HorizontalRuleBox;
+import com.whitemagicsoftware.tex.boxes.StrutBox;
+import com.whitemagicsoftware.tex.boxes.VerticalBox;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * An atom representing another atom with a line under it. 
  */
-public interface Row {
+public class UnderlinedAtom extends Atom {
 
-   /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
-    */
-   void setPreviousAtom( Dummy dummy );
+   // the base to be underlined
+   private final Atom base;
+
+   public UnderlinedAtom(Atom f) {
+      base = f;
+      type = TeXConstants.TYPE_ORDINARY; // for spacing rules
+   }
+
+   public Box createBox( TeXEnvironment env) {
+      float drt = env.getTeXFont().getDefaultRuleThickness(env.getStyle());
+
+      // create formula box in same style
+      Box b = (base == null ? new StrutBox() : base.createBox( env));
+
+      // create vertical box
+      VerticalBox vBox = new VerticalBox();
+      vBox.add(b);
+      vBox.add(new StrutBox(0, 3 * drt, 0, 0));
+      vBox.add(new HorizontalRuleBox( drt, b.getWidth(), 0));
+
+      // baseline vertical box = baseline box b
+      // there's also an invisible strut of height drt under the rule
+      vBox.setDepth(b.getDepth() + 5 * drt);
+      vBox.setHeight(b.getHeight());
+
+      return vBox;
+   }
 }

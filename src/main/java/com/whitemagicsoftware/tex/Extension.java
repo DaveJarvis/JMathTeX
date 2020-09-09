@@ -34,7 +34,7 @@ package com.whitemagicsoftware.tex;
  */
 public class Extension {
 
-   // there ALLWAYS is a repeat character! (check TFM.isExtensionChar())
+   // There is always a repeat character (check TFM.isExtensionChar())
    private final Char top;
    private final Char middle;
    private final Char bottom;

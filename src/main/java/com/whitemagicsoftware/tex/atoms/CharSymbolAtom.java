@@ -26,22 +26,51 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.atoms;
+
+import com.whitemagicsoftware.tex.CharFont;
+import com.whitemagicsoftware.tex.TeXFont;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * An common superclass for atoms that represent one single character
+ * and access the font information. 
  */
-public interface Row {
+public abstract class CharSymbolAtom extends Atom {
 
    /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
+    * Mrow will mark certain CharSymbol atoms as a text symbol.
+    * Msubsup wil use this property for a certain spacing rule.
     */
-   void setPreviousAtom( Dummy dummy );
+   private boolean textSymbol;
+
+   /**
+    * Mark as text symbol (used by Dummy)
+    */
+   public void markAsTextSymbol() {
+      textSymbol = true;
+   }
+
+   /**
+    * Remove the mark so the atom remains unchanged (used by Dummy)
+    */
+   public void removeMark() {
+      textSymbol = false;
+   }
+
+   /**
+    * Tests if this atom is marked as a text symbol (used by Msubsup)
+    * 
+    * @return whether this CharSymbol is marked as a text symbol
+    */
+   public boolean isMarkedAsTextSymbol() {
+      return textSymbol;
+   }
+
+   /**
+    * Get the CharFont-object that uniquely identifies the character that is represented
+    * by this atom.
+    * 
+    * @param tf the TeXFont containing all font related information
+    */
+   public abstract CharFont getCharFont( TeXFont tf);
 }

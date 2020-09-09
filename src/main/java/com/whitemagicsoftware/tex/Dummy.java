@@ -28,6 +28,12 @@
 
 package com.whitemagicsoftware.tex;
 
+import com.whitemagicsoftware.tex.atoms.Atom;
+import com.whitemagicsoftware.tex.atoms.CharSymbolAtom;
+import com.whitemagicsoftware.tex.atoms.FixedCharAtom;
+import com.whitemagicsoftware.tex.atoms.SpaceAtom;
+import com.whitemagicsoftware.tex.boxes.Box;
+
 /**
  * Used by RowAtom. The "textSymbol"-property and the type of an atom can change
  * (according to the TeX-algorithms used). Or this atom can be replaced by a
@@ -77,7 +83,7 @@ public class Dummy {
   }
 
   public boolean isCharSymbol() {
-    return el instanceof CharSymbol;
+    return el instanceof CharSymbolAtom;
   }
 
   /**
@@ -85,7 +91,7 @@ public class Dummy {
    * true}.
    */
   public CharFont getCharFont( final TeXFont tf ) {
-    return ((CharSymbol) el).getCharFont( tf );
+    return ((CharSymbolAtom) el).getCharFont( tf );
   }
 
   /**
@@ -101,12 +107,12 @@ public class Dummy {
 
   public Box createBox( final TeXEnvironment rs ) {
     if( textSymbol ) {
-      ((CharSymbol) el).markAsTextSymbol();
+      ((CharSymbolAtom) el).markAsTextSymbol();
     }
     final Box b = el.createBox( rs );
     if( textSymbol ) {
       // atom remains unchanged!
-      ((CharSymbol) el).removeMark();
+      ((CharSymbolAtom) el).removeMark();
     }
     return b;
   }

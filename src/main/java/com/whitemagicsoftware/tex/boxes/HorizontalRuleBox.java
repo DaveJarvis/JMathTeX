@@ -26,22 +26,25 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.boxes;
+
+import com.whitemagicsoftware.tex.boxes.Box;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * A box representing a horizontal line.
  */
-public interface Row {
+public class HorizontalRuleBox extends Box {
 
-   /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
-    */
-   void setPreviousAtom( Dummy dummy );
+   public HorizontalRuleBox( float thickness, float width, float s) {
+      height = thickness;
+      this.width = width;
+      shift = s;
+   }
+
+   public void draw( Graphics2D g, float x, float y) {
+      g.fill( new Rectangle2D.Float( x, y - height, width, height ) );
+   }
 }

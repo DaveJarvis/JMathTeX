@@ -26,22 +26,38 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.atoms;
+
+import com.whitemagicsoftware.tex.*;
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.OverBar;
+import com.whitemagicsoftware.tex.boxes.StrutBox;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * An atom representing another atom with a horizontal line above it
  */
-public interface Row {
+public class OverlinedAtom extends Atom {
 
-   /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
-    */
-   void setPreviousAtom( Dummy dummy );
+   // base atom to be overlined
+   private final Atom base;
+
+   public OverlinedAtom(Atom f) {
+      base = f;
+      type = TeXConstants.TYPE_ORDINARY;
+   }
+
+   public Box createBox( TeXEnvironment env) {
+      float drt = env.getTeXFont().getDefaultRuleThickness(env.getStyle());
+
+      // cramp the style of the formula to be overlined and create vertical box
+      Box b = (base == null ? new StrutBox() : base.createBox( env
+            .crampStyle()));
+      OverBar ob = new OverBar( b, 3 * drt, drt);
+
+      // baseline vertical box = baseline box b
+      ob.setDepth(b.getDepth());
+      ob.setHeight(b.getHeight() + 5 * drt);
+
+      return ob;
+   }
 }

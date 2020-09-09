@@ -28,6 +28,8 @@
 
 package com.whitemagicsoftware.tex;
 
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.GlueBox;
 import com.whitemagicsoftware.tex.parsers.GlueSettingsParser;
 
 /**

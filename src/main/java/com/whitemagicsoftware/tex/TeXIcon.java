@@ -28,6 +28,10 @@
 
 package com.whitemagicsoftware.tex;
 
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.HorizontalBox;
+import com.whitemagicsoftware.tex.boxes.VerticalBox;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -44,7 +48,7 @@ import java.awt.geom.AffineTransform;
 @SuppressWarnings("unused")
 public class TeXIcon implements Icon {
 
-  private Box box;
+  private com.whitemagicsoftware.tex.boxes.Box box;
 
   private final float size;
 

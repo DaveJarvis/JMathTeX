@@ -26,22 +26,31 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.atoms;
+
+import com.whitemagicsoftware.tex.*;
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.boxes.CharBox;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * An atom representing a fixed character (not depending on a text style).
  */
-public interface Row {
+public class FixedCharAtom extends CharSymbolAtom {
 
-   /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
-    */
-   void setPreviousAtom( Dummy dummy );
+   private final CharFont cf;
+
+   public FixedCharAtom(CharFont c) {
+      cf = c;
+   }
+
+   public CharFont getCharFont( TeXFont tf) {
+      return cf;
+   }
+
+   public Box createBox( TeXEnvironment env) {
+      TeXFont tf = env.getTeXFont();
+      Char c = tf.getChar(cf, env.getStyle());
+      return new CharBox( c);
+   }
+
 }

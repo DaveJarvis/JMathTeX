@@ -19,6 +19,8 @@
  */
 package com.whitemagicsoftware.tex;
 
+import com.whitemagicsoftware.tex.boxes.Box;
+
 import java.awt.*;
 
 /**

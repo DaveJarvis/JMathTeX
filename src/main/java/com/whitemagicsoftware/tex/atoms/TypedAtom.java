@@ -26,22 +26,39 @@
  * 
  */
 
-package com.whitemagicsoftware.tex;
+package com.whitemagicsoftware.tex.atoms;
+
+import com.whitemagicsoftware.tex.boxes.Box;
+import com.whitemagicsoftware.tex.TeXEnvironment;
 
 /**
- * A "composed atom": an atom that consists of child atoms that will be displayed 
- * next to each other horizontally with glue between them.
+ * An atom representing another atom with an overrided lefttype and righttype. This
+ * affects the glue inserted before and after this atom.
  */
-public interface Row {
+public class TypedAtom extends Atom {
 
-   /**
-    * Sets the given dummy containing the atom that comes just before
-    * the first child atom of this "composed atom". This method will allways be called
-    * by another composed atom, so this composed atom will be a child of it (nested). 
-    * This is necessary to determine the glue to insert between the first child atom 
-    * of this nested composed atom and the atom that the dummy contains. 
-    * 
-    * @param dummy the dummy that comes just before this "composed atom"
-    */
-   void setPreviousAtom( Dummy dummy );
+   // new lefttype and righttype
+   private final int leftType;
+   private final int rightType;
+
+   // atom for which new types are set
+   private final Atom atom;
+
+   public TypedAtom(int leftType, int rightType, Atom atom) {
+      this.leftType = leftType;
+      this.rightType = rightType;
+      this.atom = atom;
+   }
+
+   public Box createBox( TeXEnvironment env) {
+      return atom.createBox(env);
+   }
+
+   public int getLeftType() {
+      return leftType;
+   }
+
+   public int getRightType() {
+      return rightType;
+   }
 }
