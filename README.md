@@ -13,35 +13,35 @@ This is _not_ [LaTeX](https://github.com/opencollab/jlatexmath) engine.
 
 Sample output:
 
-![Equation 00](docs/images/eq-0.svg)
-<img src="docs/images/eq-0.svg" />
+![Equation 00](docs/images/eq-00.svg)
+<img src="docs/images/eq-00.svg" />
 
-![Equation 01](docs/images/eq-1.svg)
-<img src="docs/images/eq-1.svg" />
+![Equation 01](docs/images/eq-01.svg)
+<img src="docs/images/eq-01.svg" />
 
-![Equation 02](docs/images/eq-2.svg)
-<img src="docs/images/eq-2.svg" />
+![Equation 02](docs/images/eq-02.svg)
+<img src="docs/images/eq-02.svg" />
 
-![Equation 03](docs/images/eq-3.svg)
-<img src="docs/images/eq-3.svg" />
+![Equation 03](docs/images/eq-03.svg)
+<img src="docs/images/eq-03.svg" />
 
-![Equation 04](docs/images/eq-4.svg)
-<img src="docs/images/eq-4.svg" />
+![Equation 04](docs/images/eq-04.svg)
+<img src="docs/images/eq-04.svg" />
 
-![Equation 05](docs/images/eq-5.svg)
-<img src="docs/images/eq-5.svg" />
+![Equation 05](docs/images/eq-05.svg)
+<img src="docs/images/eq-05.svg" />
 
-![Equation 06](docs/images/eq-6.svg)
-<img src="docs/images/eq-6.svg" />
+![Equation 06](docs/images/eq-06.svg)
+<img src="docs/images/eq-06.svg" />
 
-![Equation 07](docs/images/eq-7.svg)
-<img src="docs/images/eq-7.svg" />
+![Equation 07](docs/images/eq-07.svg)
+<img src="docs/images/eq-07.svg" />
 
-![Equation 08](docs/images/eq-8.svg)
-<img src="docs/images/eq-8.svg" />
+![Equation 08](docs/images/eq-08.svg)
+<img src="docs/images/eq-08.svg" />
 
-![Equation 09](docs/images/eq-9.svg)
-<img src="docs/images/eq-9.svg" />
+![Equation 09](docs/images/eq-09.svg)
+<img src="docs/images/eq-09.svg" />
 
 ![Equation 10](docs/images/eq-10.svg)
 <img src="docs/images/eq-10.svg" />
