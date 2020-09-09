@@ -54,18 +54,14 @@ public class TeXFormulaTest {
     final var g = new SvgGraphics2D();
     g.scale( size, size );
 
-    final long startTime = System.currentTimeMillis();
-
     for( int j = 0; j < EQUATIONS.length; j++ ) {
-      for( int i = 0; i < 100 / EQUATIONS.length; i++ ) {
-        final var formula = new TeXFormula( EQUATIONS[ j ] );
-        final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
-        final var box = formula.createBox( env );
-        final var layout = new TeXLayout( box, size );
+      final var formula = new TeXFormula( EQUATIONS[ j ] );
+      final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
+      final var box = formula.createBox( env );
+      final var layout = new TeXLayout( box, size );
 
-        g.setDimensions( layout.getWidth(), layout.getHeight() );
-        box.draw( g, layout.getX(), layout.getY() );
-      }
+      g.setDimensions( layout.getWidth(), layout.getHeight() );
+      box.draw( g, layout.getX(), layout.getY() );
 
       final var filename = "/tmp/eq-" + j + ".svg";
       try( final var fos = new FileOutputStream( filename );
@@ -73,8 +69,6 @@ public class TeXFormulaTest {
         out.write( g.toString() );
       }
     }
-
-    System.out.println( System.currentTimeMillis() - startTime );
   }
 
   public static void main( String[] args ) throws IOException {
