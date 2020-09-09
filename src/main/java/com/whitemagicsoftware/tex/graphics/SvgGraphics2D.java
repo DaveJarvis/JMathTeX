@@ -56,7 +56,8 @@ import static java.awt.Color.BLACK;
  */
 public final class SvgGraphics2D extends Graphics2D {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
-  private static final String XML_HEADER = "<?xml version='1.0'?><svg ";
+  private static final String XML_HEADER =
+      "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
 
   /**
    * Number of decimal places for geometric shapes.

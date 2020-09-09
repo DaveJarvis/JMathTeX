@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import static com.whitemagicsoftware.tex.TeXConstants.STYLE_DISPLAY;
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TeXFormulaTest {
@@ -63,7 +64,7 @@ public class TeXFormulaTest {
       g.setDimensions( layout.getWidth(), layout.getHeight() );
       box.draw( g, layout.getX(), layout.getY() );
 
-      final var filename = "/tmp/eq-" + j + ".svg";
+      final var filename = format( "/tmp/eq-%02d.svg", j );
       try( final var fos = new FileOutputStream( filename );
            final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
         out.write( g.toString() );
