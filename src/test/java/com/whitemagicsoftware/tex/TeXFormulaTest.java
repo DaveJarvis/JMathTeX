@@ -51,12 +51,12 @@ public class TeXFormulaTest {
   public void test_MathML_SimpleFormula_Success() throws IOException {
     final var size = 100f;
     final var texFont = new DefaultTeXFont( size );
+    final var env = new TeXEnvironment( texFont );
     final var g = new SvgGraphics2D();
     g.scale( size, size );
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var formula = new TeXFormula( EQUATIONS[ j ] );
-      final var env = new TeXEnvironment( texFont );
       final var box = formula.createBox( env );
       final var layout = new TeXLayout( box, size );
 
