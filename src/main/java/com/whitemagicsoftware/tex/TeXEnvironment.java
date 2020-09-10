@@ -30,8 +30,8 @@ package com.whitemagicsoftware.tex;
 
 import java.awt.*;
 
-import static com.whitemagicsoftware.tex.boxes.Box.NO_FONT;
 import static com.whitemagicsoftware.tex.TeXConstants.*;
+import static com.whitemagicsoftware.tex.boxes.Box.NO_FONT;
 
 /**
  * Contains the used TeXFont-object, color settings and the current style in
@@ -42,10 +42,10 @@ public class TeXEnvironment {
     private Color background;
 
     private Color foreground;
-    
+
     // current style
     private int style;
-    
+
     // TeXFont used
     private final TeXFont tf;
 
@@ -53,17 +53,27 @@ public class TeXEnvironment {
     private int lastFontId = NO_FONT;
 
     /**
+     * Creates a new {@link TeXEnvironment} with a default point size with
+     * symbols rendered in the largest display size.
+     *
+     * @param tf Font to use for rendering the text.
+     */
+    public TeXEnvironment( final TeXFont tf ) {
+        this( STYLE_DISPLAY, tf, null, null );
+    }
+
+    /**
      * Creates a new {@link TeXEnvironment} with a default point size.
      *
      * @param style Controls some symbol sizes.
      * @param tf    Font to use for rendering the text.
      */
-    public TeXEnvironment(final int style, final TeXFont tf) {
-        this(style, tf, null, null);
+    public TeXEnvironment( final int style, final TeXFont tf ) {
+        this( style, tf, null, null );
     }
 
     private TeXEnvironment(
-        final int style, final TeXFont tf, final Color bg, final Color fg) {
+        final int style, final TeXFont tf, final Color bg, final Color fg ) {
         // check if style is valid
         // if not : DISPLAY = default value
         if( style == STYLE_DISPLAY ||
@@ -80,11 +90,11 @@ public class TeXEnvironment {
         this.background = bg;
         this.foreground = fg;
     }
-    
+
     public TeXEnvironment copy() {
         return new TeXEnvironment( style, tf, background, foreground );
     }
-    
+
     /**
      * @return a copy of the environment, but in a cramped style.
      */
@@ -93,7 +103,7 @@ public class TeXEnvironment {
         s.style = (style % 2 == 1 ? style : style + 1);
         return s;
     }
-    
+
     /**
      * @return a copy of the environment, but in denominator style.
      */
@@ -102,42 +112,42 @@ public class TeXEnvironment {
         s.style = 2 * (style / 2) + 1 + 2 - 2 * (style / 6);
         return s;
     }
-    
+
     /**
      * @return the background color setting
      */
     public Color getBackground() {
         return background;
     }
-    
+
     /**
      * @return the foreground color setting
      */
     public Color getColor() {
         return foreground;
     }
-    
+
     /**
      * @return the point size of the TeXFont
      */
     public float getFontPointSize() {
         return tf.getPointSize();
     }
-    
+
     /**
      * @return the current style
      */
     public int getStyle() {
         return style;
     }
-    
+
     /**
      * @return the TeXFont to be used
      */
     public TeXFont getTeXFont() {
         return tf;
     }
-    
+
     /**
      * @return a copy of the environment, but in numerator style.
      */
@@ -146,7 +156,7 @@ public class TeXEnvironment {
         s.style = style + 2 - 2 * (style / 6);
         return s;
     }
-    
+
     /**
      * Resets the color settings.
      */
@@ -154,7 +164,7 @@ public class TeXEnvironment {
         foreground = null;
         background = null;
     }
-    
+
     /**
      * @return a copy of the environment, but with the style changed for roots
      */
@@ -163,21 +173,21 @@ public class TeXEnvironment {
         s.style = STYLE_SCRIPT_SCRIPT;
         return s;
     }
-    
+
     /**
      * @param c the background color to be set
      */
     public void setBackground(Color c) {
         background = c;
     }
-    
+
     /**
      * @param c the foreground color to be set
      */
     public void setColor(Color c) {
         foreground = c;
     }
-    
+
     /**
      * @return a copy of the environment, but in subscript style.
      */
@@ -186,7 +196,7 @@ public class TeXEnvironment {
         s.style = 2 * (style / 4) + 4 + 1;
         return s;
     }
-    
+
     /**
      * @return a copy of the environment, but in superscript style.
      */
@@ -199,11 +209,11 @@ public class TeXEnvironment {
     public float getSpace() {
         return tf.getSpace(style);
     }
-    
+
     public void setLastFontId(int id) {
         lastFontId = id;
     }
-    
+
     public int getLastFontId() {
         // if there was no last font id (whitespace boxes only), use default "mu font"
         return (lastFontId == NO_FONT ? tf.getMuFontId() : lastFontId);

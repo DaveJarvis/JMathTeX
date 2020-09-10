@@ -135,60 +135,58 @@ public final class SvgGraphics2D extends Graphics2D {
           .append( '\'' );
     }
 
-    mSvg.append( '>' )
-        .append( "<path " );
-    appendPath( (Path2D) shape, mSvg );
-    mSvg.append( "/>" )
-        .append( "</g>" );
+    mSvg.append( '>' );
+    appendPath( (Path2D) shape );
+    mSvg.append( "</g>" );
   }
 
-  private void appendPath( final Path2D path, final StringBuilder buffer ) {
+  private void appendPath( final Path2D path ) {
+    mSvg.append( "<path " );
+
     if( path.getWindingRule() == 0 ) {
-      buffer.append( "fill-rule='evenodd' " );
+      mSvg.append( "fill-rule='evenodd' " );
     }
 
-    buffer.append( "d='" );
+    mSvg.append( "d='" );
     final var iterator = path.getPathIterator( null );
 
     while( !iterator.isDone() ) {
-      int type = iterator.currentSegment( mCoords );
-
-      switch( type ) {
-        case 0 -> buffer.append( 'M' )
-                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 1 -> buffer.append( 'L' )
-                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 2 -> buffer.append( 'Q' )
-                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 3 ] ) );
-        case 3 -> buffer.append( 'C' )
-                        .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 3 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 4 ] ) )
-                        .append( ' ' )
-                        .append( toGeometryPrecision( mCoords[ 5 ] ) );
-        case 4 -> buffer.append( 'Z' );
+      switch( iterator.currentSegment( mCoords ) ) {
+        case 0 -> mSvg.append( 'M' )
+                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 1 ] ) );
+        case 1 -> mSvg.append( 'L' )
+                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 1 ] ) );
+        case 2 -> mSvg.append( 'Q' )
+                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 1 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 2 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 3 ] ) );
+        case 3 -> mSvg.append( 'C' )
+                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 1 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 2 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 3 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 4 ] ) )
+                      .append( ' ' )
+                      .append( toGeometryPrecision( mCoords[ 5 ] ) );
+        case 4 -> mSvg.append( 'Z' );
       }
 
       iterator.next();
     }
 
-    buffer.append( '\'' );
+    mSvg.append( "'/>" );
   }
 
   @Override

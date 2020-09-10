@@ -187,8 +187,10 @@ public class TeXConstants {
    /**
     * TeX style: display style.
     * <p>
-    * The large versions of big operators are used and limits are placed under and over 
-    * these operators (default). Symbols are rendered in the largest size.
+    * The large versions of big operators are used and limits are placed
+    * under and over these operators (default). Symbols are rendered in the
+    * largest size.
+    * </p>
     */
    public static final int STYLE_DISPLAY = 0;
 
@@ -196,8 +198,9 @@ public class TeXConstants {
     * TeX style: text style.
     * <p>
     * The small versions of big operators are used and limits are attached to 
-    * these operators as scripts (default). The same size as in the display style
-    * is used to render symbols.
+    * these operators as scripts (default). The same size as in the display
+    * style is used to render symbols.
+    * </p>
     */
    public static final int STYLE_TEXT = 2;
 
@@ -205,6 +208,7 @@ public class TeXConstants {
     * TeX style: script style.
     * <p>
     * The same as the text style, but symbols are rendered in a smaller size.
+    * </p>
     */
    public static final int STYLE_SCRIPT = 4;
 
@@ -212,6 +216,7 @@ public class TeXConstants {
     * TeX style: script_script style.
     * <p>
     * The same as the script style, but symbols are rendered in a smaller size.
+    * </p>
     */
    public static final int STYLE_SCRIPT_SCRIPT = 6;
 

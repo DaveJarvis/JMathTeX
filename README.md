@@ -8,7 +8,7 @@ real-time. Besides performance, the fork fixes rendering issues with the
 original. This is _not_ a [LaTeX](https://github.com/opencollab/jlatexmath)
 engine.
 
-The library can parse and generate 1,000 TeX simple formulas into SVG
+The library can parse and generate 1,000 simple TeX formulas into SVG
 format in about 500 milliseconds on modern hardware, which should suffice
 for real-time rendering requirements.
 
@@ -44,10 +44,11 @@ final var g = new SvgGraphics2D();
 g.scale( size, size );
 ```
 
-The `SvgGraphics2D` is not thread-safe, but can be reused. It is
+All objects are reusable, but not thread-safe. The `SvgGraphics2D` is
 a high-performance, bare-bones drop-in replacement for Java's
 `Graphics2D` class. It is faster than the equivalent functionality
-from either Batik or JFreeSVG.
+from either Batik or JFreeSVG because it targets transcoding glyph path
+coordinates into SVG paths.
 
 ## Parse TeX
 
@@ -57,7 +58,7 @@ follows:
 ``` java
 final var equation = "\\sigma=\\sqrt{\\sum_{i=1}^{k} p_i(x_i-\\mu)^2}";
 final var formula = new TeXFormula( equations );
-final var env = new TeXEnvironment( TeXConstants.STYLE_DISPLAY, texFont );
+final var env = new TeXEnvironment( texFont );
 final var box = formula.createBox( env );
 final var layout = new TeXLayout( box, size );
 ```
@@ -78,7 +79,7 @@ box.draw( g, layout.getX(), layout.getY() );
 
 Calls to `box.draw` can take any valid `Graphics2D` class or subclass.
 The `SvgGraphics2D` class implements the minimum drawing primitives used
-to draw the TeX boxes.
+to draw the glyph boxes.
 
 ## Generate Scalable Vector Graphics
 

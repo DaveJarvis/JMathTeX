@@ -32,6 +32,8 @@ import com.whitemagicsoftware.tex.*;
 import com.whitemagicsoftware.tex.boxes.*;
 
 import static com.whitemagicsoftware.tex.boxes.Box.NO_FONT;
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
 
 /**
  * An atom representing scripts to be attached to another atom.
@@ -55,137 +57,144 @@ public class ScriptsAtom extends Atom {
    }
 
    public Box createBox( TeXEnvironment env) {
-      Box b = (base == null ? new StrutBox() : base.createBox( env));
-      if (subscript == null && superscript == null)
+      final Box b = (base == null ? new StrutBox() : base.createBox( env ));
+      if( subscript == null && superscript == null ) {
          return b;
-      else {
-         final TeXFont tf = env.getTeXFont();
-         final int style = env.getStyle();
+      }
 
-         HorizontalBox hor = new HorizontalBox( b);
+      final TeXFont tf = env.getTeXFont();
+      final int style = env.getStyle();
 
-         int lastFontId = b.getLastFontId();
-         // if no last font found (whitespace box), use default "mu font"
-         if( lastFontId == NO_FONT ) {
-            lastFontId = tf.getMuFontId();
+      HorizontalBox hor = new HorizontalBox( b );
+
+      int lastFontId = b.getLastFontId();
+      // if no last font found (whitespace box), use default "mu font"
+      if( lastFontId == NO_FONT ) {
+         lastFontId = tf.getMuFontId();
+      }
+
+      final TeXEnvironment subStyle = env.subStyle();
+      final TeXEnvironment supStyle = env.supStyle();
+
+      // set delta and preliminary shift-up and shift-down values
+      float delta = 0, shiftUp, shiftDown;
+
+      // TODO: use polymorphism?
+      if (base instanceof AccentedAtom) {
+         // improve superscript position relative to the accent.
+         Box box = ((AccentedAtom) base).base.createBox(env.crampStyle());
+         shiftUp = box.getHeight() - tf.getSupDrop(supStyle.getStyle());
+         shiftDown = box.getDepth() + tf.getSubDrop(subStyle.getStyle());
+      } else if (base instanceof SymbolAtom
+            && base.type == TeXConstants.TYPE_BIG_OPERATOR) { // single big operator symbol
+         Char c = tf.getChar(((SymbolAtom) base).getName(), style);
+         if (style < TeXConstants.STYLE_TEXT && tf.hasNextLarger(c)) // display
+            // style
+            c = tf.getNextLarger(c, style);
+         Box x = new CharBox( c);
+
+         x.setShift(-(x.getHeight() + x.getDepth()) / 2
+               - env.getTeXFont().getAxisHeight(env.getStyle()));
+         hor = new HorizontalBox(x);
+
+         // include delta in width or not?
+         delta = c.getItalic();
+         if (delta > TeXFormula.PREC && subscript == null)
+            hor.add(new StrutBox(delta));
+
+         shiftUp = hor.getHeight() - tf.getSupDrop(supStyle.getStyle());
+         shiftDown = hor.getDepth() + tf.getSubDrop(subStyle.getStyle());
+      } else if (base instanceof CharSymbolAtom ) {
+         shiftUp = shiftDown = 0;
+         CharFont cf = ((CharSymbolAtom) base).getCharFont( tf );
+         if (!((CharSymbolAtom) base).isMarkedAsTextSymbol()
+               || !tf.hasSpace(cf.fontId))
+            delta = tf.getChar(cf, style).getItalic();
+         if (delta > TeXFormula.PREC && subscript == null) {
+            hor.add(new StrutBox(delta));
+            delta = 0;
+         }
+      } else {
+         shiftUp = b.getHeight() - tf.getSupDrop(supStyle.getStyle());
+         shiftDown = b.getDepth() + tf.getSubDrop(subStyle.getStyle());
+      }
+
+      if (superscript == null) { // only subscript
+         final Box x = subscript.createBox(subStyle);
+         // calculate and set shift amount
+         x.setShift( max( max( shiftDown, tf.getSub1( style)), x
+               .getHeight()
+               - 4 * abs(tf.getXHeight(style, lastFontId)) / 5));
+
+         hor.add(x);
+         // add scriptspace (constant value!)
+         hor.add(SCRIPT_SPACE.createBox(env));
+      } else {
+         final Box x = superscript.createBox(supStyle);
+         final HorizontalBox sup = new HorizontalBox(x);
+         // add scriptspace (constant value!)
+         sup.add(SCRIPT_SPACE.createBox(env));
+
+         // adjust shift-up
+         final float p;
+
+         if( style == TeXConstants.STYLE_DISPLAY ) {
+            p = tf.getSup1( style );
+         }
+         else if( env.crampStyle().getStyle() == style ) {
+            p = tf.getSup3( style );
+         }
+         else {
+            p = tf.getSup2( style );
          }
 
-         TeXEnvironment subStyle = env.subStyle(), supStyle = env.supStyle();
+         shiftUp = max( max( shiftUp, p ), x.getDepth()
+             + abs( tf.getXHeight( style, lastFontId ) ) / 4 );
 
-         // set delta and preliminary shift-up and shift-down values
-         float delta = 0, shiftUp, shiftDown;
-
-         // TODO: use polymorphism?
-         if (base instanceof AccentedAtom) {
-            // improve superscript position relative to the accent.
-            Box box = ((AccentedAtom) base).base.createBox(env.crampStyle());
-            shiftUp = box.getHeight() - tf.getSupDrop(supStyle.getStyle());
-            shiftDown = box.getDepth() + tf.getSubDrop(subStyle.getStyle());
-         } else if (base instanceof SymbolAtom
-               && base.type == TeXConstants.TYPE_BIG_OPERATOR) { // single big operator symbol
-            Char c = tf.getChar(((SymbolAtom) base).getName(), style);
-            if (style < TeXConstants.STYLE_TEXT && tf.hasNextLarger(c)) // display
-               // style
-               c = tf.getNextLarger(c, style);
-            Box x = new CharBox( c);
-
-            x.setShift(-(x.getHeight() + x.getDepth()) / 2
-                  - env.getTeXFont().getAxisHeight(env.getStyle()));
-            hor = new HorizontalBox(x);
-
-            // include delta in width or not?
-            delta = c.getItalic();
-            if (delta > TeXFormula.PREC && subscript == null)
-               hor.add(new StrutBox(delta));
-
-            shiftUp = hor.getHeight() - tf.getSupDrop(supStyle.getStyle());
-            shiftDown = hor.getDepth() + tf.getSubDrop(subStyle.getStyle());
-         } else if (base instanceof CharSymbolAtom ) {
-            shiftUp = shiftDown = 0;
-            CharFont cf = ((CharSymbolAtom) base).getCharFont( tf);
-            if (!((CharSymbolAtom) base).isMarkedAsTextSymbol()
-                  || !tf.hasSpace(cf.fontId))
-               delta = tf.getChar(cf, style).getItalic();
-            if (delta > TeXFormula.PREC && subscript == null) {
-               hor.add(new StrutBox(delta));
-               delta = 0;
-            }
-         } else {
-            shiftUp = b.getHeight() - tf.getSupDrop(supStyle.getStyle());
-            shiftDown = b.getDepth() + tf.getSubDrop(subStyle.getStyle());
-         }
-
-         if (superscript == null) { // only subscript
-            Box x = subscript.createBox(subStyle);
-            // calculate and set shift amount
-            x.setShift(Math.max(Math.max(shiftDown, tf.getSub1(style)), x
-                  .getHeight()
-                  - 4 * Math.abs(tf.getXHeight(style, lastFontId)) / 5));
-
-            hor.add(x);
+         if (subscript == null) { // only superscript
+            sup.setShift(-shiftUp);
+            hor.add(sup);
+         } else { // both superscript and subscript
+            Box y = subscript.createBox(subStyle);
+            HorizontalBox sub = new HorizontalBox(y);
             // add scriptspace (constant value!)
-            hor.add(SCRIPT_SPACE.createBox(env));
-            return hor;
-         } else {
-            Box x = superscript.createBox(supStyle);
-            HorizontalBox sup = new HorizontalBox(x);
-            // add scriptspace (constant value!)
-            sup.add(SCRIPT_SPACE.createBox(env));
-            // adjust shift-up
-            float p;
-            if (style == TeXConstants.STYLE_DISPLAY)
-               p = tf.getSup1(style);
-            else if (env.crampStyle().getStyle() == style)
-               p = tf.getSup3(style);
-            else
-               p = tf.getSup2(style);
-            shiftUp = Math.max(Math.max(shiftUp, p), x.getDepth()
-                  + Math.abs(tf.getXHeight(style, lastFontId)) / 4);
+            sub.add(SCRIPT_SPACE.createBox(env));
+            // adjust shift-down
+            shiftDown = max(shiftDown, tf.getSub2(style));
+            // position both sub- and superscript
+            float drt = tf.getDefaultRuleThickness(style);
+            float interSpace = shiftUp - x.getDepth() + shiftDown
+                  - y.getHeight(); // space between sub- en
+            // superscript
+            if (interSpace < 4 * drt) { // too small
+               shiftUp += 4 * drt - interSpace;
+               // set bottom superscript at least 4/5 of X-height
+               // above
+               // baseline
+               float psi = 4 * abs(tf.getXHeight(style, lastFontId))
+                     / 5 - (shiftUp - x.getDepth());
 
-            if (subscript == null) { // only superscript
-               sup.setShift(-shiftUp);
-               hor.add(sup);
-            } else { // both superscript and subscript
-               Box y = subscript.createBox(subStyle);
-               HorizontalBox sub = new HorizontalBox(y);
-               // add scriptspace (constant value!)               
-               sub.add(SCRIPT_SPACE.createBox(env));
-               // adjust shift-down
-               shiftDown = Math.max(shiftDown, tf.getSub2(style));
-               // position both sub- and superscript
-               float drt = tf.getDefaultRuleThickness(style);
-               float interSpace = shiftUp - x.getDepth() + shiftDown
-                     - y.getHeight(); // space between sub- en
-               // superscript
-               if (interSpace < 4 * drt) { // too small
-                  shiftUp += 4 * drt - interSpace;
-                  // set bottom superscript at least 4/5 of X-height
-                  // above
-                  // baseline
-                  float psi = 4 * Math.abs(tf.getXHeight(style, lastFontId))
-                        / 5 - (shiftUp - x.getDepth());
-
-                  if (psi > 0) {
-                     shiftUp += psi;
-                     shiftDown -= psi;
-                  }
+               if (psi > 0) {
+                  shiftUp += psi;
+                  shiftDown -= psi;
                }
-               // create total box
-
-               VerticalBox vBox = new VerticalBox();
-               sup.setShift(delta);
-               vBox.add(sup);
-               // recalculate interspace
-               interSpace = shiftUp - x.getDepth() + shiftDown - y.getHeight();
-               vBox.add(new StrutBox(0, interSpace, 0, 0));
-               vBox.add(sub);
-               vBox.setHeight(shiftUp + x.getHeight());
-               vBox.setDepth(shiftDown + y.getDepth());
-               hor.add(vBox);
             }
-            return hor;
+            // create total box
+
+            VerticalBox vBox = new VerticalBox();
+            sup.setShift(delta);
+            vBox.add(sup);
+            // recalculate interspace
+            interSpace = shiftUp - x.getDepth() + shiftDown - y.getHeight();
+            vBox.add(new StrutBox(0, interSpace, 0, 0));
+            vBox.add(sub);
+            vBox.setHeight(shiftUp + x.getHeight());
+            vBox.setDepth(shiftDown + y.getDepth());
+            hor.add(vBox);
          }
       }
+
+      return hor;
    }
 
    public int getLeftType() {

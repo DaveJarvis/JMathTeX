@@ -57,7 +57,7 @@ public class TeXFormulaTest {
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
       final var formula = new TeXFormula( EQUATIONS[ j ] );
-      final var env = new TeXEnvironment( STYLE_DISPLAY, texFont );
+      final var env = new TeXEnvironment( texFont );
       final var box = formula.createBox( env );
       final var layout = new TeXLayout( box, size );
 
