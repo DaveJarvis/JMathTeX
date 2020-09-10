@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import static com.whitemagicsoftware.tex.TeXConstants.STYLE_DISPLAY;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 

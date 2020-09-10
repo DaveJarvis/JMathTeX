@@ -32,8 +32,8 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 /**
- * A box representing another box with a delimiter box and a script box above or under it, 
- * with script and delimiter separated by a kern.
+ * A box representing another box with a delimiter box and a script box above
+ * or under it, with script and delimiter separated by a kern.
  */
 public final class OverUnderBox extends Box {
 
