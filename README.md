@@ -22,14 +22,14 @@ This will run the unit tests, which write SVG files into `/tmp` on Linux.
 
 # Getting Started
 
-The general steps to using the library follows:
+Use the library as follows:
 
 * Initialize the TeX fonts and graphics engine.
 * Parse the TeX formula into a root-level box.
 * Resize the graphics engine to fit the box contents.
 * Display (or export) the vector graphics as needed.
 
-Let's look at a code example.
+Let's see an example.
 
 ## Initialization
 
@@ -50,6 +50,9 @@ thread-safe. The `SvgGraphics2D` is a high-performance, bare-bones drop-in
 replacement for Java's `Graphics2D` class. It is faster than the equivalent
 functionality from either Batik or JFreeSVG because it optimizes for
 transcoding glyph path coordinates into SVG paths.
+
+Much of the code that configures the system takes place in `static` blocks
+that run only once, prior to instantiating classes.
 
 ## Parse TeX
 
