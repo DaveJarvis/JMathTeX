@@ -27,13 +27,6 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.ImageObserver;
-import java.awt.image.RenderedImage;
-import java.awt.image.renderable.RenderableImage;
-import java.text.AttributedCharacterIterator;
-import java.util.Map;
 
 import static com.whitemagicsoftware.tex.graphics.RyuDouble.doubleToString;
 import static java.awt.Color.BLACK;
@@ -54,7 +47,7 @@ import static java.awt.Color.BLACK;
  * This class is not thread-safe, but can be reset for performance purposes.
  * </p>
  */
-public final class SvgGraphics2D extends Graphics2D {
+public final class SvgGraphics2D extends Graphics2DAdapter {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
   private static final String XML_HEADER =
       "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
@@ -296,6 +289,18 @@ public final class SvgGraphics2D extends Graphics2D {
   }
 
   /**
+   * Call when no more graphics operations are pending and the content is safe
+   * to convert to an SVG representation. This method is idempotent.
+   *
+   * @return A complete SVG string that can be rendered to reproduce the TeX
+   * primitives.
+   */
+  @Override
+  public String toString() {
+    return mSvg.append( "</svg>" ).toString();
+  }
+
+  /**
    * Generates a matrix transformation string of the given transform.
    *
    * @param at The transform to convert into a string.
@@ -311,310 +316,11 @@ public final class SvgGraphics2D extends Graphics2D {
         toTransformPrecision( at.getTranslateY() ) + ')';
   }
 
-  /**
-   * Call when no more graphics operations are pending and the content is safe
-   * to convert to an SVG representation. This method is idempotent.
-   *
-   * @return A complete SVG string that can be rendered to reproduce the TeX
-   * primitives.
-   */
-  @Override
-  public String toString() {
-    return mSvg.append( "</svg>" ).toString();
-  }
-
-  /**
-   * Has no effect; call {@link #setDimensions(int, int)} to reset this instance
-   * to create another SVG document.
-   */
-  @Override
-  public void dispose() {
-  }
-
   private static String toGeometryPrecision( final double value ) {
     return doubleToString( value, DECIMALS_GEOMETRY );
   }
 
   private static String toTransformPrecision( final double value ) {
     return doubleToString( value, DECIMALS_TRANSFORM );
-  }
-
-  @Override
-  public void setPaintMode() {
-  }
-
-  @Override
-  public void setXORMode( final Color c1 ) {
-  }
-
-  @Override
-  public FontMetrics getFontMetrics( final Font f ) {
-    return null;
-  }
-
-  @Override
-  public Rectangle getClipBounds() {
-    return null;
-  }
-
-  @Override
-  public void clipRect( final int x, final int y, final int width,
-                        final int height ) {
-  }
-
-  @Override
-  public void setClip( final int x, final int y, final int width,
-                       final int height ) {
-  }
-
-  @Override
-  public Shape getClip() {
-    return null;
-  }
-
-  @Override
-  public void setClip( final Shape clip ) {
-  }
-
-  @Override
-  public void copyArea( final int x, final int y, final int width,
-                        final int height, final int dx, final int dy ) {
-  }
-
-  @Override
-  public void drawLine( final int x1, final int y1, final int x2,
-                        final int y2 ) {
-  }
-
-  @Override
-  public void fillRect( final int x, final int y, final int width,
-                        final int height ) {
-  }
-
-  @Override
-  public void clearRect( final int x, final int y, final int width,
-                         final int height ) {
-  }
-
-  @Override
-  public void drawRoundRect( final int x, final int y, final int width,
-                             final int height, final int arcWidth,
-                             final int arcHeight ) {
-  }
-
-  @Override
-  public void fillRoundRect( final int x, final int y, final int width,
-                             final int height, final int arcWidth,
-                             final int arcHeight ) {
-  }
-
-  @Override
-  public void drawOval( final int x, final int y, final int width,
-                        final int height ) {
-  }
-
-  @Override
-  public void fillOval( final int x, final int y, final int width,
-                        final int height ) {
-  }
-
-  @Override
-  public void drawArc( final int x, final int y, final int width,
-                       final int height, final int startAngle,
-                       final int arcAngle ) {
-  }
-
-  @Override
-  public void fillArc( final int x, final int y, final int width,
-                       final int height, final int startAngle,
-                       final int arcAngle ) {
-  }
-
-  @Override
-  public void drawPolyline( final int[] xPoints, final int[] yPoints,
-                            final int nPoints ) {
-  }
-
-  @Override
-  public void drawPolygon( final int[] xPoints, final int[] yPoints,
-                           final int nPoints ) {
-  }
-
-  @Override
-  public void fillPolygon( final int[] xPoints, final int[] yPoints,
-                           final int nPoints ) {
-  }
-
-  @Override
-  public void rotate( final double theta ) {
-  }
-
-  @Override
-  public void rotate( final double theta, final double x, final double y ) {
-  }
-
-  @Override
-  public void shear( final double shx, final double shy ) {
-  }
-
-  @Override
-  public void transform( final AffineTransform at ) {
-  }
-
-  @Override
-  public Paint getPaint() {
-    return null;
-  }
-
-  @Override
-  public Composite getComposite() {
-    return null;
-  }
-
-  @Override
-  public void setBackground( final Color color ) {
-  }
-
-  @Override
-  public Color getBackground() {
-    return null;
-  }
-
-  @Override
-  public Stroke getStroke() {
-    return null;
-  }
-
-  @Override
-  public void clip( final Shape s ) {
-  }
-
-  @Override
-  public void drawString( final AttributedCharacterIterator iterator,
-                          final int x, final int y ) {
-  }
-
-  @Override
-  public boolean drawImage( final Image img, final int x, final int y,
-                            final ImageObserver observer ) {
-    return false;
-  }
-
-  @Override
-  public boolean drawImage( final Image img, final int x, final int y,
-                            final int width, final int height,
-                            final ImageObserver observer ) {
-    return false;
-  }
-
-  @Override
-  public boolean drawImage( final Image img, final int x, final int y,
-                            final Color bgcolor,
-                            final ImageObserver observer ) {
-    return false;
-  }
-
-  @Override
-  public boolean drawImage( final Image img, final int x, final int y,
-                            final int width, final int height,
-                            final Color bgcolor,
-                            final ImageObserver observer ) {
-    return false;
-  }
-
-  @Override
-  public boolean drawImage( final Image img, final int dx1, final int dy1,
-                            final int dx2, final int dy2,
-                            final int sx1, final int sy1, final int sx2,
-                            final int sy2,
-                            final ImageObserver observer ) {
-    return false;
-  }
-
-  @Override
-  public boolean drawImage( final Image img, final int dx1, final int dy1,
-                            final int dx2, final int dy2,
-                            final int sx1, final int sy1, final int sx2,
-                            final int sy2, final Color bgcolor,
-                            final ImageObserver observer ) {
-    return false;
-  }
-
-  @Override
-  public boolean drawImage( final Image img, final AffineTransform xform,
-                            final ImageObserver obs ) {
-    return false;
-  }
-
-  @Override
-  public void drawImage( final BufferedImage img, final BufferedImageOp op,
-                         final int x, final int y ) {
-  }
-
-  @Override
-  public void drawRenderedImage( final RenderedImage img,
-                                 final AffineTransform xform ) {
-  }
-
-  @Override
-  public void drawRenderableImage( final RenderableImage img,
-                                   final AffineTransform xform ) {
-  }
-
-  @Override
-  public void drawString( final AttributedCharacterIterator iterator,
-                          final float x,
-                          final float y ) {
-  }
-
-  @Override
-  public boolean hit( final Rectangle rect, final Shape s,
-                      final boolean onStroke ) {
-    return false;
-  }
-
-  @Override
-  public GraphicsConfiguration getDeviceConfiguration() {
-    return null;
-  }
-
-  @Override
-  public void setComposite( final Composite comp ) {
-  }
-
-  @Override
-  public void setPaint( final Paint paint ) {
-  }
-
-  @Override
-  public void setStroke( final Stroke s ) {
-  }
-
-  @Override
-  public void setRenderingHint( final RenderingHints.Key hintKey,
-                                final Object hintValue ) {
-  }
-
-  @Override
-  public Object getRenderingHint( final RenderingHints.Key hintKey ) {
-    return null;
-  }
-
-  @Override
-  public void setRenderingHints( final Map<?, ?> hints ) {
-  }
-
-  @Override
-  public void addRenderingHints( final Map<?, ?> hints ) {
-  }
-
-  @Override
-  public RenderingHints getRenderingHints() {
-    return null;
-  }
-
-  @Override
-  public Graphics create() {
-    return null;
   }
 }
