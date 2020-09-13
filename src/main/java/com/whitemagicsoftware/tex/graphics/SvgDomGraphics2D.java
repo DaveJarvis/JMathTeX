@@ -49,14 +49,17 @@ import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
  */
 @SuppressWarnings("unused")
 public final class SvgDomGraphics2D extends AbstractGraphics2D {
+  private static final String LOAD_EXTERNAL_DTD =
+      "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
   private static final DocumentBuilderFactory FACTORY_DOC = newInstance();
   private static DocumentBuilder BUILDER_DOC;
 
   static {
     try {
+      FACTORY_DOC.setFeature( LOAD_EXTERNAL_DTD, false );
+      FACTORY_DOC.setNamespaceAware( false );
       BUILDER_DOC = FACTORY_DOC.newDocumentBuilder();
-
     } catch( final Exception ex ) {
       BUILDER_DOC = new NullDocumentBuilder();
     }
