@@ -33,6 +33,7 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
+import static com.whitemagicsoftware.tex.graphics.RyuDouble.doubleToString;
 import static java.awt.Color.BLACK;
 
 /**
@@ -40,6 +41,16 @@ import static java.awt.Color.BLACK;
  * to produce the desired output format.
  */
 public abstract class AbstractGraphics2D extends Graphics2D {
+  /**
+   * Number of decimal places for geometric shapes.
+   */
+  private static final int DECIMALS_GEOMETRY = 4;
+
+  /**
+   * Number of decimal places for matrix transforms.
+   */
+  private static final int DECIMALS_TRANSFORM = 6;
+
   private Color mColour = BLACK;
   private Font mFont = new Font( "Default", Font.PLAIN, 12 );
   private AffineTransform mAffineTransform = new AffineTransform();
@@ -91,6 +102,14 @@ public abstract class AbstractGraphics2D extends Graphics2D {
     final var at = getTransform();
     at.scale( sx, sy );
     setTransform( at );
+  }
+
+  protected static String toGeometryPrecision( final double value ) {
+    return doubleToString( value, DECIMALS_GEOMETRY );
+  }
+
+  protected static String toTransformPrecision( final double value ) {
+    return doubleToString( value, DECIMALS_TRANSFORM );
   }
 
   @Override
@@ -232,8 +251,8 @@ public abstract class AbstractGraphics2D extends Graphics2D {
   }
 
   @Override
-  public boolean hit( final Rectangle rect, final Shape s,
-                      final boolean onStroke ) {
+  public boolean hit(
+      final Rectangle rect, final Shape s, final boolean onStroke ) {
     return false;
   }
 
@@ -255,8 +274,8 @@ public abstract class AbstractGraphics2D extends Graphics2D {
   }
 
   @Override
-  public void setRenderingHint( final RenderingHints.Key hintKey,
-                                final Object hintValue ) {
+  public void setRenderingHint(
+      final RenderingHints.Key hintKey, final Object hintValue ) {
   }
 
   @Override
@@ -281,7 +300,6 @@ public abstract class AbstractGraphics2D extends Graphics2D {
   public Graphics create() {
     return null;
   }
-
 
   @Override
   public void setPaintMode() {

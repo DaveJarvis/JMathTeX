@@ -310,12 +310,4 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
         toTransformPrecision( at.getTranslateX() ) + ',' +
         toTransformPrecision( at.getTranslateY() ) + ')';
   }
-
-  private static String toGeometryPrecision( final double value ) {
-    return doubleToString( value, DECIMALS_GEOMETRY );
-  }
-
-  private static String toTransformPrecision( final double value ) {
-    return doubleToString( value, DECIMALS_TRANSFORM );
-  }
 }

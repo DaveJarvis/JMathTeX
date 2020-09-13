@@ -22,12 +22,9 @@
 package com.whitemagicsoftware.tex.graphics;
 
 import java.awt.*;
-import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-
-import static com.whitemagicsoftware.tex.graphics.RyuDouble.doubleToString;
 
 /**
  * Responsible for building a SVG version of a TeX formula. Both Batik and
@@ -50,16 +47,6 @@ public final class SvgGraphics2D extends AbstractGraphics2D {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
   private static final String HEADER =
       "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
-
-  /**
-   * Number of decimal places for geometric shapes.
-   */
-  private static final int DECIMALS_GEOMETRY = 4;
-
-  /**
-   * Number of decimal places for matrix transforms.
-   */
-  private static final int DECIMALS_TRANSFORM = 6;
 
   /**
    * Initialized with a capacity of {@link #DEFAULT_SVG_BUFFER_SIZE} to
@@ -245,47 +232,6 @@ public final class SvgGraphics2D extends AbstractGraphics2D {
   }
 
   @Override
-  public void drawString( final String glyphs, final float x, final float y ) {
-    assert glyphs != null;
-
-    final var font = getFont();
-    final var frc = getFontRenderContext();
-    final var gv = font.createGlyphVector( frc, glyphs );
-    drawGlyphVector( gv, x, y );
-  }
-
-  @Override
-  public void drawString( final String glyphs, final int x, final int y ) {
-    assert glyphs != null;
-    drawString( glyphs, (float) x, (float) y );
-  }
-
-  @Override
-  public void drawGlyphVector(
-      final GlyphVector g, final float x, final float y ) {
-    fill( g.getOutline( x, y ) );
-  }
-
-  @Override
-  public void translate( final int x, final int y ) {
-    translate( x, (double) y );
-  }
-
-  @Override
-  public void translate( final double tx, final double ty ) {
-    final var at = getTransform();
-    at.translate( tx, ty );
-    setTransform( at );
-  }
-
-  @Override
-  public void scale( final double sx, final double sy ) {
-    final var at = getTransform();
-    at.scale( sx, sy );
-    setTransform( at );
-  }
-
-  @Override
   public void setTransform( final AffineTransform at ) {
     assert at != null;
     super.setTransform( at );
@@ -318,13 +264,5 @@ public final class SvgGraphics2D extends AbstractGraphics2D {
         toTransformPrecision( at.getScaleY() ) + ',' +
         toTransformPrecision( at.getTranslateX() ) + ',' +
         toTransformPrecision( at.getTranslateY() ) + ')';
-  }
-
-  private static String toGeometryPrecision( final double value ) {
-    return doubleToString( value, DECIMALS_GEOMETRY );
-  }
-
-  private static String toTransformPrecision( final double value ) {
-    return doubleToString( value, DECIMALS_TRANSFORM );
   }
 }
