@@ -39,23 +39,10 @@ import static javax.xml.parsers.DocumentBuilderFactory.newInstance;
 import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
 
 /**
- * Responsible for building a SVG version of a TeX formula. Both Batik and
- * JFreeSVG can accomplish the same thing, but they are general-purpose
- * solutions for a greater problem set. JMathTeX draws equations using a small
- * subset of the entire functionality. JFreeSVG is faster than Batik, but still
- * bogs down rendering of the final equation. This is a custom drop-in
- * replacement for {@link Graphics2D} that supports only the necessary subset
- * of drawing functionality necessary to render TeX formulae.
- * <p>
  * Use this class to generate a W3C document object model (DOM); see
  * {@link Document} for details. Even uDOM as a dependency seems overkill;
  * see <a href="https://www.w3.org/TR/SVGTiny12/svgudom.html">SVG uDOM</a> for
- * details.
- * </p>
- * <p>
- * For example, this class will only produce outlines of fonts, does not
- * support embedded fonts, nor supports embedded images.
- * </p>
+ * details. To generate SVG strings most efficiently, use {@link SvgGraphics2D}.
  * <p>
  * This class is not thread-safe, but can be reset for performance purposes.
  * </p>
