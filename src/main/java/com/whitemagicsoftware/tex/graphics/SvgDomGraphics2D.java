@@ -21,6 +21,8 @@
  */
 package com.whitemagicsoftware.tex.graphics;
 
+import org.w3c.dom.Document;
+
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
@@ -40,7 +42,8 @@ import static java.awt.Color.BLACK;
  * replacement for {@link Graphics2D} that supports only the necessary subset
  * of drawing functionality necessary to render TeX formulae.
  * <p>
- * Use this class to generate an SVG character sequence.
+ * Use this class to generate a W3C document object model (DOM); see
+ * {@link Document} for details.
  * </p>
  * <p>
  * For example, this class will only produce outlines of fonts, does not
@@ -51,7 +54,7 @@ import static java.awt.Color.BLACK;
  * </p>
  */
 @SuppressWarnings("unused")
-public final class SvgGraphics2D extends Graphics2DAdapter {
+public final class SvgDomGraphics2D extends Graphics2DAdapter {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
   private static final String HEADER =
       "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
@@ -93,7 +96,7 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
    * call {@link #initialize(int, int)} before using the class to ensure
    * the width and height are added to the document.
    */
-  public SvgGraphics2D() {
+  public SvgDomGraphics2D() {
     this( DEFAULT_SVG_BUFFER_SIZE );
   }
 
@@ -106,7 +109,7 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
    *                          buffer. If the size of the SVGs are known ahead
    *                          of time, set this to avoid memory reallocations.
    */
-  public SvgGraphics2D( final int initialBufferSize ) {
+  public SvgDomGraphics2D( final int initialBufferSize ) {
     mSvg = new StringBuilder( initialBufferSize ).append( HEADER );
   }
 
