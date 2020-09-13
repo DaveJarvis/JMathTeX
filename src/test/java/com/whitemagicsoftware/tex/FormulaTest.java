@@ -74,7 +74,8 @@ public class FormulaTest {
    */
   @Test
   public void test_Parser_InputFormulas_OutputSvgDom() throws IOException {
-    test_Parser( new SvgDomGraphics2D() );
+    final var g = new SvgDomGraphics2D();
+    test_Parser( g );
   }
 
   private void test_Parser( final AbstractGraphics2D g )

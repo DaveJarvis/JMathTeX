@@ -58,7 +58,6 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
   static {
     try {
       FACTORY_DOC.setFeature( LOAD_EXTERNAL_DTD, false );
-      FACTORY_DOC.setNamespaceAware( false );
       BUILDER_DOC = FACTORY_DOC.newDocumentBuilder();
     } catch( final Exception ex ) {
       BUILDER_DOC = new NullDocumentBuilder();
@@ -144,7 +143,7 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
    */
   public void initialize( final int id, final int w, final int h ) {
     initialize( w, h );
-    mRoot.setAttribute( ATTR_NAME_ID, Integer.toString( id ) );
+    mRoot.setAttributeNS( null, ATTR_NAME_ID, Integer.toString( id ) );
   }
 
   /**
@@ -158,7 +157,7 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
     }
 
     mRoot = mDocument.createElementNS( NAMESPACE, "svg" );
-    mRoot.setAttribute( ATTR_NAME_VERSION, ATTR_VALUE_VERSION );
+    mRoot.setAttributeNS( null, ATTR_NAME_VERSION, ATTR_VALUE_VERSION );
     mDocument.appendChild( mRoot );
   }
 
@@ -170,28 +169,28 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
    * @param h The final document height (in pixels).
    */
   private void setDimensions( final int w, final int h ) {
-    mRoot.setAttribute( ATTR_NAME_WIDTH, w + "px" );
-    mRoot.setAttribute( ATTR_NAME_HEIGHT, h + "px" );
+    mRoot.setAttributeNS( null, ATTR_NAME_WIDTH, w + "px" );
+    mRoot.setAttributeNS( null, ATTR_NAME_HEIGHT, h + "px" );
   }
 
   @Override
   public void draw( final Shape shape ) {
-    final var e = mDocument.createElement( "g" );
+    final var e = mDocument.createElementNS( NAMESPACE, "g" );
     mRoot.appendChild( e );
 
     if( !isIdentityTransform() ) {
-      e.setAttribute( ATTR_NAME_TRANSFORM, mTransform );
+      e.setAttributeNS( null, ATTR_NAME_TRANSFORM, mTransform );
     }
 
     appendPath( (Path2D) shape, e );
   }
 
   private void appendPath( final Path2D path, final Element parent ) {
-    final var e = mDocument.createElement( "path" );
+    final var e = mDocument.createElementNS( NAMESPACE, "path" );
     parent.appendChild( e );
 
     if( path.getWindingRule() == 0 ) {
-      e.setAttribute( ATTR_NAME_PATH_FILL_RULE, "evenodd" );
+      e.setAttributeNS( null, ATTR_NAME_PATH_FILL_RULE, "evenodd" );
     }
 
     final var iterator = path.getPathIterator( null );
@@ -232,7 +231,7 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
       iterator.next();
     }
 
-    e.setAttribute( ATTR_NAME_PATH_DATA, sData.toString() );
+    e.setAttributeNS( null, ATTR_NAME_PATH_DATA, sData.toString() );
 
     // Clear out the path data for the next export.
     sData.setLength( 0 );
@@ -241,18 +240,20 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
   @Override
   public void fill( final Shape shape ) {
     if( shape instanceof Rectangle2D ) {
-      final var e = mDocument.createElement( "rect" );
+      final var e = mDocument.createElementNS( NAMESPACE, "rect" );
       mRoot.appendChild( e );
 
       final var r = (Rectangle2D) shape;
 
-      e.setAttribute( ATTR_NAME_X, toGeometryPrecision( r.getX() ) );
-      e.setAttribute( ATTR_NAME_Y, toGeometryPrecision( r.getY() ) );
-      e.setAttribute( ATTR_NAME_WIDTH, toGeometryPrecision( r.getWidth() ) );
-      e.setAttribute( ATTR_NAME_HEIGHT, toGeometryPrecision( r.getHeight() ) );
+      e.setAttributeNS( null, ATTR_NAME_X, toGeometryPrecision( r.getX() ) );
+      e.setAttributeNS( null, ATTR_NAME_Y, toGeometryPrecision( r.getY() ) );
+      e.setAttributeNS(
+          null, ATTR_NAME_WIDTH, toGeometryPrecision( r.getWidth() ) );
+      e.setAttributeNS(
+          null, ATTR_NAME_HEIGHT, toGeometryPrecision( r.getHeight() ) );
 
       if( !isIdentityTransform() ) {
-        e.setAttribute( ATTR_NAME_TRANSFORM, mTransform );
+        e.setAttributeNS( null, ATTR_NAME_TRANSFORM, mTransform );
       }
     }
     else {
@@ -290,8 +291,7 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
     try( final var writer = new StringWriter() ) {
       final var t = TransformerFactory.newInstance().newTransformer();
       t.setOutputProperty( OMIT_XML_DECLARATION, "yes" );
-      t.transform(
-          new DOMSource( mDocument ), new StreamResult( writer ) );
+      t.transform( new DOMSource( mDocument ), new StreamResult( writer ) );
 
       return writer.toString();
     } catch( final Exception ex ) {
