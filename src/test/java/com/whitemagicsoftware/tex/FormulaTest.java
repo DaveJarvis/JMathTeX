@@ -25,11 +25,15 @@ import org.junit.Test;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Path;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class TeXFormulaTest {
+public class FormulaTest {
+  private static final String DIR_TEMP = getProperty( "java.io.tmpdir" );
+
   private final static String[] EQUATIONS = {
       "(a+b)^2=a^2 + 2ab + b^2",
       "S_x = sqrt((SS_x)/(N-1))",
@@ -45,10 +49,12 @@ public class TeXFormulaTest {
       "\\int_{a}^{b} x^2 dx",
       "G_{\\mu \\nu} = \\frac{8 \\pi G}{c^4} T_{{\\mu \\nu}}",
       "\\prod_{i=a}^{b} f(i)",
+      "u(n) \\Leftrightarrow \\frac{1}{1-e^{-jw}} + " +
+          "\\sum_{k=-\\infty}^{\\infty} \\pi \\delta (\\omega + 2\\pi k)\n"
   };
 
   @Test
-  public void test_MathML_SimpleFormula_Success() throws IOException {
+  public void test_Parser_SimpleFormulas_GeneratesSvg() throws IOException {
     final var size = 100f;
     final var texFont = new DefaultTeXFont( size );
     final var env = new TeXEnvironment( texFont );
@@ -60,11 +66,12 @@ public class TeXFormulaTest {
       final var box = formula.createBox( env );
       final var layout = new TeXLayout( box, size );
 
+      g.setId( formula.hashCode() );
       g.setDimensions( layout.getWidth(), layout.getHeight() );
       box.draw( g, layout.getX(), layout.getY() );
 
-      final var filename = format( "/tmp/eq-%02d.svg", j );
-      try( final var fos = new FileOutputStream( filename );
+      final var path = Path.of( DIR_TEMP, format( "eq-%02d.svg", j ) );
+      try( final var fos = new FileOutputStream( path.toFile() );
            final var out = new OutputStreamWriter( fos, UTF_8 ) ) {
         out.write( g.toString() );
       }
@@ -72,7 +79,7 @@ public class TeXFormulaTest {
   }
 
   public static void main( String[] args ) throws IOException {
-    final var test = new TeXFormulaTest();
-    test.test_MathML_SimpleFormula_Success();
+    final var test = new FormulaTest();
+    test.test_Parser_SimpleFormulas_GeneratesSvg();
   }
 }

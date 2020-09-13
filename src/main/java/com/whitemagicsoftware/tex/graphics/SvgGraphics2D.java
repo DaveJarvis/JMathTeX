@@ -49,7 +49,7 @@ import static java.awt.Color.BLACK;
  */
 public final class SvgGraphics2D extends Graphics2DAdapter {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
-  private static final String XML_HEADER =
+  private static final String HEADER =
       "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
 
   /**
@@ -99,7 +99,22 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
    * the width and height are added to the document.
    */
   public SvgGraphics2D( final int initialBufferSize ) {
-    mSvg = new StringBuilder( initialBufferSize ).append( XML_HEADER );
+    mSvg = new StringBuilder( initialBufferSize ).append( HEADER );
+  }
+
+  /**
+   * Sets the SVG document's root-level {@code id} attribute. See the
+   * <a href="https://www.w3.org/TR/SVG2/struct.html#SVGElement">W3C Spec</a>
+   * for details. This allows developers to mark documents having the same
+   * content with the same code, which can allow for performance operations
+   * (e.g., avoid transcoding the same document twice).
+   *
+   * @param code The unique identifier for the {@code <svg>} element.
+   */
+  public void setId( final int code ) {
+    mSvg.append( "id='" )
+        .append( code )
+        .append( "' " );
   }
 
   /**
@@ -110,7 +125,7 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
    * @param h The final document height (in pixels).
    */
   public void setDimensions( final int w, final int h ) {
-    mSvg.setLength( XML_HEADER.length() );
+    mSvg.setLength( HEADER.length() );
     mSvg.append( "width='" )
         .append( w )
         .append( "px' height='" )
