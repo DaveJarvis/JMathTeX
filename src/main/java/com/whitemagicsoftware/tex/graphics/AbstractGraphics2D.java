@@ -57,6 +57,32 @@ public abstract class AbstractGraphics2D extends Graphics2D {
   private final FontRenderContext mRenderContext =
       new FontRenderContext( null, false, true );
 
+  /**
+   * Resets the SVG buffer to a new state. One of the {@link #initialize}
+   * methods must be called before calling drawing primitives.
+   *
+   * @param w The final document width (in pixels).
+   * @param h The final document height (in pixels).
+   */
+  public abstract void initialize( final int w, final int h );
+
+  /**
+   * Resets the SVG buffer to a new state. One of the {@link #initialize}
+   * methods must be called before calling drawing primitives.
+   * <p>
+   * Sets the SVG document's root-level {@code id} attribute. See the
+   * <a href="https://www.w3.org/TR/SVG2/struct.html#SVGElement">W3C Spec</a>
+   * for details. This allows developers to mark documents having the same
+   * content with the same code, which can allow for performance operations
+   * (e.g., avoid transcoding the same document twice).
+   * </p>
+   *
+   * @param id The unique identifier for the {@code <svg>} element.
+   * @param w  The final document width (in pixels).
+   * @param h  The final document height (in pixels).
+   */
+  public abstract void initialize( final int id, final int w, final int h );
+
   @Override
   public void drawString( final String glyphs, final float x, final float y ) {
     assert glyphs != null;

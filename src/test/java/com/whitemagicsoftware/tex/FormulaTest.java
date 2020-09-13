@@ -19,8 +19,11 @@
  */
 package com.whitemagicsoftware.tex;
 
+import com.whitemagicsoftware.tex.graphics.AbstractGraphics2D;
+import com.whitemagicsoftware.tex.graphics.SvgDomGraphics2D;
 import com.whitemagicsoftware.tex.graphics.SvgGraphics2D;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,12 +56,32 @@ public class FormulaTest {
           "\\sum_{k=-\\infty}^{\\infty} \\pi \\delta (\\omega + 2\\pi k)\n"
   };
 
+  /**
+   * Test that the framework can output a correct SVG string.
+   *
+   * @throws IOException Could not save the result.
+   */
   @Test
-  public void test_Parser_SimpleFormulas_GeneratesSvg() throws IOException {
+  public void test_Parser_InputFormulas_OutputSvgString() throws IOException {
+    test_Parser( new SvgGraphics2D() );
+  }
+
+  /**
+   * Test that the framework can output a correct SVG document object model
+   * (DOM) {@link Document}.
+   *
+   * @throws IOException Could not save the result.
+   */
+  @Test
+  public void test_Parser_InputFormulas_OutputSvgDom() throws IOException {
+    test_Parser( new SvgDomGraphics2D() );
+  }
+
+  private void test_Parser( final AbstractGraphics2D g )
+      throws IOException {
     final var size = 100f;
     final var texFont = new DefaultTeXFont( size );
     final var env = new TeXEnvironment( texFont );
-    final var g = new SvgGraphics2D();
     g.scale( size, size );
 
     for( int j = 0; j < EQUATIONS.length; j++ ) {
@@ -79,6 +102,6 @@ public class FormulaTest {
 
   public static void main( String[] args ) throws IOException {
     final var test = new FormulaTest();
-    test.test_Parser_SimpleFormulas_GeneratesSvg();
+    test.test_Parser_InputFormulas_OutputSvgString();
   }
 }
