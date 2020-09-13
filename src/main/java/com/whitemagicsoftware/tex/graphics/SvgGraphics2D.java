@@ -47,6 +47,7 @@ import static java.awt.Color.BLACK;
  * This class is not thread-safe, but can be reset for performance purposes.
  * </p>
  */
+@SuppressWarnings("unused")
 public final class SvgGraphics2D extends Graphics2DAdapter {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
   private static final String HEADER =
@@ -86,7 +87,7 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
 
   /**
    * Creates a new instance with a default buffer size. Client classes must
-   * call {@link #setDimensions(int, int)} before using the class to ensure
+   * call {@link #initialize(int, int)} before using the class to ensure
    * the width and height are added to the document.
    */
   public SvgGraphics2D() {
@@ -95,7 +96,7 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
 
   /**
    * Creates a new instance with a given buffer size. Calling classes must
-   * call {@link #setDimensions(int, int)} before using the class to ensure
+   * call {@link #initialize(int, int)} before using the class to ensure
    * the width and height are added to the document.
    */
   public SvgGraphics2D( final int initialBufferSize ) {
@@ -103,34 +104,38 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
   }
 
   /**
+   * Resets the SVG buffer to a new state. One of the {@link #initialize}
+   * methods must be called before calling drawing primitives.
+   *
+   * @param w The final document width (in pixels).
+   * @param h The final document height (in pixels).
+   */
+  public void initialize( final int w, final int h ) {
+    reset();
+    appendDimensions( w, h );
+  }
+
+  /**
+   * Resets the SVG buffer to a new state. One of the {@link #initialize}
+   * methods must be called before calling drawing primitives.
+   * <p>
    * Sets the SVG document's root-level {@code id} attribute. See the
    * <a href="https://www.w3.org/TR/SVG2/struct.html#SVGElement">W3C Spec</a>
    * for details. This allows developers to mark documents having the same
    * content with the same code, which can allow for performance operations
    * (e.g., avoid transcoding the same document twice).
+   * </p>
    *
-   * @param code The unique identifier for the {@code <svg>} element.
+   * @param id The unique identifier for the {@code <svg>} element.
+   * @param w  The final document width (in pixels).
+   * @param h  The final document height (in pixels).
    */
-  public void setId( final int code ) {
+  public void initialize( final int id, final int w, final int h ) {
+    reset();
     mSvg.append( "id='" )
-        .append( code )
+        .append( id )
         .append( "' " );
-  }
-
-  /**
-   * Resets the SVG buffer to a new state. This method must be called before
-   * calling drawing primitives.
-   *
-   * @param w The final document width (in pixels).
-   * @param h The final document height (in pixels).
-   */
-  public void setDimensions( final int w, final int h ) {
-    mSvg.setLength( HEADER.length() );
-    mSvg.append( "width='" )
-        .append( w )
-        .append( "px' height='" )
-        .append( h )
-        .append( "px'>" );
+    appendDimensions( w, h );
   }
 
   @Override
@@ -146,6 +151,29 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
     mSvg.append( '>' );
     appendPath( (Path2D) shape );
     mSvg.append( "</g>" );
+  }
+
+  /**
+   * Resets the internal buffer to start writing after the {@link #HEADER}
+   * text.
+   */
+  private void reset() {
+    mSvg.setLength( HEADER.length() );
+  }
+
+  /**
+   * Appends the dimensions, which are the last items added to the
+   * {@code <svg>} element.
+   *
+   * @param w The final document width (in pixels).
+   * @param h The final document height (in pixels).
+   */
+  private void appendDimensions( final int w, final int h ) {
+    mSvg.append( "width='" )
+        .append( w )
+        .append( "px' height='" )
+        .append( h )
+        .append( "px'>" );
   }
 
   private void appendPath( final Path2D path ) {

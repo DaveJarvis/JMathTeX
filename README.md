@@ -73,10 +73,10 @@ encapsulates the equation.
 
 Having a reusable `SvgGraphics2D` object requires resetting its state
 each time a new formula is to be drawn. This is accomplished by calling
-`setDimensions` using the dimensions from the `TeXLayout` object:
+`initialize` using the dimensions from the `TeXLayout` object:
 
 ``` java
-g.setDimensions( layout.getWidth(), layout.getHeight() );
+g.initialize( layout.getWidth(), layout.getHeight() );
 box.draw( g, layout.getX(), layout.getY() );
 ```
 

@@ -66,8 +66,7 @@ public class FormulaTest {
       final var box = formula.createBox( env );
       final var layout = new TeXLayout( box, size );
 
-      g.setId( formula.hashCode() );
-      g.setDimensions( layout.getWidth(), layout.getHeight() );
+      g.initialize( layout.getWidth(), layout.getHeight() );
       box.draw( g, layout.getX(), layout.getY() );
 
       final var path = Path.of( DIR_TEMP, format( "eq-%02d.svg", j ) );
