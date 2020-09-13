@@ -22,16 +22,21 @@
 package com.whitemagicsoftware.tex.graphics;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
-import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
+import java.io.StringWriter;
 
-import static com.whitemagicsoftware.tex.graphics.RyuDouble.doubleToString;
-import static javax.xml.parsers.DocumentBuilderFactory.*;
+import static javax.xml.parsers.DocumentBuilderFactory.newInstance;
+import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
 
 /**
  * Responsible for building a SVG version of a TeX formula. Both Batik and
@@ -43,7 +48,9 @@ import static javax.xml.parsers.DocumentBuilderFactory.*;
  * of drawing functionality necessary to render TeX formulae.
  * <p>
  * Use this class to generate a W3C document object model (DOM); see
- * {@link Document} for details.
+ * {@link Document} for details. Even uDOM as a dependency seems overkill;
+ * see <a href="https://www.w3.org/TR/SVGTiny12/svgudom.html">SVG uDOM</a> for
+ * details.
  * </p>
  * <p>
  * For example, this class will only produce outlines of fonts, does not
@@ -57,10 +64,34 @@ import static javax.xml.parsers.DocumentBuilderFactory.*;
 public final class SvgDomGraphics2D extends AbstractGraphics2D {
 
   private static final DocumentBuilderFactory FACTORY_DOC = newInstance();
-  //private static final DocumentBuilder BUILDER_DOC = FACTORY_DOC.newDocumentBuilder();
+  private static DocumentBuilder BUILDER_DOC;
 
-  private static final String HEADER =
-      "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
+  static {
+    try {
+      BUILDER_DOC = FACTORY_DOC.newDocumentBuilder();
+
+    } catch( final Exception ex ) {
+      BUILDER_DOC = new NullDocumentBuilder();
+    }
+  }
+
+  /**
+   * Contains path data in a non-thread-safe way.
+   */
+  private static final StringBuilder sData = new StringBuilder( 16384 );
+
+  private static final String NAMESPACE = "http://www.w3.org/2000/svg";
+  private static final String ATTR_NAME_VERSION = "version";
+  private static final String ATTR_VALUE_VERSION = "1.1";
+
+  private static final String ATTR_NAME_ID = "id";
+  private static final String ATTR_NAME_X = "x";
+  private static final String ATTR_NAME_Y = "y";
+  private static final String ATTR_NAME_WIDTH = "width";
+  private static final String ATTR_NAME_HEIGHT = "height";
+  private static final String ATTR_NAME_TRANSFORM = "transform";
+  private static final String ATTR_NAME_PATH_FILL_RULE = "fill-rule";
+  private static final String ATTR_NAME_PATH_DATA = "d";
 
   /**
    * Number of decimal places for geometric shapes.
@@ -82,7 +113,8 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
    */
   private String mTransform = "";
 
-  private StringBuilder mSvg = new StringBuilder(1024);
+  private final Document mDocument;
+  private Element mRoot;
 
   /**
    * Creates a new instance with a default buffer size. Client classes must
@@ -90,6 +122,7 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
    * the width and height are added to the document.
    */
   public SvgDomGraphics2D() {
+    mDocument = BUILDER_DOC.newDocument();
   }
 
   /**
@@ -101,7 +134,7 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
    */
   public void initialize( final int w, final int h ) {
     reset();
-    appendDimensions( w, h );
+    setDimensions( w, h );
   }
 
   /**
@@ -120,34 +153,23 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
    * @param h  The final document height (in pixels).
    */
   public void initialize( final int id, final int w, final int h ) {
-    reset();
-    mSvg.append( "id='" )
-        .append( id )
-        .append( "' " );
-    appendDimensions( w, h );
-  }
-
-  @Override
-  public void draw( final Shape shape ) {
-    mSvg.append( "<g" );
-
-    if( !isIdentityTransform() ) {
-      mSvg.append( " transform='" )
-          .append( mTransform )
-          .append( '\'' );
-    }
-
-    mSvg.append( '>' );
-    appendPath( (Path2D) shape );
-    mSvg.append( "</g>" );
+    initialize( w, h );
+    mRoot.setAttribute( ATTR_NAME_ID, Integer.toString( id ) );
   }
 
   /**
-   * Resets the internal buffer to start writing after the {@link #HEADER}
-   * text.
+   * Replaces the {@link Document} root node with a new SVG {@link Element}.
+   * The root {@link Element} must be initialized before drawing with this
+   * instance.
    */
   private void reset() {
-    mSvg.setLength( HEADER.length() );
+    if( mRoot != null ) {
+      mDocument.removeChild( mRoot );
+    }
+
+    mRoot = mDocument.createElementNS( NAMESPACE, "svg" );
+    mRoot.setAttribute( ATTR_NAME_VERSION, ATTR_VALUE_VERSION );
+    mDocument.appendChild( mRoot );
   }
 
   /**
@@ -157,135 +179,95 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
    * @param w The final document width (in pixels).
    * @param h The final document height (in pixels).
    */
-  private void appendDimensions( final int w, final int h ) {
-    mSvg.append( "width='" )
-        .append( w )
-        .append( "px' height='" )
-        .append( h )
-        .append( "px'>" );
+  private void setDimensions( final int w, final int h ) {
+    mRoot.setAttribute( ATTR_NAME_WIDTH, w + "px" );
+    mRoot.setAttribute( ATTR_NAME_HEIGHT, h + "px" );
   }
 
-  private void appendPath( final Path2D path ) {
-    mSvg.append( "<path " );
+  @Override
+  public void draw( final Shape shape ) {
+    final var e = mDocument.createElement( "g" );
+    mRoot.appendChild( e );
 
-    if( path.getWindingRule() == 0 ) {
-      mSvg.append( "fill-rule='evenodd' " );
+    if( !isIdentityTransform() ) {
+      e.setAttribute( ATTR_NAME_TRANSFORM, mTransform );
     }
 
-    mSvg.append( "d='" );
+    appendPath( (Path2D) shape, e );
+  }
+
+  private void appendPath( final Path2D path, final Element parent ) {
+    final var e = mDocument.createElement( "path" );
+    parent.appendChild( e );
+
+    if( path.getWindingRule() == 0 ) {
+      e.setAttribute( ATTR_NAME_PATH_FILL_RULE, "evenodd" );
+    }
+
     final var iterator = path.getPathIterator( null );
 
     while( !iterator.isDone() ) {
       switch( iterator.currentSegment( mCoords ) ) {
-        case 0 -> mSvg.append( 'M' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 1 -> mSvg.append( 'L' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 2 -> mSvg.append( 'Q' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 3 ] ) );
-        case 3 -> mSvg.append( 'C' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 3 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 4 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 5 ] ) );
-        case 4 -> mSvg.append( 'Z' );
+        case 0 -> sData.append( 'M' )
+                       .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 1 ] ) );
+        case 1 -> sData.append( 'L' )
+                       .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 1 ] ) );
+        case 2 -> sData.append( 'Q' )
+                       .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 1 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 2 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 3 ] ) );
+        case 3 -> sData.append( 'C' )
+                       .append( toGeometryPrecision( mCoords[ 0 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 1 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 2 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 3 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 4 ] ) )
+                       .append( ' ' )
+                       .append( toGeometryPrecision( mCoords[ 5 ] ) );
+        case 4 -> sData.append( 'Z' );
       }
 
       iterator.next();
     }
 
-    mSvg.append( "'/>" );
+    e.setAttribute( ATTR_NAME_PATH_DATA, sData.toString() );
+
+    // Clear out the path data for the next export.
+    sData.setLength( 0 );
   }
 
   @Override
   public void fill( final Shape shape ) {
     if( shape instanceof Rectangle2D ) {
-      final var rect = (Rectangle2D) shape;
+      final var e = mDocument.createElement( "rect" );
+      mRoot.appendChild( e );
 
-      mSvg.append( "<rect x='" )
-          .append( toGeometryPrecision( rect.getX() ) )
-          .append( "' y='" )
-          .append( toGeometryPrecision( rect.getY() ) )
-          .append( "' width='" )
-          .append( toGeometryPrecision( rect.getWidth() ) )
-          .append( "' height='" )
-          .append( toGeometryPrecision( rect.getHeight() ) );
+      final var r = (Rectangle2D) shape;
+
+      e.setAttribute( ATTR_NAME_X, toGeometryPrecision( r.getX() ) );
+      e.setAttribute( ATTR_NAME_Y, toGeometryPrecision( r.getY() ) );
+      e.setAttribute( ATTR_NAME_WIDTH, toGeometryPrecision( r.getWidth() ) );
+      e.setAttribute( ATTR_NAME_HEIGHT, toGeometryPrecision( r.getHeight() ) );
 
       if( !isIdentityTransform() ) {
-        mSvg.append( "' transform='" )
-            .append( mTransform );
+        e.setAttribute( ATTR_NAME_TRANSFORM, mTransform );
       }
-
-      // Double-duty: closes either height or transform.
-      mSvg.append( "'/>" );
     }
     else {
       draw( shape );
     }
-  }
-
-  @Override
-  public void drawString( final String glyphs, final float x, final float y ) {
-    assert glyphs != null;
-
-    final var font = getFont();
-    final var frc = getFontRenderContext();
-    final var gv = font.createGlyphVector( frc, glyphs );
-    drawGlyphVector( gv, x, y );
-  }
-
-  @Override
-  public void drawString( final String glyphs, final int x, final int y ) {
-    assert glyphs != null;
-    drawString( glyphs, (float) x, (float) y );
-  }
-
-  @Override
-  public void drawGlyphVector(
-      final GlyphVector g, final float x, final float y ) {
-    fill( g.getOutline( x, y ) );
-  }
-
-  @Override
-  public void translate( final int x, final int y ) {
-    translate( x, (double) y );
-  }
-
-  @Override
-  public void translate( final double tx, final double ty ) {
-    final var at = getTransform();
-    at.translate( tx, ty );
-    setTransform( at );
-  }
-
-  /**
-   * Multiple calls to this method will scale the scaling.
-   *
-   * @param sx The scaling factor for the x dimension.
-   * @param sy The scaling factor for the y dimension.
-   */
-  @Override
-  public void scale( final double sx, final double sy ) {
-    final var at = getTransform();
-    at.scale( sx, sy );
-    setTransform( at );
   }
 
   @Override
@@ -296,18 +278,34 @@ public final class SvgDomGraphics2D extends AbstractGraphics2D {
   }
 
   /**
-   * Generates a matrix transformation string of the given transform.
+   * Returns the underlying {@link Document} object containing SVG
+   * {@link Element}s, provided both initialization and at least one drawing
+   * primitive have been called.
    *
-   * @param at The transform to convert into a string.
-   * @return A matrix transformation string.
+   * @return The SVG document as a document object model.
    */
-  private String toString( final AffineTransform at ) {
-    return "matrix(" +
-        toTransformPrecision( at.getScaleX() ) + ',' +
-        toTransformPrecision( at.getShearY() ) + ',' +
-        toTransformPrecision( at.getShearX() ) + ',' +
-        toTransformPrecision( at.getScaleY() ) + ',' +
-        toTransformPrecision( at.getTranslateX() ) + ',' +
-        toTransformPrecision( at.getTranslateY() ) + ')';
+  public Document toDom() {
+    return mDocument;
+  }
+
+  /**
+   * Returns the SVG document as a string. This is a heavyweight method,
+   * suitable only for unit tests. No attempts at optimizing this method
+   * have been made.
+   *
+   * @return The SVG document transformed into a string.
+   */
+  @Override
+  public String toString() {
+    try( final var writer = new StringWriter() ) {
+      final var t = TransformerFactory.newInstance().newTransformer();
+      t.setOutputProperty( OMIT_XML_DECLARATION, "yes" );
+      t.transform(
+          new DOMSource( mDocument ), new StreamResult( writer ) );
+
+      return writer.toString();
+    } catch( final Exception ex ) {
+      return "";
+    }
   }
 }

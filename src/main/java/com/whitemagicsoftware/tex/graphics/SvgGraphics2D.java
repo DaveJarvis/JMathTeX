@@ -229,20 +229,4 @@ public final class SvgGraphics2D extends AbstractGraphics2D {
   public String toString() {
     return mSvg.append( "</svg>" ).toString();
   }
-
-  /**
-   * Generates a matrix transformation string of the given transform.
-   *
-   * @param at The transform to convert into a string.
-   * @return A matrix transformation string.
-   */
-  private String toString( final AffineTransform at ) {
-    return "matrix(" +
-        toTransformPrecision( at.getScaleX() ) + ',' +
-        toTransformPrecision( at.getShearY() ) + ',' +
-        toTransformPrecision( at.getShearX() ) + ',' +
-        toTransformPrecision( at.getScaleY() ) + ',' +
-        toTransformPrecision( at.getTranslateX() ) + ',' +
-        toTransformPrecision( at.getTranslateY() ) + ')';
-  }
 }
