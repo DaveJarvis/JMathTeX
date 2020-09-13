@@ -18,6 +18,8 @@ package com.whitemagicsoftware.tex.graphics;
 import java.math.BigInteger;
 
 import static java.lang.Math.*;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.valueOf;
 
 /**
  * An implementation of Ryu for double.
@@ -42,12 +44,12 @@ public final class RyuDouble {
   private static final int[][] POW5_INV_SPLIT = new int[NEG_TABLE_SIZE][4];
 
   static {
-    BigInteger mask = BigInteger.valueOf(1).shiftLeft(POW5_QUARTER_BITCOUNT).subtract(BigInteger.ONE);
-    BigInteger invMask = BigInteger.valueOf(1).shiftLeft(POW5_INV_QUARTER_BITCOUNT).subtract(BigInteger.ONE);
+    final BigInteger mask = valueOf(1).shiftLeft(POW5_QUARTER_BITCOUNT).subtract(ONE);
+    final BigInteger invMask = valueOf(1).shiftLeft(POW5_INV_QUARTER_BITCOUNT).subtract(ONE);
     for ( int i = 0; i < POS_TABLE_SIZE; i++) {
-      BigInteger pow = BigInteger.valueOf(5).pow(i);
-      int pow5len = pow.bitLength();
-      int expectedPow5Bits = pow5bits(i);
+      final BigInteger pow = valueOf(5).pow(i);
+      final int pow5len = pow.bitLength();
+      final int expectedPow5Bits = pow5bits(i);
       if (expectedPow5Bits != pow5len) {
         throw new IllegalStateException(pow5len + " != " + expectedPow5Bits);
       }
@@ -61,8 +63,8 @@ public final class RyuDouble {
 
       if (i < POW5_INV_SPLIT.length) {
         // We want floor(log_2 5^q) here, which is pow5len - 1.
-        int j = pow5len - 1 + POW5_INV_BITCOUNT;
-        BigInteger inv = BigInteger.ONE.shiftLeft(j).divide(pow).add(BigInteger.ONE);
+        final int j = pow5len - 1 + POW5_INV_BITCOUNT;
+        final BigInteger inv = ONE.shiftLeft(j).divide(pow).add(ONE);
         for (int k = 0; k < 4; k++) {
           if (k == 0) {
             POW5_INV_SPLIT[i][k] = inv.shiftRight((3 - k) * POW5_INV_QUARTER_BITCOUNT).intValueExact();
@@ -74,7 +76,8 @@ public final class RyuDouble {
     }
   }
 
-  public static String doubleToString(final double value, final int decimals) {
+  public static String doubleToString(
+      final double value, final int decimals ) {
     // Step 1: Decode the floating point number, and unify normalized and subnormal cases.
     // First, handle all the trivial cases.
     if (Double.isNaN(value)) return "NaN";

@@ -286,6 +286,12 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
     setTransform( at );
   }
 
+  /**
+   * Multiple calls to this method will scale the scaling.
+   *
+   * @param sx The scaling factor for the x dimension.
+   * @param sy The scaling factor for the y dimension.
+   */
   @Override
   public void scale( final double sx, final double sy ) {
     final var at = getTransform();

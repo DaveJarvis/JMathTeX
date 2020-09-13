@@ -40,7 +40,6 @@ import java.util.Map;
 public abstract class Graphics2DAdapter extends Graphics2D {
   @Override
   public void draw( final Shape s ) {
-
   }
 
   @Override
@@ -52,35 +51,29 @@ public abstract class Graphics2DAdapter extends Graphics2D {
   @Override
   public void drawImage( final BufferedImage img, final BufferedImageOp op,
                          final int x, final int y ) {
-
   }
 
   @Override
   public void drawRenderedImage( final RenderedImage img,
                                  final AffineTransform xform ) {
-
   }
 
   @Override
   public void drawRenderableImage( final RenderableImage img,
                                    final AffineTransform xform ) {
-
   }
 
   @Override
   public void drawString( final String str, final int x, final int y ) {
-
   }
 
   @Override
   public void drawString( final String str, final float x, final float y ) {
-
   }
 
   @Override
   public void drawString( final AttributedCharacterIterator iterator,
                           final int x, final int y ) {
-
   }
 
   @Override
@@ -131,25 +124,21 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void dispose() {
-
   }
 
   @Override
   public void drawString( final AttributedCharacterIterator iterator,
                           final float x,
                           final float y ) {
-
   }
 
   @Override
   public void drawGlyphVector( final GlyphVector g, final float x,
                                final float y ) {
-
   }
 
   @Override
   public void fill( final Shape s ) {
-
   }
 
   @Override
@@ -165,23 +154,19 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void setComposite( final Composite comp ) {
-
   }
 
   @Override
   public void setPaint( final Paint paint ) {
-
   }
 
   @Override
   public void setStroke( final Stroke s ) {
-
   }
 
   @Override
   public void setRenderingHint( final RenderingHints.Key hintKey,
                                 final Object hintValue ) {
-
   }
 
   @Override
@@ -191,12 +176,10 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void setRenderingHints( final Map<?, ?> hints ) {
-
   }
 
   @Override
   public void addRenderingHints( final Map<?, ?> hints ) {
-
   }
 
   @Override
@@ -211,7 +194,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void translate( final int x, final int y ) {
-
   }
 
   @Override
@@ -221,17 +203,14 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void setColor( final Color c ) {
-
   }
 
   @Override
   public void setPaintMode() {
-
   }
 
   @Override
   public void setXORMode( final Color c1 ) {
-
   }
 
   @Override
@@ -241,7 +220,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void setFont( final Font font ) {
-
   }
 
   @Override
@@ -257,13 +235,11 @@ public abstract class Graphics2DAdapter extends Graphics2D {
   @Override
   public void clipRect( final int x, final int y, final int width,
                         final int height ) {
-
   }
 
   @Override
   public void setClip( final int x, final int y, final int width,
                        final int height ) {
-
   }
 
   @Override
@@ -273,124 +249,103 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void setClip( final Shape clip ) {
-
   }
 
   @Override
   public void copyArea( final int x, final int y, final int width,
                         final int height, final int dx, final int dy ) {
-
   }
 
   @Override
   public void drawLine( final int x1, final int y1, final int x2,
                         final int y2 ) {
-
   }
 
   @Override
   public void fillRect( final int x, final int y, final int width,
                         final int height ) {
-
   }
 
   @Override
   public void clearRect( final int x, final int y, final int width,
                          final int height ) {
-
   }
 
   @Override
   public void drawRoundRect( final int x, final int y, final int width,
                              final int height, final int arcWidth,
                              final int arcHeight ) {
-
   }
 
   @Override
   public void fillRoundRect( final int x, final int y, final int width,
                              final int height, final int arcWidth,
                              final int arcHeight ) {
-
   }
 
   @Override
   public void drawOval( final int x, final int y, final int width,
                         final int height ) {
-
   }
 
   @Override
   public void fillOval( final int x, final int y, final int width,
                         final int height ) {
-
   }
 
   @Override
   public void drawArc( final int x, final int y, final int width,
                        final int height, final int startAngle,
                        final int arcAngle ) {
-
   }
 
   @Override
   public void fillArc( final int x, final int y, final int width,
                        final int height, final int startAngle,
                        final int arcAngle ) {
-
   }
 
   @Override
   public void drawPolyline( final int[] xPoints, final int[] yPoints,
                             final int nPoints ) {
-
   }
 
   @Override
   public void drawPolygon( final int[] xPoints, final int[] yPoints,
                            final int nPoints ) {
-
   }
 
   @Override
   public void fillPolygon( final int[] xPoints, final int[] yPoints,
                            final int nPoints ) {
-
   }
 
   @Override
   public void translate( final double tx, final double ty ) {
-
   }
 
   @Override
   public void rotate( final double theta ) {
-
   }
 
   @Override
   public void rotate( final double theta, final double x, final double y ) {
-
   }
 
   @Override
   public void scale( final double sx, final double sy ) {
-
   }
 
   @Override
   public void shear( final double shx, final double shy ) {
-
   }
 
   @Override
   public void transform( final AffineTransform Tx ) {
-
   }
 
   @Override
   public void setTransform( final AffineTransform Tx ) {
-
   }
 
   @Override
@@ -410,7 +365,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void setBackground( final Color color ) {
-
   }
 
   @Override
@@ -425,7 +379,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void clip( final Shape s ) {
-
   }
 
   @Override
