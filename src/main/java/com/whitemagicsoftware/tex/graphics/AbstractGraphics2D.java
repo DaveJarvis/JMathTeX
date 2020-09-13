@@ -33,13 +33,116 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
+import static java.awt.Color.BLACK;
+
 /**
  * Allows subclasses to implement only those methods that are necessary
  * to produce the desired output format.
  */
-public abstract class Graphics2DAdapter extends Graphics2D {
+public abstract class AbstractGraphics2D extends Graphics2D {
+  private Color mColour = BLACK;
+  private Font mFont = new Font( "Default", Font.PLAIN, 12 );
+  private AffineTransform mAffineTransform = new AffineTransform();
+  private final FontRenderContext mRenderContext =
+      new FontRenderContext( null, false, true );
+
   @Override
-  public void draw( final Shape s ) {
+  public void drawString( final String glyphs, final float x, final float y ) {
+    assert glyphs != null;
+
+    final var font = getFont();
+    final var frc = getFontRenderContext();
+    final var gv = font.createGlyphVector( frc, glyphs );
+    drawGlyphVector( gv, x, y );
+  }
+
+  @Override
+  public void drawString( final String glyphs, final int x, final int y ) {
+    assert glyphs != null;
+    drawString( glyphs, (float) x, (float) y );
+  }
+
+  @Override
+  public void drawGlyphVector(
+      final GlyphVector g, final float x, final float y ) {
+    fill( g.getOutline( x, y ) );
+  }
+
+  @Override
+  public void translate( final int x, final int y ) {
+    translate( x, (double) y );
+  }
+
+  @Override
+  public void translate( final double tx, final double ty ) {
+    final var at = getTransform();
+    at.translate( tx, ty );
+    setTransform( at );
+  }
+
+  /**
+   * Multiple calls to this method will scale the scaling.
+   *
+   * @param sx The scaling factor for the x dimension.
+   * @param sy The scaling factor for the y dimension.
+   */
+  @Override
+  public void scale( final double sx, final double sy ) {
+    final var at = getTransform();
+    at.scale( sx, sy );
+    setTransform( at );
+  }
+
+  @Override
+  public void setTransform( final AffineTransform at ) {
+    assert at != null;
+    mAffineTransform = new AffineTransform( at );
+  }
+
+  @Override
+  public AffineTransform getTransform() {
+    return (AffineTransform) mAffineTransform.clone();
+  }
+
+  /**
+   * Answers whether this is the identity transform.
+   *
+   * @return {@code true} when this is the identity transform.
+   */
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+  protected boolean isIdentityTransform() {
+    return mAffineTransform.isIdentity();
+  }
+
+  @Override
+  public FontRenderContext getFontRenderContext() {
+    return mRenderContext;
+  }
+
+  @Override
+  public Font getFont() {
+    return mFont;
+  }
+
+  @Override
+  public void setFont( final Font font ) {
+    assert font != null;
+    mFont = font;
+  }
+
+  @Override
+  public Color getColor() {
+    return mColour;
+  }
+
+  @Override
+  public void setColor( final Color colour ) {
+    mColour = colour;
+  }
+
+  @Override
+  public FontMetrics getFontMetrics( final Font f ) {
+    return null;
   }
 
   @Override
@@ -61,14 +164,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
   @Override
   public void drawRenderableImage( final RenderableImage img,
                                    final AffineTransform xform ) {
-  }
-
-  @Override
-  public void drawString( final String str, final int x, final int y ) {
-  }
-
-  @Override
-  public void drawString( final String str, final float x, final float y ) {
   }
 
   @Override
@@ -133,11 +228,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
   }
 
   @Override
-  public void drawGlyphVector( final GlyphVector g, final float x,
-                               final float y ) {
-  }
-
-  @Override
   public void fill( final Shape s ) {
   }
 
@@ -192,18 +282,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
     return null;
   }
 
-  @Override
-  public void translate( final int x, final int y ) {
-  }
-
-  @Override
-  public Color getColor() {
-    return null;
-  }
-
-  @Override
-  public void setColor( final Color c ) {
-  }
 
   @Override
   public void setPaintMode() {
@@ -211,20 +289,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void setXORMode( final Color c1 ) {
-  }
-
-  @Override
-  public Font getFont() {
-    return null;
-  }
-
-  @Override
-  public void setFont( final Font font ) {
-  }
-
-  @Override
-  public FontMetrics getFontMetrics( final Font f ) {
-    return null;
   }
 
   @Override
@@ -321,10 +385,6 @@ public abstract class Graphics2DAdapter extends Graphics2D {
   }
 
   @Override
-  public void translate( final double tx, final double ty ) {
-  }
-
-  @Override
   public void rotate( final double theta ) {
   }
 
@@ -333,24 +393,11 @@ public abstract class Graphics2DAdapter extends Graphics2D {
   }
 
   @Override
-  public void scale( final double sx, final double sy ) {
-  }
-
-  @Override
   public void shear( final double shx, final double shy ) {
   }
 
   @Override
   public void transform( final AffineTransform Tx ) {
-  }
-
-  @Override
-  public void setTransform( final AffineTransform Tx ) {
-  }
-
-  @Override
-  public AffineTransform getTransform() {
-    return null;
   }
 
   @Override
@@ -379,10 +426,5 @@ public abstract class Graphics2DAdapter extends Graphics2D {
 
   @Override
   public void clip( final Shape s ) {
-  }
-
-  @Override
-  public FontRenderContext getFontRenderContext() {
-    return null;
   }
 }

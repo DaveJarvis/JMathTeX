@@ -23,15 +23,15 @@ package com.whitemagicsoftware.tex.graphics;
 
 import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 
 import static com.whitemagicsoftware.tex.graphics.RyuDouble.doubleToString;
-import static java.awt.Color.BLACK;
+import static javax.xml.parsers.DocumentBuilderFactory.*;
 
 /**
  * Responsible for building a SVG version of a TeX formula. Both Batik and
@@ -54,8 +54,11 @@ import static java.awt.Color.BLACK;
  * </p>
  */
 @SuppressWarnings("unused")
-public final class SvgDomGraphics2D extends Graphics2DAdapter {
-  private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
+public final class SvgDomGraphics2D extends AbstractGraphics2D {
+
+  private static final DocumentBuilderFactory FACTORY_DOC = newInstance();
+  //private static final DocumentBuilder BUILDER_DOC = FACTORY_DOC.newDocumentBuilder();
+
   private static final String HEADER =
       "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
 
@@ -70,12 +73,6 @@ public final class SvgDomGraphics2D extends Graphics2DAdapter {
   private static final int DECIMALS_TRANSFORM = 6;
 
   /**
-   * Initialized with a capacity of {@link #DEFAULT_SVG_BUFFER_SIZE} to
-   * minimize the number of memory reallocations.
-   */
-  private final StringBuilder mSvg;
-
-  /**
    * Filled when drawing paths, not thread-safe.
    */
   private final float[] mCoords = new float[ 6 ];
@@ -85,11 +82,7 @@ public final class SvgDomGraphics2D extends Graphics2DAdapter {
    */
   private String mTransform = "";
 
-  private Color mColour = BLACK;
-  private Font mFont = new Font( "Default", Font.PLAIN, 12 );
-  private AffineTransform mAffineTransform = new AffineTransform();
-  private final FontRenderContext mRenderContext =
-      new FontRenderContext( null, false, true );
+  private StringBuilder mSvg = new StringBuilder(1024);
 
   /**
    * Creates a new instance with a default buffer size. Client classes must
@@ -97,20 +90,6 @@ public final class SvgDomGraphics2D extends Graphics2DAdapter {
    * the width and height are added to the document.
    */
   public SvgDomGraphics2D() {
-    this( DEFAULT_SVG_BUFFER_SIZE );
-  }
-
-  /**
-   * Creates a new instance with a given buffer size. Calling classes must
-   * call {@link #initialize(int, int)} before using the class to ensure
-   * the width and height are added to the document.
-   *
-   * @param initialBufferSize Amount of memory to preallocate to the internal
-   *                          buffer. If the size of the SVGs are known ahead
-   *                          of time, set this to avoid memory reallocations.
-   */
-  public SvgDomGraphics2D( final int initialBufferSize ) {
-    mSvg = new StringBuilder( initialBufferSize ).append( HEADER );
   }
 
   /**
@@ -152,7 +131,7 @@ public final class SvgDomGraphics2D extends Graphics2DAdapter {
   public void draw( final Shape shape ) {
     mSvg.append( "<g" );
 
-    if( !mAffineTransform.isIdentity() ) {
+    if( !isIdentityTransform() ) {
       mSvg.append( " transform='" )
           .append( mTransform )
           .append( '\'' );
@@ -249,7 +228,7 @@ public final class SvgDomGraphics2D extends Graphics2DAdapter {
           .append( "' height='" )
           .append( toGeometryPrecision( rect.getHeight() ) );
 
-      if( !mAffineTransform.isIdentity() ) {
+      if( !isIdentityTransform() ) {
         mSvg.append( "' transform='" )
             .append( mTransform );
       }
@@ -312,51 +291,8 @@ public final class SvgDomGraphics2D extends Graphics2DAdapter {
   @Override
   public void setTransform( final AffineTransform at ) {
     assert at != null;
-    mAffineTransform = new AffineTransform( at );
+    super.setTransform( at );
     mTransform = toString( at );
-  }
-
-  @Override
-  public AffineTransform getTransform() {
-    return (AffineTransform) mAffineTransform.clone();
-  }
-
-  @Override
-  public FontRenderContext getFontRenderContext() {
-    return mRenderContext;
-  }
-
-  @Override
-  public Font getFont() {
-    return mFont;
-  }
-
-  @Override
-  public void setFont( final Font font ) {
-    assert font != null;
-    mFont = font;
-  }
-
-  @Override
-  public Color getColor() {
-    return mColour;
-  }
-
-  @Override
-  public void setColor( final Color colour ) {
-    mColour = colour;
-  }
-
-  /**
-   * Call when no more graphics operations are pending and the content is safe
-   * to convert to an SVG representation. This method is idempotent.
-   *
-   * @return A complete SVG string that can be rendered to reproduce the TeX
-   * primitives.
-   */
-  @Override
-  public String toString() {
-    return mSvg.append( "</svg>" ).toString();
   }
 
   /**

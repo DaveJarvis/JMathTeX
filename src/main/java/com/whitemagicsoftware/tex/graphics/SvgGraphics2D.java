@@ -22,26 +22,21 @@
 package com.whitemagicsoftware.tex.graphics;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 
 import static com.whitemagicsoftware.tex.graphics.RyuDouble.doubleToString;
-import static java.awt.Color.BLACK;
 
 /**
  * Responsible for building a SVG version of a TeX formula. Both Batik and
  * JFreeSVG can accomplish the same thing, but they are general-purpose
- * solutions for a greater problem set. JMathTeX draws equations using a small
- * subset of the entire functionality. JFreeSVG is faster than Batik, but still
- * bogs down rendering of the final equation. This is a custom drop-in
- * replacement for {@link Graphics2D} that supports only the necessary subset
- * of drawing functionality necessary to render TeX formulae.
- * <p>
- * Use this class to generate an SVG character sequence.
- * </p>
+ * solutions for a greater problem set. JMathTeX uses draws equations using
+ * a small subset of the entire functionality. JFreeSVG is faster than Batik,
+ * but is still bogs down rendering of the final equation. This is a custom
+ * drop-in replacement for {@link Graphics2D} that supports only the necessary
+ * subset of drawing functionality necessary to render TeX formulae.
  * <p>
  * For example, this class will only produce outlines of fonts, does not
  * support embedded fonts, nor supports embedded images.
@@ -51,7 +46,7 @@ import static java.awt.Color.BLACK;
  * </p>
  */
 @SuppressWarnings("unused")
-public final class SvgGraphics2D extends Graphics2DAdapter {
+public final class SvgGraphics2D extends AbstractGraphics2D {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
   private static final String HEADER =
       "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' ";
@@ -82,12 +77,6 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
    */
   private String mTransform = "";
 
-  private Color mColour = BLACK;
-  private Font mFont = new Font( "Default", Font.PLAIN, 12 );
-  private AffineTransform mAffineTransform = new AffineTransform();
-  private final FontRenderContext mRenderContext =
-      new FontRenderContext( null, false, true );
-
   /**
    * Creates a new instance with a default buffer size. Client classes must
    * call {@link #initialize(int, int)} before using the class to ensure
@@ -101,10 +90,6 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
    * Creates a new instance with a given buffer size. Calling classes must
    * call {@link #initialize(int, int)} before using the class to ensure
    * the width and height are added to the document.
-   *
-   * @param initialBufferSize Amount of memory to preallocate to the internal
-   *                          buffer. If the size of the SVGs are known ahead
-   *                          of time, set this to avoid memory reallocations.
    */
   public SvgGraphics2D( final int initialBufferSize ) {
     mSvg = new StringBuilder( initialBufferSize ).append( HEADER );
@@ -149,7 +134,7 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
   public void draw( final Shape shape ) {
     mSvg.append( "<g" );
 
-    if( !mAffineTransform.isIdentity() ) {
+    if( !isIdentityTransform() ) {
       mSvg.append( " transform='" )
           .append( mTransform )
           .append( '\'' );
@@ -246,7 +231,7 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
           .append( "' height='" )
           .append( toGeometryPrecision( rect.getHeight() ) );
 
-      if( !mAffineTransform.isIdentity() ) {
+      if( !isIdentityTransform() ) {
         mSvg.append( "' transform='" )
             .append( mTransform );
       }
@@ -293,12 +278,6 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
     setTransform( at );
   }
 
-  /**
-   * Multiple calls to this method will scale the scaling.
-   *
-   * @param sx The scaling factor for the x dimension.
-   * @param sy The scaling factor for the y dimension.
-   */
   @Override
   public void scale( final double sx, final double sy ) {
     final var at = getTransform();
@@ -309,39 +288,8 @@ public final class SvgGraphics2D extends Graphics2DAdapter {
   @Override
   public void setTransform( final AffineTransform at ) {
     assert at != null;
-    mAffineTransform = new AffineTransform( at );
+    super.setTransform( at );
     mTransform = toString( at );
-  }
-
-  @Override
-  public AffineTransform getTransform() {
-    return (AffineTransform) mAffineTransform.clone();
-  }
-
-  @Override
-  public FontRenderContext getFontRenderContext() {
-    return mRenderContext;
-  }
-
-  @Override
-  public Font getFont() {
-    return mFont;
-  }
-
-  @Override
-  public void setFont( final Font font ) {
-    assert font != null;
-    mFont = font;
-  }
-
-  @Override
-  public Color getColor() {
-    return mColour;
-  }
-
-  @Override
-  public void setColor( final Color colour ) {
-    mColour = colour;
   }
 
   /**
