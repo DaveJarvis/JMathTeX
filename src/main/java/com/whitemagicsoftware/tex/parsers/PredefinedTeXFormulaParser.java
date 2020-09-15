@@ -37,7 +37,7 @@ import org.jdom2.Element;
 import java.util.Map;
 
 /**
- * Parses and creates predefined TeXFormula objects form an XML-file.
+ * Parses and creates predefined {@link TeXFormula} objects from an XML-file.
  */
 public class PredefinedTeXFormulaParser {
     
@@ -51,15 +51,15 @@ public class PredefinedTeXFormulaParser {
     
     public void parse(final Map<String, TeXFormula> predefinedTeXFormulas) {
         // get required string attribute
-        String enabledAll = getAttrValueAndCheckIfNotNull("enabled", root);
+        final var enabledAll = getAttrValueAndCheckIfNotNull("enabled", root);
         if ("true".equals(enabledAll)) { // parse formula's
             // iterate all "Font"-elements
-            for (final Element formula : root.getChildren("TeXFormula")) {
+            for (final var formula : root.getChildren("TeXFormula")) {
                 // get required string attribute
-                String enabled = getAttrValueAndCheckIfNotNull("enabled", formula);
+                final var enabled = getAttrValueAndCheckIfNotNull("enabled", formula);
                 if ("true".equals (enabled)) { // parse this formula
                     // get required string attribute
-                    String name = getAttrValueAndCheckIfNotNull("name", formula);
+                    final var name = getAttrValueAndCheckIfNotNull("name", formula);
                     
                     // parse and build the formula and add it to the table
                     predefinedTeXFormulas.put(name, new TeXFormulaParser(name, formula).parse());
@@ -70,7 +70,7 @@ public class PredefinedTeXFormulaParser {
 
     private static String getAttrValueAndCheckIfNotNull(
         String attrName, Element element ) throws ResourceParseException {
-        String attrValue = element.getAttributeValue( attrName );
+        final var attrValue = element.getAttributeValue( attrName );
         if( attrValue == null ) {
             throw new XMLResourceParseException(
                 RESOURCE_NAME, element.getName(), attrName, null );

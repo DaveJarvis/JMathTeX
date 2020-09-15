@@ -68,12 +68,12 @@ import static java.lang.String.format;
  */
 @SuppressWarnings("unused")
 public class TeXFormula {
-    
+
     // TeX commands and text styles (for parsing)
     private static final Set<String> commands = new HashSet<>();
-    
+
     private static final Set<String> textStyles;
-    
+
     // table for putting delimiters over and under formula's,
     // indexed by constants from "TeXConstants"
     private static final String[][] delimiterNames = {
@@ -89,16 +89,16 @@ public class TeXFormula {
         { "vert", "vert" },
         { "Vert", "Vert" }
     };
-    
+
     // the escape character
     private static final char ESCAPE = '\\';
-    
+
     // grouping characters (for parsing)
     private static final char L_GROUP = '{';
     private static final char R_GROUP = '}';
     private static final char L_BRACK = '[';
     private static final char R_BRACK = ']';
-    
+
     // used as second index in "delimiterNames" table (over or under)
     private static final int OVER_DEL = 0;
     private static final int UNDER_DEL = 1;
@@ -111,57 +111,57 @@ public class TeXFormula {
 
     // for comparing floats with 0
     public static final float PREC = 0.0000001f;
-    
+
     // predefined TeXFormula's
     private static final Map<String,TeXFormula> predefinedTeXFormulas = new HashMap<>();
-    
+
     // script characters (for parsing)
     private static final char SUB_SCRIPT = '_';
     private static final char SUPER_SCRIPT = '^';
     private static final char PRIME = '\'';
-    
+
     // character-to-symbol and character-to-delimiter mappings
     private static final String[] symbolMappings;
     private static final String[] delimiterMappings;
-    
+
     static {
         // character-to-symbol and character-to-delimiter mappings
         final var parser = new TeXFormulaSettingsParser();
         symbolMappings = parser.parseSymbolMappings();
         delimiterMappings = parser.parseDelimiterMappings();
-        
+
         // textstyle commands
         textStyles = parser.parseTextStyles();
-        
+
         // commands
         commands.add("frac");
         commands.add("sqrt");
-        
+
         // predefined TeXFormula's
         new PredefinedTeXFormulaParser().parse( predefinedTeXFormulas );
     }
-    
+
     // the string to be parsed
     private String texString;
 
     // Length of string to be parsed.
     private int texStringLen;
-    
+
     // current position in the parse string
     private int pos;
-    
+
     // the root atom of the "atom tree" that represents the formula
     protected Atom root;
-    
+
     // the current text style
     private String textStyle;
-    
+
     /**
      * Creates an empty instance.
      */
     public TeXFormula() {
     }
-    
+
     /**
      * Creates a new TeXFormula from a list of TeXFormula objects.
      * <p>
@@ -169,6 +169,7 @@ public class TeXFormula {
      * Otherwise, the newly created TeXFormula is the same as if
      * all the TeXFormula's in the list were added one after another (starting with the
      * first one) to an empty TeXFormula using the {@link #add(TeXFormula)} method.
+     * </p>
      * <p>
      * <b> The new TeXFormula is independent of all the TeXFormula's from the list!</b>
      *
@@ -188,7 +189,7 @@ public class TeXFormula {
         }
       }
     }
-    
+
     /**
      * Creates a new TeXFormula by parsing the given string (using a primitive TeX parser).
      *
@@ -198,7 +199,7 @@ public class TeXFormula {
     public TeXFormula( final String s ) throws ParseException {
       this( s, null );
     }
-    
+
    /*
     * Creates a TeXFormula by parsing the given string in the given text style.
     * Used when a text style command was found in the parse string.
@@ -209,7 +210,7 @@ public class TeXFormula {
       this.textStyle = textStyle;
       parse(s);
     }
-    
+
     /**
      * Creates a new TeXFormula that is a copy of the given TeXFormula.
      * <p>
@@ -222,7 +223,7 @@ public class TeXFormula {
       assert f != null;
       addImpl(f);
     }
-    
+
    /**
     * Appends the given {@link Atom} to the formula.
     */
@@ -241,7 +242,7 @@ public class TeXFormula {
 
       return this;
     }
-    
+
     /**
      * Parses the given string and inserts the resulting formula at the end
      * of the current TeXFormula.
@@ -260,7 +261,7 @@ public class TeXFormula {
       }
       return this;
     }
-    
+
     /**
      * Inserts the given TeXFormula at the end of the current TeXFormula.
      *
@@ -278,7 +279,7 @@ public class TeXFormula {
         add( f.root instanceof RowAtom ? new RowAtom( f.root ) : f.root );
       }
     }
-    
+
     /**
      * Centers the current TeXFormula vertically on the axis (defined by the parameter
      * "axisheight" in the resource "DefaultTeXFont.xml").
@@ -289,7 +290,7 @@ public class TeXFormula {
         root = new VCenteredAtom(root);
         return this;
     }
-    
+
     /**
      * Parses the given string(s) into a TeXFormula, puts the given accent above it and
      * inserts the result at the end of the current TeXFormula.
@@ -307,7 +308,7 @@ public class TeXFormula {
         ParseException {
       return addAcc( new TeXFormula( s ), accentName );
     }
-    
+
     /**
      * Puts the given accent above the given TeXFormula and inserts the result
      * at the end of the current TeXFormula.
@@ -322,7 +323,7 @@ public class TeXFormula {
         throws InvalidSymbolTypeException, SymbolNotFoundException {
       return add( new AccentedAtom( base == null ? null : base.root, accentName ) );
     }
-    
+
     /**
      * Puts the given accent TeXFormula (that must represent a single accent symbol!) above
      * the given base TeXFormula and inserts the result at the end of the current TeXFormula.
@@ -343,7 +344,7 @@ public class TeXFormula {
     throws InvalidSymbolTypeException, InvalidTeXFormulaException {
         return add(new AccentedAtom((base == null ? null : base.root), accent));
     }
-    
+
     /**
      * Parses the given string into a TeXFormula, surrounds it with the given
      * delimiters and inserts the result at the end of the current TeXFormula.
@@ -366,7 +367,7 @@ public class TeXFormula {
             ParseException, DelimiterMappingNotFoundException {
         return addEmbraced(new TeXFormula(s), l, r);
     }
-    
+
     /**
      * Parses the given string(s) into a TeXFormula, surrounds it with the given
      * delimiters (if not null) and inserts the result at the end of the current
@@ -388,7 +389,7 @@ public class TeXFormula {
             InvalidDelimiterException {
         return addEmbraced(new TeXFormula(s), left, right);
     }
-    
+
     /**
      * Surrounds the given TeXFormula with the given delimiters and
      * inserts the result at the end of the current TeXformula.
@@ -410,7 +411,7 @@ public class TeXFormula {
         return addEmbraced(f, getCharacterToDelimiterMapping(l),
                 getCharacterToDelimiterMapping(r));
     }
-    
+
     /**
      * Surrounds the given TeXFormula with the given delimiters (if not null) and inserts the
      * result at the end of the current TeXFormula.
@@ -429,7 +430,7 @@ public class TeXFormula {
         return add(new FencedAtom((f == null ? null : f.root),
                 getDelimiterSymbol(left), getDelimiterSymbol(right)));
     }
-    
+
     /**
      * Parses the given strings into TeXFormula's that will represent the numerator (num)
      * and the denominator (denom) of a fraction, draws a line between them
@@ -448,7 +449,7 @@ public class TeXFormula {
     throws ParseException {
         return addFraction(new TeXFormula(num), new TeXFormula(denom), rule);
     }
-    
+
     /**
      * Parses the given strings into TeXFormula's that will represent the numerator (num)
      * and denominator (denom) of a fraction, draws a line between them
@@ -475,7 +476,7 @@ public class TeXFormula {
         return addFraction(new TeXFormula(num), new TeXFormula(denom), rule,
                 numAlign, denomAlign);
     }
-    
+
     /**
      * Parses the given string into a TeXFormula that will represent the numerator of
      * a fraction, uses the given TeXFormula as the denominator of this fraction,
@@ -494,7 +495,7 @@ public class TeXFormula {
     throws ParseException {
         return addFraction(new TeXFormula(num), denom, rule);
     }
-    
+
     /**
      * Parses the given string into a TeXFormula that will represent the denominator of
      * a fraction, uses the given TeXFormula as the numerator of this fraction,
@@ -513,7 +514,7 @@ public class TeXFormula {
     throws ParseException {
         return addFraction(num, new TeXFormula(denom), rule);
     }
-    
+
     /**
      * Uses the given TeXFormula's as the numerator (num) and denominator (denom) of
      * a fraction, draws a line between them depending on "rule"
@@ -530,7 +531,7 @@ public class TeXFormula {
         return add(new FractionAtom((num == null ? null : num.root),
                 (denom == null ? null : denom.root), rule));
     }
-    
+
     /**
      * Uses the given TeXFormula's as the numerator (num) and denominator (denom) of
      * a fraction, draws a line between them depending on "rule",
@@ -556,7 +557,7 @@ public class TeXFormula {
         return add(new FractionAtom((num == null ? null : num.root),
                 (denom == null ? null : denom.root), rule, numAlign, denomAlign));
     }
-    
+
     /**
      * Parses the given strings into TeXFormula's, puts them under a root
      * sign (base) and in the upper left corner over this root sign (nthRoot)
@@ -573,7 +574,7 @@ public class TeXFormula {
     throws ParseException {
         return addNthRoot(new TeXFormula(base), new TeXFormula(nthRoot));
     }
-    
+
     /**
      * Parses the given string into a TeXFormula, puts it under a root
      * sign, puts the given TeXFormula in the upper left corner over this root sign
@@ -590,7 +591,7 @@ public class TeXFormula {
     throws ParseException {
         return addNthRoot(new TeXFormula(base), nthRoot);
     }
-    
+
     /**
      * Parses the given string into a TeXFormula, puts it in the upper
      * left corner over the root sign, puts the given TeXFormula under this root sign
@@ -606,7 +607,7 @@ public class TeXFormula {
     throws ParseException {
         return addNthRoot(base, new TeXFormula(nthRoot));
     }
-    
+
     /**
      * Puts the given TeXFormula's under a root sign (base) and in the upper left
      * corner over this root sign (nthRoot) and inserts the result at the end of the
@@ -621,7 +622,7 @@ public class TeXFormula {
         return add(new NthRootAtom( (base == null ? null : base.root),
                                     (nthRoot == null ? null : nthRoot.root)));
     }
-    
+
     /**
      * Parses the given strings into TeXFormula's that will represent a "big operator"
      * (op), it's lower (low) and upper (up) bound, and inserts the result at the end
@@ -644,7 +645,7 @@ public class TeXFormula {
     throws ParseException {
         return addOp(new TeXFormula(op), new TeXFormula(low), new TeXFormula(up));
     }
-    
+
     /**
      * Parses the given strings into TeXFormula's that will represent a "big operator"
      * (op), it's lower (low) and upper (up) bound, and inserts the result at the end
@@ -668,7 +669,7 @@ public class TeXFormula {
         return addOp(new TeXFormula(op), new TeXFormula(low), new TeXFormula(up),
                 lim);
     }
-    
+
     /**
      * Uses the given TeXFormula's as a "big operator"
      * (op), it's lower (low) and upper (up) bound, and inserts the result at the end
@@ -690,7 +691,7 @@ public class TeXFormula {
         return add(new BigOperatorAtom( (op == null ? null : op.root),
                                         (low == null ? null : low.root), (up == null ? null : up.root)));
     }
-    
+
     /**
      * Uses the given TeXFormula's as a "big operator"
      * (op), it's lower (low) and upper (up) bound, and inserts the result at the end
@@ -713,7 +714,7 @@ public class TeXFormula {
         return add(new BigOperatorAtom((op == null ? null : op.root),
                 (low == null ? null : low.root), (up == null ? null : up.root), lim));
     }
-    
+
     /**
      * Parses the given string into a phantom TeXFormula and inserts the result at the
      * end of the current TeXFormula. A phantom TeXFormula will be rendered invisibly.
@@ -727,7 +728,7 @@ public class TeXFormula {
     public TeXFormula addPhantom(String phantom) throws ParseException {
         return addPhantom(new TeXFormula(phantom));
     }
-    
+
     /**
      * Parses the given string into a phantom TeXFormula and inserts the result at the
      * end of the current TeXFormula. Only the dimensions set to true will be taken into
@@ -745,7 +746,7 @@ public class TeXFormula {
             boolean depth) throws ParseException {
         return addPhantom(new TeXFormula(phantom), width, height, depth);
     }
-    
+
     /**
      * Inserts the given TeXFormula as a phantom TeXFormula at the
      * end of the current TeXFormula. A phantom TeXFormula will be rendered invisibly.
@@ -758,7 +759,7 @@ public class TeXFormula {
     public TeXFormula addPhantom(TeXFormula phantom) {
         return add(new PhantomAtom((phantom == null ? null : phantom.root)));
     }
-    
+
     /**
      * Inserts the given TeXFormula as a phantom TeXFormula at the
      * end of the current TeXFormula. Only the dimensions set to true will be taken into
@@ -776,7 +777,7 @@ public class TeXFormula {
         return add(new PhantomAtom((phantom == null ? null : phantom.root),
                 width, height, depth));
     }
-    
+
     /**
      * Parses the given string into a TeXFormula that will be displayed under a root
      * sign and inserts the result at the end of the current TeXFormula.
@@ -789,7 +790,7 @@ public class TeXFormula {
     public TeXFormula addSqrt(String base) throws ParseException {
         return addSqrt(new TeXFormula(base));
     }
-    
+
     /**
      * Displays the given TeXFormula under a root
      * sign and inserts the result at the end of the current TeXFormula.
@@ -801,7 +802,7 @@ public class TeXFormula {
     public TeXFormula addSqrt(TeXFormula base) {
         return addNthRoot(base, (TeXFormula) null);
     }
-    
+
     /**
      * Inserts a strut box (whitespace) with the given width, height and depth (in
      * the given unit) at the end of the current TeXFormula.
@@ -818,7 +819,7 @@ public class TeXFormula {
     throws InvalidUnitException {
         return add(new SpaceAtom(unit, width, height, depth));
     }
-    
+
     /**
      * Inserts a strut box (whitespace) with the given width (in widthUnits), height
      * (in heightUnits) and depth (in depthUnits) at the end of the current TeXFormula.
@@ -838,7 +839,7 @@ public class TeXFormula {
         return add(new SpaceAtom(widthUnit, width, heightUnit, height, depthUnit,
                 depth));
     }
-    
+
     /**
      * Inserts the symbol with the given name at the end of the current TeXFormula.
      *
@@ -849,7 +850,7 @@ public class TeXFormula {
     public TeXFormula addSymbol(String name) throws SymbolNotFoundException {
         return add(SymbolAtom.get(name));
     }
-    
+
     /**
      * Inserts the symbol with the given name at the end of the current TeXFormula
      * as a symbol of the given symbol type. This type can be (and is meant to be)
@@ -866,7 +867,7 @@ public class TeXFormula {
     throws SymbolNotFoundException, InvalidSymbolTypeException {
         return add(new SymbolAtom(SymbolAtom.get(name), type));
     }
-    
+
    /*
     * Look for scripts at the current position in the parse string
     * and attach them to the given atom (if found)
@@ -874,17 +875,17 @@ public class TeXFormula {
     private Atom attachScripts(Atom atom) throws ParseException {
         skipWhitespace();
         Atom f = atom;
-        
+
         if (pos < texStringLen ) {
             // attach script(s) if present
             char ch = texString.charAt( pos);
-            
+
             // ' = ^{\prime... so first replace this, then attach this script
             if (ch == PRIME) {
                 replaceAccents();
                 ch = texString.charAt( pos);
             }
-            
+
             // look for scripts and attach them
             if (ch == SUPER_SCRIPT || ch == SUB_SCRIPT) {
                 pos++;
@@ -917,7 +918,7 @@ public class TeXFormula {
         }
         return f;
     }
-    
+
    /*
     * Converts a character (from the parse string) to an atom (CharAtom or Symbol)
     */
@@ -952,7 +953,7 @@ public class TeXFormula {
 
         return root.createBox(style);
     }
-    
+
     /**
      * Creates a TeXIcon from this TeXFormula using the default TeXFont in the given
      * point size and starting from the given TeX style. If the given integer value
@@ -968,7 +969,7 @@ public class TeXFormula {
           style, new DefaultTeXFont( size ) ) ), size
       );
     }
-    
+
     /**
      * Surrounds this TeXFormula with the given delimiters.
      *
@@ -988,7 +989,7 @@ public class TeXFormula {
         return embrace(getCharacterToDelimiterMapping(left),
                 getCharacterToDelimiterMapping(right));
     }
-    
+
     /**
      * Surrounds this TeXFormula with the given delimiters (if not null).
      *
@@ -1006,7 +1007,7 @@ public class TeXFormula {
                 getDelimiterSymbol(right));
         return this;
     }
-    
+
     /**
      * Uses the current TeXFormula as the numerator of a fraction, parses the given string
      * into a TeXFormula that will represent the denominator of the fraction, draws a line
@@ -1022,7 +1023,7 @@ public class TeXFormula {
     public TeXFormula fraction(String s, boolean rule) throws ParseException {
         return fraction(new TeXFormula(s), rule);
     }
-    
+
     /**
      * Uses the current TeXFormula as the numerator of a fraction, parses the given string
      * into a TeXFormula that will represent the denominator of the fraction, possibly
@@ -1046,7 +1047,7 @@ public class TeXFormula {
             int denomAlign) throws ParseException {
         return fraction(new TeXFormula(s), rule, numAlign, denomAlign);
     }
-    
+
     /**
      * Uses the current TeXFormula as the numerator of a fraction, the given TeXFormula
      * as the denominator of the fraction, draws a line between them depending on "rule"
@@ -1061,7 +1062,7 @@ public class TeXFormula {
         root = new FractionAtom(root, (f == null ? null : f.root), rule);
         return this;
     }
-    
+
     /**
      * Uses the current TeXFormula as the numerator of a fraction, the given TeXFormula
      * as the denominator of the fraction, draws a line between them with the given
@@ -1083,7 +1084,7 @@ public class TeXFormula {
                 thickness);
         return this;
     }
-    
+
     /**
      * Uses the current TeXFormula as the numerator of a fraction, the given TeXFormula
      * as the denominator of the fraction, draws a line between them depending on "rule",
@@ -1112,7 +1113,7 @@ public class TeXFormula {
                 thickness, numAlign, denomAlign);
         return this;
     }
-    
+
     /**
      * Uses the current TeXFormula as the numerator of a fraction, the given TeXFormula
      * as the denominator of the fraction, draws a line between them with a thickness
@@ -1139,7 +1140,7 @@ public class TeXFormula {
                 numAlign, denomAlign);
         return this;
     }
-    
+
     /**
      * Uses the current TeXFormula as the numerator of a fraction, the given TeXFormula
      * as the denominator of the fraction, draws a line between them depending on "rule",
@@ -1164,7 +1165,7 @@ public class TeXFormula {
                 numAlign, denomAlign);
         return this;
     }
-    
+
     /**
      * Uses the current TeXFormula as the denominator of a fraction, parses the given string
      * into a TeXFormula that will represent the numerator of the fraction, draws a line
@@ -1181,7 +1182,7 @@ public class TeXFormula {
     throws ParseException {
         return fractionInvert(new TeXFormula(s), rule);
     }
-    
+
     /**
      * Uses the current TeXFormula as the denominator of a fraction, parses the given string
      * into a TeXFormula that will represent the numerator of the fraction, draws a line
@@ -1205,7 +1206,7 @@ public class TeXFormula {
             int denomAlign) throws ParseException {
         return fractionInvert(new TeXFormula(s), rule, numAlign, denomAlign);
     }
-    
+
     /**
      * Uses the current TeXFormula as the denominator of a fraction, the given TeXFormula
      * as the numerator of the fraction, draws a line between them depending on "rule"
@@ -1220,7 +1221,7 @@ public class TeXFormula {
         root = new FractionAtom((f == null ? null : f.root), root, rule);
         return this;
     }
-    
+
     /**
      * Uses the current TeXFormula as the denominator of a fraction, the given TeXFormula
      * as the numerator of the fraction, draws a line between them depending on "rule",
@@ -1245,7 +1246,7 @@ public class TeXFormula {
                 numAlign, denomAlign);
         return this;
     }
-    
+
    /**
     * Get the next group (between the given opening and closing characters)
     * at the current position in the parse string, return it as a string and
@@ -1291,7 +1292,7 @@ public class TeXFormula {
       // the situation.
       return "";
     }
-    
+
    /*
     * Get the next script at the current position in the parse string.
     * If a group opening character is found, this is the next group, otherwise
@@ -1312,7 +1313,7 @@ public class TeXFormula {
         // end of string reached, but not processed properly
         throw new ParseException("illegal end, missing script!");
     }
-    
+
     /**
      * Changes this TeXFormula into a phantom TeXFormula. It will be rendered
      * invisibly. This means that a strut box (whitespace) will be displayed
@@ -1327,7 +1328,7 @@ public class TeXFormula {
         root = new PhantomAtom(root);
         return this;
     }
-    
+
     /**
      * Changes this TeXFormula into a phantom TeXFormula. Only the dimensions set to true will be taken into
      * account for drawing the whitespace. Although this formula is now made invisible, it's
@@ -1342,7 +1343,7 @@ public class TeXFormula {
         root = new PhantomAtom(root, width, height, depth);
         return this;
     }
-    
+
     /**
      * Parses the given string into a TeXFormula, puts it in the upper
      * left corner over a root sign (nthRoot), puts the current TeXFormula under this
@@ -1356,7 +1357,7 @@ public class TeXFormula {
     public TeXFormula nthRoot(String nthRoot) throws ParseException {
         return nthRoot(new TeXFormula(nthRoot));
     }
-    
+
     /**
      * Puts the given TeXFormula in the upper left corner over a root sign, puts the
      * current TeXFormula under this root sign and changes the current TeXFormula
@@ -1370,7 +1371,7 @@ public class TeXFormula {
         root = new NthRootAtom( root, (nthRoot == null ? null : nthRoot.root));
         return this;
     }
-    
+
     /**
      * Puts a line over the current TeXFormula and changes the current TeXFormula into
      * the resulting construction.
@@ -1450,7 +1451,7 @@ public class TeXFormula {
         }
       }
     }
-    
+
    /*
     * Processes the given TeX command (by parsing following command arguments
     * in the parse string).
@@ -1558,7 +1559,7 @@ public class TeXFormula {
         root = new AccentedAtom(root, accentName);
         return this;
     }
-    
+
     /**
      * Puts the delimiter symbol represented by the given delimiter type constant above the
      * current TeXFormula and changes the current TeXFormula into the resulting construction.
@@ -1575,13 +1576,13 @@ public class TeXFormula {
     throws InvalidDelimiterTypeException, SymbolNotFoundException {
         if (delimiter < 0 || delimiter >= delimiterNames.length)
             throw new InvalidDelimiterTypeException();
-        
+
         String name = delimiterNames[delimiter][OVER_DEL];
         root = new OverUnderDelimiterAtom( root, null, SymbolAtom.get( name),
                                            TeXConstants.UNIT_EX, 0, true);
         return this;
     }
-    
+
     /**
      * Puts the delimiter symbol represented by the given delimiter type constant above the
      * current TeXFormula, parses the given string into a TeXFormula and
@@ -1611,7 +1612,7 @@ public class TeXFormula {
             InvalidUnitException, ParseException, SymbolNotFoundException {
         return putDelimiterOver(delimiter, new TeXFormula(sup), kernUnit, kern);
     }
-    
+
     /**
      * Puts the delimiter symbol represented by the given delimiter type constant above the
      * current TeXFormula, puts the given TeXFormula above the delimiter symbol (separated
@@ -1640,13 +1641,13 @@ public class TeXFormula {
             InvalidUnitException, SymbolNotFoundException {
         if (delimiter < 0 || delimiter >= delimiterNames.length)
             throw new InvalidDelimiterTypeException();
-        
+
         String name = delimiterNames[delimiter][OVER_DEL];
         root = new OverUnderDelimiterAtom( root, (sup == null ? null : sup.root),
                                            SymbolAtom.get(name), kernUnit, kern, true);
         return this;
     }
-    
+
     /**
      * Puts the delimiter symbol represented by the given delimiter type constant under the
      * current TeXFormula and changes the current
@@ -1664,13 +1665,13 @@ public class TeXFormula {
     throws InvalidDelimiterTypeException, SymbolNotFoundException {
         if (delimiter < 0 || delimiter >= delimiterNames.length)
             throw new InvalidDelimiterTypeException();
-        
+
         String name = delimiterNames[delimiter][UNDER_DEL];
         root = new OverUnderDelimiterAtom( root, null, SymbolAtom.get( name),
                                            TeXConstants.UNIT_EX, 0, false);
         return this;
     }
-    
+
     /**
      * Puts the delimiter symbol represented by the given delimiter type constant under the
      * current TeXFormula, parses the given string into a TeXFormula and puts
@@ -1700,7 +1701,7 @@ public class TeXFormula {
             InvalidUnitException, ParseException, SymbolNotFoundException {
         return putDelimiterUnder(delimiter, new TeXFormula(sub), kernUnit, kern);
     }
-    
+
     /**
      * Puts the delimiter symbol represented by the given delimiter type constant under the
      * current TeXFormula, puts the given TeXFormula under the delimiter symbol (separated
@@ -1729,13 +1730,13 @@ public class TeXFormula {
             InvalidUnitException, SymbolNotFoundException {
         if (delimiter < 0 || delimiter >= delimiterNames.length)
             throw new InvalidDelimiterTypeException();
-        
+
         String name = delimiterNames[delimiter][UNDER_DEL];
         root = new OverUnderDelimiterAtom( root, (sub == null ? null : sub.root),
                                            SymbolAtom.get(name), kernUnit, kern, false);
         return this;
     }
-    
+
     /**
      * Puts the given TeXFormula
      * above the current TeXFormula, in a smaller size
@@ -1759,7 +1760,7 @@ public class TeXFormula {
                 overUnit, overSpace, overScriptSize, true);
         return this;
     }
-    
+
     /**
      * Parses the given string into a TeXFormula that will be put
      * above the current
@@ -1785,7 +1786,7 @@ public class TeXFormula {
         return putOver((over == null ? null : new TeXFormula(over)), overUnit,
                 overSpace, overScriptSize);
     }
-    
+
     /**
      * Parses the given string into a TeXFormula that will be put
      * under the current TeXFormula,
@@ -1811,7 +1812,7 @@ public class TeXFormula {
         return putUnder((under == null ? null : new TeXFormula(under)),
                 underUnit, underSpace, underScriptSize);
     }
-    
+
     /**
      * Puts the given TeXFormula under the current TeXFormula,
      * in a smaller size
@@ -1836,7 +1837,7 @@ public class TeXFormula {
                 underUnit, underSpace, underScriptSize, false);
         return this;
     }
-    
+
     /**
      * Parses the given string "under" into a TeXFormula that will be put
      * under the current TeXFormula,
@@ -1876,7 +1877,7 @@ public class TeXFormula {
                 underUnit, underSpace, underScriptSize, (over == null ? null
                 : new TeXFormula(over)), overUnit, overSpace, overScriptSize);
     }
-    
+
     /**
      * Puts the given TeXFormula "under" under the current TeXFormula,
      * in a smaller size
@@ -1912,7 +1913,7 @@ public class TeXFormula {
                 : over.root), overUnit, overSpace, overScriptSize);
         return this;
     }
-    
+
    /*
     * Replaces "'" with "^{\prime}", "''" with "^{\prime\prime}", etc. at the
     * current position in the parse string.
@@ -1938,7 +1939,7 @@ public class TeXFormula {
             + texString.substring( i );
         texStringLen = texString.length();
     }
-    
+
     /**
      * Changes the background color of the <i>current</i> TeXFormula into the given color.
      * By default, a TeXFormula has no background color, it's transparent.
@@ -1959,7 +1960,7 @@ public class TeXFormula {
         }
         return this;
     }
-    
+
     /**
      * Changes the (foreground) color of the <i>current</i> TeXFormula into the given color.
      * By default, the foreground color of a TeXFormula is the foreground color of the
@@ -1981,7 +1982,7 @@ public class TeXFormula {
         }
         return this;
     }
-    
+
     /**
      * Sets a fixed left and right type of the current TeXFormula. This has an influence
      * on the glue that will be inserted before and after this TeXFormula.
@@ -1997,7 +1998,7 @@ public class TeXFormula {
         root = new TypedAtom(leftType, rightType, root);
         return this;
     }
-    
+
     /**
      * Parses the given strings into TeXFormula's and attaches them <i>together</i> to
      * the <i>current</i> TeXFormula as a subscript (sub) and a superscript (sup).
@@ -2015,7 +2016,7 @@ public class TeXFormula {
     public TeXFormula setScripts(String sub, String sup) throws ParseException {
         return setScripts(new TeXFormula(sub), new TeXFormula(sup));
     }
-    
+
     /**
      * Parses the given string into a TeXFormula's and attaches it to
      * the <i>current</i> TeXFormula as a subscript <i>together</i> with the given
@@ -2035,7 +2036,7 @@ public class TeXFormula {
     throws ParseException {
         return setScripts(new TeXFormula(sub), sup);
     }
-    
+
     /**
      * Parses the given string into a TeXFormula's and attaches it to
      * the <i>current</i> TeXFormula as a superscript <i>together</i> with the given TeXFormula
@@ -2054,7 +2055,7 @@ public class TeXFormula {
     throws ParseException {
         return setScripts(sub, new TeXFormula(sup));
     }
-    
+
     /**
      * Attaches the given TeXFormula's <i>together</i> to the <i>current</i> TeXFormula as a subscript
      * (sub) and a superscript (sup). This is not the same as attaching both scripts seperately
@@ -2072,7 +2073,7 @@ public class TeXFormula {
                 (sup == null ? null : sup.root));
         return this;
     }
-    
+
     /**
      * Parses the given string into a TeXFormula and attaches it to the <i>current</i>
      * TeXFormula as a subscript.
@@ -2085,7 +2086,7 @@ public class TeXFormula {
     public TeXFormula setSubscript(String sub) throws ParseException {
         return setSubscript(new TeXFormula(sub));
     }
-    
+
     /**
      * Attaches the given TeXFormula to the <i>current</i> TeXFormula as a subscript.
      *
@@ -2097,7 +2098,7 @@ public class TeXFormula {
         root = new ScriptsAtom(root, (sub == null ? null : sub.root), null);
         return this;
     }
-    
+
     /**
      * Parses the given string into a TeXFormula and attaches it to the <i>current</i>
      * TeXFormula as a superscript.
@@ -2110,7 +2111,7 @@ public class TeXFormula {
     public TeXFormula setSuperscript(String sup) throws ParseException {
         return setSuperscript(new TeXFormula(sup));
     }
-    
+
     /**
      * Attaches the given TeXFormula to the <i>current</i> TeXFormula as a superscript.
      *
@@ -2122,7 +2123,7 @@ public class TeXFormula {
         root = new ScriptsAtom(root, null, (sup == null ? null : sup.root));
         return this;
     }
-    
+
    /*
     * change the current position (in the parse string) to the first following
     * non-whitespace character
@@ -2132,7 +2133,7 @@ public class TeXFormula {
         pos++;
       }
     }
-    
+
     /**
      * Puts the current TeXFormula under a root sign and changes the current TeXFormula
      * into the resulting square root construction.
@@ -2142,7 +2143,7 @@ public class TeXFormula {
     public TeXFormula sqrt() {
         return nthRoot((TeXFormula) null);
     }
-    
+
     /**
      * Puts a line under the current TeXFormula and changes the current TeXFormula into
      * the resulting construction.
@@ -2153,7 +2154,7 @@ public class TeXFormula {
         root = new UnderlinedAtom(root);
         return this;
     }
-    
+
     /**
      * Get a predefined TeXFormula.
      *
@@ -2175,7 +2176,7 @@ public class TeXFormula {
     private static TeXFormula getNullable( final String name ) {
       return predefinedTeXFormulas.get( name );
     }
-    
+
    /*
     * Retrieves the delimiter mapping (a symbol name) of the given character
     * from a hash table.
@@ -2188,7 +2189,7 @@ public class TeXFormula {
         else
             return str;
     }
-    
+
    /*
     * Retrieves the delimiter symbol with the given name from a hash table
     * and checks if it's a valid delimiter.
@@ -2205,7 +2206,7 @@ public class TeXFormula {
         }
         return res;
     }
-    
+
    /**
     * Tests if the given character is a symbol character. A character is a
     * symbol character if it is not alphanumeric.

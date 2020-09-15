@@ -101,36 +101,39 @@
 
   <!-- miscellaneous symbols of type "ord" -->
   <Symbol name="aleph" type="ord"/>
-  <Symbol name="imath" type="ord"/>
-  <Symbol name="jmath" type="ord"/>
+  <Symbol name="angle" type="ord" />
+  <Symbol name="backslash" type="ord" del="true"/>
+  <Symbol name="bot" type="ord"/>
   <Symbol name="ell" type="ord"/>
-  <Symbol name="wp" type="ord"/>
-  <Symbol name="Re" type="ord"/>
-  <Symbol name="Im" type="ord"/>
-  <Symbol name="partial" type="ord"/>
-  <Symbol name="infty" type="ord"/>
-  <Symbol name="prime" type="ord"/>
   <Symbol name="emptyset" type="ord"/>
+  <Symbol name="exists" type="ord"/>
+  <Symbol name="flat" type="ord"/>
+  <Symbol name="forall" type="ord"/>
+  <Symbol name="hbar" type="ord" />
+  <Symbol name="imath" type="ord"/>
+  <Symbol name="Im" type="ord"/>
+  <Symbol name="infty" type="ord"/>
+  <Symbol name="jmath" type="ord"/>
+  <Symbol name="lacc" type="ord"/>
+  <Symbol name="lnot" type="ord"/>
   <Symbol name="nabla" type="ord"/>
+  <Symbol name="natural" type="ord"/>
+  <Symbol name="neg" type="ord"/>
+  <Symbol name="partial" type="ord"/>
+  <Symbol name="prime" type="ord"/>
+  <Symbol name="racc" type="ord"/>
+  <Symbol name="Re" type="ord"/>
+  <Symbol name="sharp" type="ord"/>
   <Symbol name="surdsign" type="ord"/>
   <Symbol name="top" type="ord"/>
-  <Symbol name="bot" type="ord"/>
-  <Symbol name="|" type="ord"/>
   <Symbol name="triangle" type="ord"/>
-  <Symbol name="backslash" type="ord" del="true"/>
-  <Symbol name="forall" type="ord"/>
-  <Symbol name="exists" type="ord"/>
-  <Symbol name="neg" type="ord"/>
-  <Symbol name="lnot" type="ord"/>
-  <Symbol name="flat" type="ord"/>
-  <Symbol name="natural" type="ord"/>
-  <Symbol name="sharp" type="ord"/>
+  <Symbol name="|" type="ord"/>
+  <Symbol name="wp" type="ord"/>
+
   <Symbol name="clubsuit" type="ord"/>
   <Symbol name="diamondsuit" type="ord"/>
   <Symbol name="heartsuit" type="ord"/>
   <Symbol name="spadesuit" type="ord"/>
-  <Symbol name="lacc" type="ord"/>
-  <Symbol name="racc" type="ord"/>
 
   <!-- "large" operators -->
   <Symbol name="bigcap" type="op"/>
@@ -245,4 +248,5 @@
   <Symbol name="leftharpoondown" type="rel"/>
   <Symbol name="rightharpoonup" type="rel"/>
   <Symbol name="rightharpoondown" type="rel"/>
+  <Symbol name="rightleftharpoons" type="rel" />
 </TeXSymbols>

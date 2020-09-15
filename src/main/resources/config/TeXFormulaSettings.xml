@@ -42,7 +42,7 @@
 
   <!--
   These are used in the method "embrace(char,char)" from the class "Formula".
-  The symbolnames must be defined in "TeXSymbols.xml" as delimiters (del="true").
+  The symbol names must be defined in "TeXSymbols.xml" as delimiters (del="true").
   -->
   <CharacterToDelimiterMappings>
     <Map char="(" symbol="lbrack"/>

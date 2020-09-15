@@ -38,6 +38,9 @@ public class FormulaTest {
   private static final String DIR_TEMP = getProperty( "java.io.tmpdir" );
 
   private final static String[] EQUATIONS = {
+      "-\\frac{{\\hbar ^2 }}{{2m}}\\frac{{\\partial ^2 \\psi (x,t)" +
+          "}}{{\\partial x^2 }} + U(x)\\psi (x,t) = i\\hbar \\frac{{\\partial" +
+          " \\psi (x,t)}}{{\\partial t}}",
       "(a+b)^2=a^2 + 2ab + b^2",
       "S_x = sqrt((SS_x)/(N-1))",
       "e^{\\pi i} + 1 = 0",
@@ -53,7 +56,8 @@ public class FormulaTest {
       "G_{\\mu \\nu} = \\frac{8 \\pi G}{c^4} T_{{\\mu \\nu}}",
       "\\prod_{i=a}^{b} f(i)",
       "u(n) \\Leftrightarrow \\frac{1}{1-e^{-jw}} + " +
-          "\\sum_{k=-\\infty}^{\\infty} \\pi \\delta (\\omega + 2\\pi k)\n"
+          "\\sum_{k=-\\infty}^{\\infty} \\pi \\delta (\\omega + 2\\pi k)\n",
+      "\\rightleftharpoons\\angle\\hbar"
   };
 
   /**

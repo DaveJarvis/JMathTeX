@@ -22,22 +22,6 @@
     <Return name="f"/>
   </TeXFormula>
 
-  <TeXFormula name="hbar" enabled="true">
-    <CreateTeXFormula name="f">
-      <Argument type="String" value="\bar"/>
-    </CreateTeXFormula>
-    <MethodInvocation name="addStrut" formula="f">
-      <Argument type="TeXConstants" value="UNIT_MU"/>
-      <Argument type="float" value="-9"/>
-      <Argument type="float" value="0"/>
-      <Argument type="float" value="0"/>
-    </MethodInvocation>
-    <MethodInvocation name="add" formula="f">
-      <Argument type="String" value="h"/>
-    </MethodInvocation>
-    <Return name="f"/>
-  </TeXFormula>
-
   <TeXFormula name="surd" enabled="true">
     <CreateTeXFormula name="f">
       <Argument type="String" value="\surdsign"/>
