@@ -23,10 +23,7 @@ import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -38,41 +35,16 @@ public class ResourceReader<T> {
   private final Path mPath;
 
   public ResourceReader( final Path path ) {
-    mPath = path;
+    mPath = Path.of( File.separator, path.toString() );
   }
 
   public T read( final Function<InputStream, T> f )
       throws XMLResourceParseException {
-    try( final var stream = getResourceAsStream( mPath ) ) {
+    final var filename = mPath.toString();
+    try( final var stream = getClass().getResourceAsStream( filename ) ) {
       return f.apply( stream );
     } catch( final Exception e ) {
-      throw new XMLResourceParseException( mPath.toString(), e );
+      throw new XMLResourceParseException( filename, e );
     }
-  }
-
-  /**
-   * Returns the path to the resource.
-   *
-   * @return The path to a resource, starting at the root level of the
-   * container.
-   */
-  public String getAbsolutePath() throws URISyntaxException {
-    final var url = getClass().getClassLoader().getResource( mPath.toString() );
-    final var uri = Objects.requireNonNull( url ).toURI();
-    final var file = Paths.get( uri ).getParent().toFile();
-    return file.getAbsolutePath();
-  }
-
-  /**
-   * Opens the given path as a resource.
-   *
-   * @param path The path to a resource, starting at the root level of the
-   *             container.
-   * @return An open {@link InputStream} instance that must be closed after
-   * reading the contents.
-   */
-  protected static InputStream getResourceAsStream( final Path path ) {
-    final Path root = Path.of( File.separator, path.toString() );
-    return ResourceReader.class.getResourceAsStream( root.toString() );
   }
 }
