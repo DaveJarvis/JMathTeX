@@ -38,7 +38,7 @@ public class XMLResourceReader extends ResourceReader<Element> {
   private final static String DIR_XML = "config";
 
   public XMLResourceReader( final String filename ) {
-    super( Path.of( DIR_XML, filename ) );
+    super( DIR_XML + '/' + filename );
   }
 
   /**

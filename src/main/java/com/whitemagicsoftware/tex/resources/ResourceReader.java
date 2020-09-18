@@ -21,9 +21,7 @@ package com.whitemagicsoftware.tex.resources;
 
 import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
 
-import java.io.File;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.function.Function;
 
 /**
@@ -32,15 +30,15 @@ import java.util.function.Function;
  * @param <T> The type of resource to read.
  */
 public class ResourceReader<T> {
-  private final Path mPath;
+  private final String mPath;
 
-  public ResourceReader( final Path path ) {
-    mPath = new File( File.separator, path.toString() ).toPath();
+  public ResourceReader( final String path ) {
+    mPath = '/' + path;
   }
 
   public T read( final Function<InputStream, T> f )
       throws XMLResourceParseException {
-    final var filename = mPath.toString();
+    final var filename = mPath;
     try( final var stream = getClass().getResourceAsStream( filename ) ) {
       return f.apply( stream );
     } catch( final Exception e ) {
