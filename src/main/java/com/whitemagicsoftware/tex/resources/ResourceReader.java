@@ -35,7 +35,7 @@ public class ResourceReader<T> {
   private final Path mPath;
 
   public ResourceReader( final Path path ) {
-    mPath = Path.of( File.separator, path.toString() );
+    mPath = new File( File.separator, path.toString() ).toPath();
   }
 
   public T read( final Function<InputStream, T> f )
