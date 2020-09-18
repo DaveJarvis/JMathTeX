@@ -19,32 +19,28 @@
  */
 package com.whitemagicsoftware.tex.resources;
 
-import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
-
-import java.io.InputStream;
-import java.util.function.Function;
-
-import static com.whitemagicsoftware.tex.resources.ResourcePath.SEPARATOR;
-
 /**
- * Offers common behaviours for various resource readers.
- *
- * @param <T> The type of resource to read.
+ * Facilitates joining paths to reference resource files. Resource paths
+ * differ from paths in Java's nio library. Cross-platform slashes are to
+ * be avoided because slashes for resource files are always forward ones.
  */
-public class ResourceReader<T> {
-  private final String mPath;
+public class ResourcePath {
+  public static final String SEPARATOR = "/";
 
-  public ResourceReader( final String path ) {
-    mPath = SEPARATOR + path;
+  /**
+   * Join the given names with the resource separator char {@link #SEPARATOR}.
+   * The names can contain all directory names or any number of directory names
+   * followed by a terminal a file name. This method does not enforce or check
+   * that the directory names (or file name) exist.
+   *
+   * @param names The paths to join with the separator used for resources.
+   * @return The given set of names concatenated with {@link #SEPARATOR} in
+   * between.
+   */
+  public static String join( final String... names ) {
+    return String.join( SEPARATOR, names );
   }
 
-  public T read( final Function<InputStream, T> f )
-      throws XMLResourceParseException {
-    final var filename = mPath;
-    try( final var stream = getClass().getResourceAsStream( filename ) ) {
-      return f.apply( stream );
-    } catch( final Exception e ) {
-      throw new XMLResourceParseException( filename, e );
-    }
+  private ResourcePath() {
   }
 }

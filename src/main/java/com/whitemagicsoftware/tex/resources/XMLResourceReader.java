@@ -23,7 +23,7 @@ import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
-import java.nio.file.Path;
+import static com.whitemagicsoftware.tex.resources.ResourcePath.join;
 
 /**
  * Responsible for reading XML resources located in the {@code config}
@@ -38,7 +38,7 @@ public class XMLResourceReader extends ResourceReader<Element> {
   private final static String DIR_XML = "config";
 
   public XMLResourceReader( final String filename ) {
-    super( DIR_XML + '/' + filename );
+    super( join( DIR_XML, filename ) );
   }
 
   /**

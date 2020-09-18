@@ -24,6 +24,8 @@ import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
 import java.nio.file.Path;
 import java.util.Properties;
 
+import static com.whitemagicsoftware.tex.resources.ResourcePath.join;
+
 /**
  * Responsible for reading unicode property resources located in the {@code
  * property} directory.
@@ -37,7 +39,7 @@ public class UnicodeResourceReader extends ResourceReader<Properties> {
   private final static String DIR_PROPERTY = "property";
 
   public UnicodeResourceReader( final String filename ) {
-    super( Path.of( DIR_PROPERTY, filename ) );
+    super( join( DIR_PROPERTY, filename ) );
   }
 
   /**

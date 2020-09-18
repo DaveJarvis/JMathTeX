@@ -19,12 +19,12 @@
  */
 package com.whitemagicsoftware.tex.resources;
 
-import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
 import com.whitemagicsoftware.tex.TeXFormula;
+import com.whitemagicsoftware.tex.exceptions.XMLResourceParseException;
 
 import java.awt.*;
-import java.nio.file.Path;
 
+import static com.whitemagicsoftware.tex.resources.ResourcePath.join;
 import static java.awt.Font.TRUETYPE_FONT;
 import static java.awt.Font.createFont;
 import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
@@ -43,7 +43,7 @@ public class FontResourceReader extends ResourceReader<Font> {
   private static final String DIR_FONT_COMPUTER_MODERN = "cm";
 
   public FontResourceReader( final String filename ) {
-    super( Path.of( DIR_FONT, DIR_FONT_COMPUTER_MODERN, filename ) );
+    super( join( DIR_FONT, DIR_FONT_COMPUTER_MODERN, filename ) );
   }
 
   /**
