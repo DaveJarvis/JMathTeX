@@ -41,6 +41,8 @@ public class FormulaTest {
       "-\\frac{{\\hbar ^2 }}{{2m}}\\frac{{\\partial ^2 \\psi (x,t)" +
           "}}{{\\partial x^2 }} + U(x)\\psi (x,t) = i\\hbar \\frac{{\\partial" +
           " \\psi (x,t)}}{{\\partial t}}",
+      "E=mc^2",
+      "\\pi",
       "(a+b)^2=a^2 + 2ab + b^2",
       "S_x = sqrt((SS_x)/(N-1))",
       "e^{\\pi i} + 1 = 0",
