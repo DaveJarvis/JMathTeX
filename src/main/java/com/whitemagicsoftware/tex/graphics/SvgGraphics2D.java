@@ -42,7 +42,6 @@ import java.awt.geom.Rectangle2D;
  * This class is not thread-safe, but can be reset for performance purposes.
  * </p>
  */
-@SuppressWarnings("unused")
 public final class SvgGraphics2D extends AbstractGraphics2D {
   private static final int DEFAULT_SVG_BUFFER_SIZE = 65536;
   private static final String HEADER =

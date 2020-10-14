@@ -81,6 +81,7 @@ public abstract class AbstractGraphics2D extends Graphics2D {
    * @param w  The final document width (in pixels).
    * @param h  The final document height (in pixels).
    */
+  @SuppressWarnings("unused")
   public abstract void initialize( final int id, final int w, final int h );
 
   @Override

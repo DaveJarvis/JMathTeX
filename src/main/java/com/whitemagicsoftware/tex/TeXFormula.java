@@ -919,28 +919,33 @@ public class TeXFormula {
         return f;
     }
 
-   /*
-    * Converts a character (from the parse string) to an atom (CharAtom or Symbol)
-    */
-    private Atom convertCharacter(char c) throws ParseException {
-        pos++;
-        if (isSymbol(c)) {
-            final String symbolName = symbolMappings[c];
-            if (symbolName == null)
-                throw new ParseException("Unknown character: '" + c + "'");
-            else
-                try {
-                    return SymbolAtom.get(symbolName);
-                } catch (final SymbolNotFoundException e) {
-                    throw new ParseException( "The character '"
-                            + c
-                            + "' was mapped to an unknown symbol with the name '"
-                            + symbolName + "'", e);
-                }
-        }
+    /*
+     * Converts a character (from the parse string) to an atom (CharAtom or
+     * Symbol)
+     */
+    private Atom convertCharacter( char c ) throws ParseException {
+      pos++;
+      if( isSymbol( c ) && c < symbolMappings.length ) {
+        final String symbolName = symbolMappings[ c ];
 
-        // alphanumeric character
-        return new CharAtom( c, textStyle);
+        if( symbolName == null ) {
+          final var m = format( "Unknown character: '%s'", c );
+          throw new ParseException( m );
+        }
+        else {
+          try {
+            return SymbolAtom.get( symbolName );
+          } catch( final SymbolNotFoundException e ) {
+            final var m = format(
+                "The character '%c' was mapped to unknown symbol name '%s'",
+                c, symbolName );
+            throw new ParseException( m, e );
+          }
+        }
+      }
+
+      // alphanumeric character
+      return new CharAtom( c, textStyle );
     }
 
    /*
@@ -2177,23 +2182,23 @@ public class TeXFormula {
       return predefinedTeXFormulas.get( name );
     }
 
-   /*
-    * Retrieves the delimiter mapping (a symbol name) of the given character
-    * from a hash table.
-    */
-    private static String getCharacterToDelimiterMapping(char ch)
-    throws DelimiterMappingNotFoundException {
-        String str = delimiterMappings[ch];
-        if (str == null)
-            throw new DelimiterMappingNotFoundException(ch);
-        else
-            return str;
+    /**
+     * Retrieves the delimiter mapping (a symbol name) of the given character
+     * from a hash table.
+     */
+    private static String getCharacterToDelimiterMapping( char ch )
+       throws DelimiterMappingNotFoundException {
+     final String str = delimiterMappings[ ch ];
+     if( str == null ) {
+       throw new DelimiterMappingNotFoundException( ch );
+     }
+     return str;
     }
 
-   /*
-    * Retrieves the delimiter symbol with the given name from a hash table
-    * and checks if it's a valid delimiter.
-    */
+    /**
+     * Retrieves the delimiter symbol with the given name from a hash table
+     * and checks if it's a valid delimiter.
+     */
     private static SymbolAtom getDelimiterSymbol(String delName)
         throws SymbolNotFoundException, InvalidDelimiterException {
         SymbolAtom res = null;
@@ -2207,10 +2212,10 @@ public class TeXFormula {
         return res;
     }
 
-   /**
-    * Tests if the given character is a symbol character. A character is a
-    * symbol character if it is not alphanumeric.
-    */
+    /**
+     * Tests if the given character is a symbol character. A character is a
+     * symbol character if it is not alphanumeric.
+     */
     private static boolean isSymbol(final char c) {
       return !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
     }

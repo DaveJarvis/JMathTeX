@@ -43,33 +43,35 @@ import java.util.Set;
  * Parse predefined {@link TeXFormula}s from an XML file.
  */
 public class TeXFormulaSettingsParser {
-    
+
     public static final String RESOURCE_NAME = "TeXFormulaSettings.xml";
-    public static final String CHARTODEL_MAPPING_EL = "Map";
-    
+    public static final String CHAR_MAPPING_EL = "Map";
+
     private final Element root;
-    
+
     public TeXFormulaSettingsParser() throws ResourceParseException {
         root = new XMLResourceReader( RESOURCE_NAME ).read();
     }
-    
+
     public String[] parseSymbolMappings() throws ResourceParseException {
-        String[] mappings = new String[ FontInfo.NUMBER_OF_CHAR_CODES];
-        Element charToSymbol = root.getChild("CharacterToSymbolMappings");
-        if (charToSymbol != null)
-            addToMap(charToSymbol.getChildren("Map"), mappings);
+        String[] mappings = new String[ FontInfo.NUMBER_OF_CHAR_CODES ];
+        Element symbols = root.getChild( "CharacterToSymbolMappings" );
+        if( symbols != null ) {
+            addToMap( symbols.getChildren( CHAR_MAPPING_EL ), mappings );
+        }
         return mappings;
     }
-    
+
     public String[] parseDelimiterMappings() throws ResourceParseException {
-        String[] mappings = new String[FontInfo.NUMBER_OF_CHAR_CODES];
-        Element charToDelimiter = root.getChild("CharacterToDelimiterMappings");
-        if (charToDelimiter != null)
-            addToMap(charToDelimiter.getChildren(CHARTODEL_MAPPING_EL),
-                    mappings);
+        String[] mappings = new String[ FontInfo.NUMBER_OF_CHAR_CODES ];
+        Element delimiters = root.getChild( "CharacterToDelimiterMappings" );
+        if( delimiters != null ) {
+            addToMap( delimiters.getChildren( CHAR_MAPPING_EL ),
+                      mappings );
+        }
         return mappings;
     }
-    
+
     private static void addToMap(List<Element> mapList, String[] table)
         throws ResourceParseException {
         for (Object obj : mapList) {
@@ -95,7 +97,7 @@ public class TeXFormulaSettingsParser {
                         "must have a value that contains exactly 1 character!");
         }
     }
-    
+
     public Set<String> parseTextStyles() throws ResourceParseException {
         final Set<String> res = new HashSet<>();
         final Element textStyles = root.getChild("TextStyles");
