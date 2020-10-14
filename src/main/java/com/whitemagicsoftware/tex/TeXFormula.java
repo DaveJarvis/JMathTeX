@@ -925,22 +925,29 @@ public class TeXFormula {
      */
     private Atom convertCharacter( char c ) throws ParseException {
       pos++;
-      if( isSymbol( c ) && c < symbolMappings.length ) {
-        final String symbolName = symbolMappings[ c ];
 
-        if( symbolName == null ) {
-          final var m = format( "Unknown character: '%s'", c );
-          throw new ParseException( m );
+      if( isSymbol( c ) ) {
+        if( c < symbolMappings.length ) {
+          final String symbolName = symbolMappings[ c ];
+
+          if( symbolName == null ) {
+            final var m = format( "Unknown character: '%s'", c );
+            throw new ParseException( m );
+          }
+          else {
+            try {
+              return SymbolAtom.get( symbolName );
+            } catch( final SymbolNotFoundException e ) {
+              final var m = format(
+                  "The character '%c' was mapped to unknown symbol name '%s'",
+                  c, symbolName );
+              throw new ParseException( m, e );
+            }
+          }
         }
         else {
-          try {
-            return SymbolAtom.get( symbolName );
-          } catch( final SymbolNotFoundException e ) {
-            final var m = format(
-                "The character '%c' was mapped to unknown symbol name '%s'",
-                c, symbolName );
-            throw new ParseException( m, e );
-          }
+          final var m = format( "Unknown symbol: '%s'", c );
+          throw new ParseException( m );
         }
       }
 
