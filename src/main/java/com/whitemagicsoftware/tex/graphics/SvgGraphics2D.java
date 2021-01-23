@@ -146,35 +146,45 @@ public final class SvgGraphics2D extends AbstractGraphics2D {
 
     while( !iterator.isDone() ) {
       switch( iterator.currentSegment( mCoords ) ) {
-        case 0 -> mSvg.append( 'M' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 1 -> mSvg.append( 'L' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) );
-        case 2 -> mSvg.append( 'Q' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 3 ] ) );
-        case 3 -> mSvg.append( 'C' )
-                      .append( toGeometryPrecision( mCoords[ 0 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 1 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 2 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 3 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 4 ] ) )
-                      .append( ' ' )
-                      .append( toGeometryPrecision( mCoords[ 5 ] ) );
-        case 4 -> mSvg.append( 'Z' );
+        case 0:
+          mSvg.append( 'M' )
+              .append( toGeometryPrecision( mCoords[ 0 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 1 ] ) );
+          break;
+        case 1:
+          mSvg.append( 'L' )
+              .append( toGeometryPrecision( mCoords[ 0 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 1 ] ) );
+          break;
+        case 2:
+          mSvg.append( 'Q' )
+              .append( toGeometryPrecision( mCoords[ 0 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 1 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 2 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 3 ] ) );
+          break;
+        case 3:
+          mSvg.append( 'C' )
+              .append( toGeometryPrecision( mCoords[ 0 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 1 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 2 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 3 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 4 ] ) )
+              .append( ' ' )
+              .append( toGeometryPrecision( mCoords[ 5 ] ) );
+          break;
+        case 4:
+          mSvg.append( 'Z' );
+          break;
       }
 
       iterator.next();

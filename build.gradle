@@ -23,6 +23,8 @@ dependencies {
   testImplementation 'junit:junit:4.13'
 }
 
+sourceCompatibility = targetCompatibility = 11
+
 jar {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
