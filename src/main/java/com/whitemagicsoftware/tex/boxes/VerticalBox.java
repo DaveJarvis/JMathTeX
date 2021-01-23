@@ -50,21 +50,23 @@ public class VerticalBox extends Box {
     this();
     add( b );
     switch( alignment ) {
-      case TeXConstants.ALIGN_CENTER -> {
+      case TeXConstants.ALIGN_CENTER:
         final StrutBox s = new StrutBox( 0, rest / 2, 0, 0 );
         super.add( 0, s );
         height += rest / 2;
         depth += rest / 2;
         super.add( s );
-      }
-      case TeXConstants.ALIGN_TOP -> {
+        break;
+
+      case TeXConstants.ALIGN_TOP:
         depth += rest;
         super.add( new StrutBox( 0, rest, 0, 0 ) );
-      }
-      case TeXConstants.ALIGN_BOTTOM -> {
+        break;
+
+      case TeXConstants.ALIGN_BOTTOM:
         height += rest;
         super.add( 0, new StrutBox( 0, rest, 0, 0 ) );
-      }
+        break;
     }
   }
 

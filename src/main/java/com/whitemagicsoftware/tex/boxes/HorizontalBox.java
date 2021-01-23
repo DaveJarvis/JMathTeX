@@ -54,20 +54,22 @@ public final class HorizontalBox extends Box {
   public HorizontalBox( final Box b, final float w, final int alignment ) {
     final float rest = w - b.getWidth();
     switch( alignment ) {
-      case TeXConstants.ALIGN_CENTER -> {
+      case TeXConstants.ALIGN_CENTER:
         final var s = new StrutBox( rest / 2 );
         add( s );
         add( b );
         add( s );
-      }
-      case TeXConstants.ALIGN_LEFT -> {
+        break;
+
+      case TeXConstants.ALIGN_LEFT:
         add( b );
         add( new StrutBox( rest ) );
-      }
-      case TeXConstants.ALIGN_RIGHT -> {
+        break;
+
+      case TeXConstants.ALIGN_RIGHT:
         add( new StrutBox( rest ) );
         add( b );
-      }
+        break;
     }
   }
 
