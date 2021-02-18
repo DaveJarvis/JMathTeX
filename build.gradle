@@ -70,8 +70,8 @@ task squish(type: proguard.gradle.ProGuardTask) {
   // Ensure reflection doesn't break
   dontobfuscate
 
+  // A library has no entry point, so keep all class and member names intact
   keep 'public class com.whitemagicsoftware.tex.** { public *; }'
-  //keepclassmembers 'public class com.whitemagicsoftware.tex.** { *; }'
 
   keep name: 'org.apache.lucene.analysis.tokenattributes.KeywordAttributeImpl'
 }
