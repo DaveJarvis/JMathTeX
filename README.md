@@ -16,9 +16,15 @@ in about 500 milliseconds on modern hardware.
 
 Build the library as follows:
 
-    gradle clean build
+    ./gradlew clean build
 
-This will run the unit tests, which write SVG files into `/tmp` on Linux.
+This runs the unit tests, leaving SVG files in `/tmp` on Linux.
+
+Build an optimized version as follows:
+
+    ./gradlew clean build squish
+
+This runs a bytecode optimizer to produce a smallar JAR file.
 
 # Getting Started
 

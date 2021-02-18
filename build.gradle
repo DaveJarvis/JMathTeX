@@ -1,3 +1,13 @@
+buildscript {
+  repositories {
+    flatDir dirs: 'lib'
+  }
+  dependencies {
+    classpath ':proguard-gradle:'
+    classpath ':proguard:'
+  }
+}
+
 plugins {
   id 'com.github.johnrengelman.shadow' version '6.0.0'
   id 'java'
@@ -41,4 +51,27 @@ jar {
   archiveFileName = "jmathtex.jar"
 
   exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+}
+
+//noinspection UnnecessaryQualifiedReference
+task squish(type: proguard.gradle.ProGuardTask) {
+  libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+  libraryjars "${System.getProperty('java.home')}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+  libraryjars "${System.getProperty('java.home')}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+
+  injars 'build/libs/jmathtex.jar'
+  outjars 'build/libs/jmathtex.out.jar'
+
+  // ProGuard cannot resolve MethodHandle.invokeExact
+  dontwarn 'java.lang.invoke.MethodHandle'
+  dontwarn 'java.awt.**'
+  dontwarn 'org.jaxen.**'
+
+  // Ensure reflection doesn't break
+  dontobfuscate
+
+  keep 'public class com.whitemagicsoftware.tex.** { public *; }'
+  //keepclassmembers 'public class com.whitemagicsoftware.tex.** { *; }'
+
+  keep name: 'org.apache.lucene.analysis.tokenattributes.KeywordAttributeImpl'
 }
