@@ -229,7 +229,9 @@ public final class SvgGraphics2D extends AbstractGraphics2D {
 
   /**
    * Call when no more graphics operations are pending and the content is safe
-   * to convert to an SVG representation. This method is idempotent.
+   * to convert to an SVG representation. This is <em>not</em> idempotent;
+   * reset must be called before attempting to generate the SVG string
+   * returned from this method.
    *
    * @return A complete SVG string that can be rendered to reproduce the TeX
    * primitives.
